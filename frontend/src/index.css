@@ -1,0 +1,19 @@
+@font-face {
+  font-family: "heyam";
+  src: url("fonts/font.ttf") format("truetype");
+}
+@font-face {
+  font-family: "flight";
+  src: url("fonts/June\ in\ Rock\ -\ Personal\ Use.otf") format("truetype");
+}
+
+
+body {
+  background: linear-gradient(rgb(189, 202, 211), rgb(236, 236, 236));
+  background-repeat: no-repeat;
+  height: 120vh;
+  color: black;
+  font-family: "heyam";
+  margin: 0;
+  padding: 0;
+}

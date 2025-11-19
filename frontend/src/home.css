@@ -1,0 +1,153 @@
+.homeContainer {
+  padding: 0 30px;
+  margin: 0;
+  height: 100%;
+}
+nav {
+  display: flex;
+  justify-content: space-between;
+}
+nav a {
+  display: inline-block;
+  text-decoration: 0;
+  color: black;
+  margin-top: 30px;
+}
+.leftLinks,
+.rightLinks {
+  display: flex;
+  gap: 50px;
+}
+.logo h1 {
+  width: 600px;
+  padding: 15px;
+  font-size: 2.5rem;
+  color: #1d546c;
+  margin: 0;
+  text-align: center;
+  background-color: whitesmoke;
+  font-family: "flight";
+  clip-path: polygon(0 0, 100% 0, 91% 84%, 12% 84%);
+}
+.marketingText {
+  width: 800px;
+  height: 200px;
+  display: block;
+  line-height: 3.5rem;
+  padding: 15px;
+  margin: auto;
+  text-align: center;
+  position: relative;
+  margin-top: 20px;
+  transition: 0.5s ease;
+}
+.display {
+  display: none;
+  right: 0;
+}
+.marketingText h1 {
+  font-size: 2.3rem;
+  animation: fromLeft 1s ease;
+  position: relative;
+}
+.marketingText h1 b {
+  color: #1d546c;
+  font-family: "flight";
+  text-transform: uppercase;
+  font-size: 2.8rem;
+  position: relative;
+  animation: forB 2s ease;
+}
+@keyframes forB {
+  from{
+    top: -1000px;
+    left: -1000Px;
+  }
+  to{
+    top: 0;
+    left: 0;
+  }
+}
+@keyframes fromLeft {
+  from {
+    right: 500px;
+    opacity: 0;
+  }
+  to {
+    right: 0;
+    opacity: 1;
+  }
+}
+.marketingText button {
+  background: black;
+  border: none;
+  padding: 10px 20px;
+  display: inline-block;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  width: 140px;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  animation: fromLeft 1s ease;
+  transform: skew(-21deg);
+}
+
+button span {
+  display: inline-block;
+  transform: skew(21deg);
+}
+
+.marketingText button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 100%;
+  left: 0;
+  background: white;
+  opacity: 0;
+  z-index: -1;
+  transition: all 0.5s;
+}
+
+.marketingText button:hover {
+  color: black;
+}
+
+.marketingText button:hover::before {
+  left: 0;
+  right: 0;
+  opacity: 1;
+}
+article {
+  width: 700px;
+  height: 100%;
+  margin: auto;
+  transition: 0.5s ease;
+  position: relative;
+}
+@keyframes fromTop {
+  from {
+    top: 500px;
+  }
+  to {
+    top: 200px;
+  }
+}
+.animateImg{
+  animation: fromTop 2s ease;
+}
+article iframe {
+  width: 100%;
+  height: 330px;
+  border: 0;
+  margin-top: 20px;
+  margin-left: 130px;
+  transition: 0.5s ease;
+}
+
+article iframe::-webkit-scrollbar {
+  display: none;
+}
