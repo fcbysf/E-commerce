@@ -122,9 +122,10 @@ button span {
   opacity: 1;
 }
 article {
-  width: 700px;
   height: 100%;
-  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   transition: 0.5s ease;
   position: relative;
 }
@@ -139,15 +140,155 @@ article {
 .animateImg{
   animation: fromTop 2s ease;
 }
-article iframe {
-  width: 100%;
+article img {
   height: 330px;
-  border: 0;
   margin-top: 20px;
-  margin-left: 130px;
-  transition: 0.5s ease;
+  transition: 0.8s ease;
 }
-
+.puffer{
+  position: relative;
+  left: 140px;
+}
 article iframe::-webkit-scrollbar {
   display: none;
+}
+article small{
+  width: 100px;
+  margin-left: 15px;
+  position: relative;
+}
+.productsImage{
+  width: fit-content;
+  position: relative;
+  left: 150px;
+  scale: .4;
+}
+section{
+  margin-top: 100Px;
+  height: fit-content;
+  animation: fromTop 2s ease;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+
+}
+.forLeft{
+  display: flex;
+  flex-direction: column;
+}
+section small{
+  width: 170px;
+  opacity: .89;
+  margin: auto;
+  animation: scrollAnimationForleftImg ease ;
+  animation-timeline: view();
+  animation-range: entry 0% cover 18%;
+}
+.forLeft img{
+  width: 300px;
+  scale: .8;
+  border-radius: 30px;
+  margin-left: 20px;
+  animation: scrollAnimationForleftImg 2s ease ;
+  animation-timeline: view();
+  animation-range: entry 0% cover 60%;
+}
+.forMiddle{
+  padding-top: 140px;
+  position: relative;
+  z-index: 3;
+  opacity: 0.95;
+
+}
+.forMiddle img{
+  width:550px;
+  height: fit-content;
+  object-fit: cover;
+  border-radius: 30px;
+  animation: scrollAnimationForMiddleImg ease ;
+  animation-timeline: view();
+  animation-range: entry 0% cover 50%;
+}
+.rightP{
+  width: 170px;
+  margin: auto;
+  position: relative;
+  bottom: 60px;
+  opacity: .89;
+      animation: scrollAnimationForRightImg ease ;
+  animation-timeline: view();
+  animation-range: entry 0% cover 60%;
+}
+.forRight img{
+  width: 300px;
+  scale: .8;
+  border-radius: 30px;
+    animation: scrollAnimationForRightImg ease ;
+  animation-timeline: view();
+  animation-range: entry 0% cover 40%;
+}
+.forRight{
+  padding-top: 300px; 
+
+  opacity: .9;
+}
+.textFlowt{
+  position: absolute;
+  font-size: 20rem;
+  top: -250px;
+  opacity: .4;
+  letter-spacing:28px;
+  transition: 1s ease;
+  z-index: 1;
+  color: #1d546c;
+  font-family: "flight";
+  animation: scrollAnimationForText ease ;
+  animation-timeline: view();
+  animation-range: entry 0% cover 50%;
+   transition: all 1.5s ease;
+  
+}
+@keyframes scrollAnimationForText {
+  from{
+    transform: translateY(1000px);
+    opacity: 0;
+    }
+  to{
+    transform: translateY(0);
+    opacity: .4;
+  }
+}
+@keyframes scrollAnimationForMiddleImg {
+from{
+    scale: 0;
+  opacity: 0;
+  transform: translateY(1000px);
+}
+to{
+  opacity: 1;
+  scale: 1;
+  transform: translateY(0);
+}
+}
+@keyframes scrollAnimationForleftImg {
+from{
+  opacity: 0;
+  scale: 0;
+  transform: translateX(-1000px);
+}
+to{
+  opacity: 1;
+  scale: .8;
+  transform: translateX(0);
+}
+}
+@keyframes scrollAnimationForRightImg {
+from{
+  opacity: 0;
+  transform: translateY(1000px);
+}
+to{
+  opacity: 1;
+  transform: translateX(0);
+}
 }
