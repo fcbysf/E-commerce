@@ -13,7 +13,10 @@ class ProductController extends Controller
      */
     public function index()
     {
-        //
+return Product::with('images')
+    ->latest()
+    ->take(6)
+    ->get();
     }
 
 
