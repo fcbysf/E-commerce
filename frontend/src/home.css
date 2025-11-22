@@ -122,7 +122,7 @@ button span {
   right: 0;
   opacity: 1;
 }
-article {
+.homeContainer article {
   height: 100%;
   display: flex;
   justify-content: space-between;
@@ -141,7 +141,7 @@ article {
 .animateImg {
   animation: fromTop 2s ease;
 }
-article img {
+.homeContainer article img {
   height: 330px;
   margin-top: 20px;
   transition: 0.8s ease;
@@ -150,10 +150,10 @@ article img {
   position: relative;
   left: 140px;
 }
-article iframe::-webkit-scrollbar {
+.homeContainer article iframe::-webkit-scrollbar {
   display: none;
 }
-article small {
+.homeContainer article small {
   width: 100px;
   margin-left: 15px;
   position: relative;
@@ -164,7 +164,7 @@ article small {
   left: 150px;
   scale: 0.4;
 }
-section {
+.homeContainer section {
   margin-top: 100px;
   height: fit-content;
   animation: fromTop 2s ease;
@@ -176,7 +176,7 @@ section {
   display: flex;
   flex-direction: column;
 }
-section small {
+.homeContainer section small {
   width: 170px;
   opacity: 0.89;
   margin: auto;
@@ -313,17 +313,7 @@ section small {
   z-index: -1;
   transition: all 1.5s ease;
 }
-.products {
-  width: 100%;
-  margin: auto;
-  margin-bottom: 20px;
-  height: fit-content;
-  align-items: center;
-  justify-content: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 30px;
-}
+
 .product:first-child {
   animation: scrollAnimationForProduct ease;
   animation-timeline: view();
@@ -364,6 +354,17 @@ section small {
     visibility: visible;
     transform: translateY(0);
   }
+}
+.products {
+  width: 100%;
+  margin: auto;
+  margin-bottom: 20px;
+  height: fit-content;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
 }
 .product {
   font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;

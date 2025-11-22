@@ -12,7 +12,7 @@ export default function Home() {
   const [showStock, setShowStock] = useState(false);
   const { api } = useContext(Context);
   useEffect(() => {
-    fetch(api + "product")
+    fetch(api + "homeProducts")
       .then((res) => res.ok && res.json())
       .then((data) => setProducts(data))
       .catch((err) => console.log(err));
