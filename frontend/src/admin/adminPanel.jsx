@@ -28,6 +28,7 @@ export default function AdminPanel(){
             <input type="text" name="description" placeholder="description" /><br />
             <input type="text" name="price" placeholder="price" /><br />
             <input type="text" name="stock" placeholder="stock" /><br />
+            <input type="text" name="category" placeholder="category" /><br />
             main product image  : 
             <input type="file" name="image"  /><br />
             product images :

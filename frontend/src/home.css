@@ -1,8 +1,9 @@
 .homeContainer {
-  padding: 0 30px;
   margin: 0;
   height: 100%;
+  padding: 0 30px;
 }
+
 nav {
   display: flex;
   justify-content: space-between;
@@ -40,7 +41,6 @@ nav a {
   position: relative;
   margin-top: 20px;
   transition: 0.5s ease;
-
 }
 .display {
   display: none;
@@ -50,7 +50,6 @@ nav a {
   font-size: 2.3rem;
   animation: fromLeft 1s ease;
   position: relative;
-
 }
 .marketingText h1 b {
   color: #1d546c;
@@ -61,11 +60,11 @@ nav a {
   animation: forB 2s ease;
 }
 @keyframes forB {
-  from{
+  from {
     top: -1000px;
-    left: -1000Px;
+    left: -1000px;
   }
-  to{
+  to {
     top: 0;
     left: 0;
   }
@@ -123,7 +122,7 @@ button span {
   right: 0;
   opacity: 1;
 }
-article {
+.homeContainer article {
   height: 100%;
   display: flex;
   justify-content: space-between;
@@ -139,158 +138,446 @@ article {
     top: 200px;
   }
 }
-.animateImg{
+.animateImg {
   animation: fromTop 2s ease;
 }
-article img {
+.homeContainer article img {
   height: 330px;
   margin-top: 20px;
   transition: 0.8s ease;
 }
-.puffer{
+.puffer {
   position: relative;
   left: 140px;
 }
-article iframe::-webkit-scrollbar {
+.homeContainer article iframe::-webkit-scrollbar {
   display: none;
 }
-article small{
+.homeContainer article small {
   width: 100px;
   margin-left: 15px;
   position: relative;
 }
-.productsImage{
+.productsImage {
   width: fit-content;
   position: relative;
   left: 150px;
-  scale: .4;
+  scale: 0.4;
 }
-section{
-  margin-top: 100Px;
+.homeContainer section {
+  margin-top: 100px;
   height: fit-content;
   animation: fromTop 2s ease;
   position: relative;
   display: flex;
   justify-content: space-between;
-
 }
-.forLeft{
+.forLeft {
   display: flex;
   flex-direction: column;
 }
-section small{
+.homeContainer section small {
   width: 170px;
-  opacity: .89;
+  opacity: 0.89;
   margin: auto;
-  animation: scrollAnimationForleftImg ease ;
+  animation: scrollAnimationForleftImg ease;
   animation-timeline: view();
   animation-range: entry 0% cover 18%;
 }
-.forLeft img{
+.forLeft img {
   width: 300px;
-  scale: .8;
+  scale: 0.8;
   border-radius: 30px;
   margin-left: 20px;
-  animation: scrollAnimationForleftImg 2s ease ;
+  animation: scrollAnimationForleftImg 2s ease;
   animation-timeline: view();
   animation-range: entry 0% cover 60%;
 }
-.forMiddle{
+.forMiddle {
   padding-top: 140px;
   position: relative;
   z-index: 3;
   opacity: 0.95;
-
 }
-.forMiddle img{
-  width:550px;
+.forMiddle img {
+  width: 550px;
   height: fit-content;
   object-fit: cover;
   border-radius: 30px;
-  animation: scrollAnimationForMiddleImg ease ;
+  animation: scrollAnimationForMiddleImg ease;
   animation-timeline: view();
   animation-range: entry 0% cover 40%;
 }
-.rightP{
+.rightP {
   width: 170px;
   margin: auto;
   position: relative;
   bottom: 60px;
-  opacity: .89;
-      animation: scrollAnimationForRightImg ease ;
+  opacity: 0.89;
+  animation: scrollAnimationForRightImg ease;
   animation-timeline: view();
   animation-range: entry 0% cover 60%;
 }
-.forRight img{
+.forRight img {
   width: 300px;
-  scale: .8;
+  scale: 0.8;
   border-radius: 30px;
-    animation: scrollAnimationForRightImg ease ;
+  animation: scrollAnimationForRightImg ease;
   animation-timeline: view();
   animation-range: entry 0% cover 40%;
 }
-.forRight{
-  padding-top: 300px; 
+.forRight {
+  padding-top: 300px;
 
-  opacity: .9;
+  opacity: 0.9;
 }
-.textFlowt{
+.textFlowt {
   position: absolute;
   font-size: 20rem;
   top: -250px;
-  opacity: .4;
-  letter-spacing:28px;
+  opacity: 0.4;
+  letter-spacing: 28px;
   transition: 1s ease;
   z-index: 1;
   color: #1d546c;
   font-family: "flight";
-  animation: scrollAnimationForText ease ;
+  animation: scrollAnimationForText ease;
   animation-timeline: view();
   animation-range: entry 0% cover 50%;
-   transition: all 1.5s ease;
-  
+  transition: all 1.5s ease;
 }
 @keyframes scrollAnimationForText {
-  from{
+  from {
     transform: translateY(1000px);
     opacity: 0;
-    }
-  to{
+  }
+  to {
     transform: translateY(0);
-    opacity: .4;
+    opacity: 0.4;
   }
 }
 @keyframes scrollAnimationForMiddleImg {
-from{
+  from {
     scale: 0;
-  opacity: 0;
-  transform: translateY(1000px);
-}
-to{
-  opacity: 1;
-  scale: 1;
-  transform: translateY(0);
-}
+    opacity: 0;
+    transform: translateY(1000px);
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes scrollAnimationForleftImg {
-from{
-  opacity: 0;
-  scale: 0;
-  transform: translateX(-1000px);
-}
-to{
-  opacity: 1;
-  scale: .8;
-  transform: translateX(0);
-}
+  from {
+    opacity: 0;
+    scale: 0;
+    transform: translateX(-1000px);
+  }
+  to {
+    opacity: 1;
+    scale: 0.8;
+    transform: translateX(0);
+  }
 }
 @keyframes scrollAnimationForRightImg {
-from{
+  from {
+    opacity: 0;
+    transform: translateY(1000px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.lastProducts {
+  margin-top: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+.lastProducts h1 {
+  position: absolute;
+  font-size: 16rem;
+  top: -350px;
+  opacity: 0.4;
+  letter-spacing: 23px;
+  transition: 1s ease;
+  z-index: 1;
+  color: #1d546c;
+  font-family: "flight";
+  animation: scrollAnimationForText ease;
+  animation-timeline: view();
+  animation-range: entry 0% cover 50%;
+  z-index: -1;
+  transition: all 1.5s ease;
+}
+
+.product:first-child {
+  animation: scrollAnimationForProduct ease;
+  animation-timeline: view();
+  animation-range: entry 0% cover 30%;
+}
+.product:nth-child(2) {
+  animation: scrollAnimationForProduct ease;
+  animation-timeline: view();
+  animation-range: entry 0% cover 40%;
+}
+.product:nth-child(3) {
+  animation: scrollAnimationForProduct ease;
+  animation-timeline: view();
+  animation-range: entry 0% cover 45%;
+}
+.product:nth-child(4) {
+  animation: scrollAnimationForProduct ease;
+  animation-timeline: view();
+  animation-range: entry 0% cover 30%;
+}
+.product:nth-child(5) {
+  animation: scrollAnimationForProduct ease;
+  animation-timeline: view();
+  animation-range: entry 0% cover 40%;
+}
+.product:nth-child(6) {
+  animation: scrollAnimationForProduct ease;
+  animation-timeline: view();
+  animation-range: entry 0% cover 40%;
+}
+
+@keyframes scrollAnimationForProduct {
+  from {
+    visibility: hidden;
+    transform: translateY(1000px);
+  }
+  to {
+    visibility: visible;
+    transform: translateY(0);
+  }
+}
+.products {
+  width: 100%;
+  margin: auto;
+  margin-bottom: 20px;
+  height: fit-content;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+.product {
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  width: 25%;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: fit-content;
+  background: #dedede;
+  background: linear-gradient(
+    141deg,
+    rgb(219, 219, 219) 5%,
+    rgba(255, 255, 255, 1) 90%
+  );
+  box-shadow: 4px 4px 10px rgba(110, 110, 110, 0.274);
+  transition: 0.5s ease;
+}
+.product:hover {
+  transform: translateY(-3px);
+  background: linear-gradient(141deg, #093b502d 0%, rgb(255, 255, 255) 90%);
+}
+.product:hover .productInfos {
+  background: transparent;
+}
+.image-wrapper {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  padding: 15px;
+}
+.image-wrapper::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  width: 40%;
+  height: 20px;
+  background: radial-gradient(
+    ellipse,
+    rgba(0, 0, 0, 0.4) 0%,
+    rgba(0, 0, 0, 0) 70%
+  );
+  filter: blur(5px);
+}
+.image-wrapper p {
+  opacity: 0.8;
+  font-size: 0.9rem;
+  border-radius: 20px;
+  transition: 0.6s ease;
+  position: absolute;
+  background-color: white;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
+  width: 150px;
+  text-align: center;
+}
+.product img {
+  width: 400px;
+  height: 200px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+.product .productInfos {
+  background-color: white;
+  width: 100%;
+  text-align: center;
+  border-radius: 15px;
+  padding-bottom: 10px;
+}
+.price {
+  display: flex;
+  justify-content: space-around;
+}
+.cartBtn {
+  width: 120px;
+  height: 40px;
+  padding: 10px;
+  border: none;
+  margin: 10px auto;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 500;
+  position: relative;
+  background-color: #1d546cda;
+  box-shadow: 0 20px 30px -7px rgba(27, 27, 27, 0.219);
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.cart {
+  z-index: 2;
+}
+
+.cartBtn:hover {
+  background-color: #347896;
+  transform: scale(0.96);
+}
+
+.svg {
+  position: absolute;
+  width: 9px;
+  border-radius: 3px;
+  content: "";
+  left: 14px;
+  bottom: 15px;
   opacity: 0;
-  transform: translateY(1000px);
+  z-index: 1;
+  fill: rgb(211, 211, 211);
 }
-to{
-  opacity: 1;
-  transform: translateY(0);
+
+.cartBtn:hover .svg {
+  animation: slide-in-top 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
 }
+
+@keyframes slide-in-top {
+  0% {
+    transform: translateY(-30px);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(0) rotate(-90deg);
+    opacity: 1;
+    visibility: hidden;
+  }
+}
+
+.cartBtn:hover .cart {
+  animation: slide-in-left 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+@keyframes slide-in-left {
+  0% {
+    transform: translateX(-10px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+.button1 {
+  width: fit-content;
+  margin: 13px auto;
+  opacity: 0.95;
+  cursor: pointer;
+  line-height: 1;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: #000;
+  color: #fff;
+  border-radius: 10rem;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  padding-left: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  animation: scrollAnimationForProduct ease;
+  animation-timeline: view();
+  animation-range: entry 0% cover 5%;
+  transition: background-color 0.3s;
+}
+
+.button1__icon-wrapper {
+  flex-shrink: 0;
+  width: 25px;
+  height: 25px;
+  position: relative;
+  color: #000;
+  background-color: #fff;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.button1:hover {
+  background-color: #fff;
+  color: black;
+}
+
+.button1:hover .button1__icon-wrapper {
+  color: #fff;
+  background-color: #000;
+}
+
+.button1__icon-svg--copy {
+  position: absolute;
+  transform: translate(-150%, 150%);
+}
+
+.button1:hover .button1__icon-svg:first-child {
+  transition: transform 0.3s ease-in-out;
+  transform: translate(150%, -150%);
+}
+
+.button1:hover .button1__icon-svg--copy {
+  transition: transform 0.3s ease-in-out 0.1s;
+  transform: translate(0);
 }

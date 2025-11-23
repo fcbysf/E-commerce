@@ -11,11 +11,22 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function homeProducts()
     {
-        //
+           return Product::with('images')
+            ->latest()
+            ->take(6)
+            ->get();
     }
-
+    public function index(Request $request){
+        $category=$request->category;
+        if($category=='allCategories'){
+            return Product::latest()->paginate(40);
+        }
+        else{
+            return Product::where('category',$category)->latest()->paginate(40);
+        }
+    }
 
 
     public function store(Request $request)
