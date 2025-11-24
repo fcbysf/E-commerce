@@ -2,17 +2,18 @@ import { NavLink, useNavigate, useParams } from "react-router-dom";
 import "./shop.css";
 import { useContext, useEffect, useState } from "react";
 import { Context } from "../context/context";
+import { Range } from "react-range";
 
 export default function Shop() {
   const { category } = useParams();
   const navigate = useNavigate();
-  const [priceFiltre, setPriceFilter] = useState(0);
   const [products, setProducts] = useState([]);
   const [showStock, setShowStock] = useState(false);
   const [imageId, setImageId] = useState("");
-
   const { api } = useContext(Context);
   const [checked, setChecked] = useState([]);
+  const [values, setValues] = useState([0, 9999]);
+  const [priceFiltred, setPriceFiltered] = useState("0-9999");
   const [brands, setBrands] = useState([
     { brand: "nike", icon: "/nike-removebg-preview.png" },
     { brand: "adidas", icon: "/download-removebg-preview.png" },
@@ -30,24 +31,31 @@ export default function Shop() {
     "sport",
     "music",
     "gaming",
-    "tech"
+    "tech",
   ];
   useEffect(() => {
-    if (!category) {
-      fetch(api + "product")
-        .then((res) => res.ok && res.json())
-        .then((data) => setProducts(data.data))
-        .catch((err) => console.log(err));
-    }
-  }, []);
+    const timer = setTimeout(() => {
+      setPriceFiltered(values.join("-"));
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, [values]);
+
   useEffect(() => {
-    if (category) {
-      fetch(api + `product?category=${decodeURIComponent(category)}`)
-        .then((res) => res.ok && res.json())
-        .then((data) => setProducts(data.data))
-        .catch((err) => console.log(err));
-    }
-  }, [category]);
+    const [min, max] = priceFiltred.split("-");
+
+    const url = category
+      ? `${api}product?category=${decodeURIComponent(
+          category
+        )}&min=${min}&max=${max}`
+      : `${api}product?min=${min}&max=${max}`;
+
+    fetch(url)
+      .then((res) => res.ok && res.json())
+      .then((data) => setProducts(data.data))
+      .catch((err) => console.log(err));
+  }, [category, priceFiltred]);
+
   return (
     <div className="shopContainer">
       <header>
@@ -130,15 +138,47 @@ export default function Shop() {
                 <h3>price range</h3>
                 <small>reset</small>
               </div>
-              <input
-                type="range"
-                max={9999}
+              <Range
+                step={10}
                 min={0}
-                value={priceFiltre}
-                onChange={(e) => setPriceFilter(e.target.value)}
-              />{" "}
-              <br />
-              starting price ${priceFiltre}
+                max={9999}
+                values={values}
+                onChange={(values) => setValues(values)}
+                renderTrack={({ props, children }) => (
+                  <div
+                    {...props}
+                    style={{
+                      ...props.style,
+                      height: "6px",
+                      width: "100%",
+                      background: "#ddd",
+                    }}
+                  >
+                    {children}
+                  </div>
+                )}
+                renderThumb={({ props }) => (
+                  <div
+                    {...props}
+                    style={{
+                      ...props.style,
+                      height: "20px",
+                      width: "20px",
+                      backgroundColor: "#1d546c",
+                      borderRadius: "50%",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      top: "50%", // center vertically
+                      transform: "translateY(-50%)", // correct alignment
+                    }}
+                  />
+                )}
+              />
+              <span className="minMax">
+                <small>Min ${values[0]}</small>
+                <small>max ${values[1]}</small>
+              </span>
             </div>
             <div className="filterByBrand">
               <div className="topOfpriceDiv">
@@ -162,6 +202,7 @@ export default function Shop() {
           </aside>
           <div className="productsSide">
             {products.map((product) => (
+              // product.price>values[0]&&product.price<values[1]&&
               <div
                 key={product.id}
                 className="oneProduct"

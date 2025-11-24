@@ -20,11 +20,11 @@ class ProductController extends Controller
     }
     public function index(Request $request){
         $category=$request->category;
-        if($category=='allCategories'){
-            return Product::latest()->paginate(40);
+        if($category=='allCategories'||!$category){
+            return Product::whereBetween('price', [$request->min,$request->max])->latest()->paginate(40);
         }
         else{
-            return Product::where('category',$category)->latest()->paginate(40);
+            return Product::where('category',$category)->whereBetween('price', [$request->min,$request->max])->latest()->paginate(40);
         }
     }
 

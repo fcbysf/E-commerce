@@ -4,10 +4,11 @@ import { Context } from "../context/context"
 export default function AdminPanel(){
     const [images, setImages] = useState([])
     const {api} = useContext(Context)
-    console.log(api)
     const submit = (e) => {
         e.preventDefault()
         const formData = new FormData(e.target)
+        const payload = Object.fromEntries(formData)
+        console.log(payload)
         formData.delete('images')
         images.forEach(image => {
             formData.append('images[]', image)
@@ -15,11 +16,7 @@ export default function AdminPanel(){
         fetch(api+ 'product',{
             method:'POST',
             body:formData
-            
         })
-
-        
-
     }
 
     return(

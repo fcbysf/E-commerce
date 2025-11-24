@@ -347,10 +347,12 @@ button span {
 
 @keyframes scrollAnimationForProduct {
   from {
+    filter: blur(50px);
     visibility: hidden;
     transform: translateY(1000px);
   }
   to {
+    filter: blur(0);
     visibility: visible;
     transform: translateY(0);
   }
