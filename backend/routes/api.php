@@ -8,4 +8,5 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::get('homeProducts', [ProductController::class,'homeProducts']);
+Route::get('sameCategoryProducts', [ProductController::class,'sameCategoryProducts']);
 Route::apiResource('product', ProductController::class);

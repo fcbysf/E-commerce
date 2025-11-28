@@ -80,5 +80,10 @@ class ProductController extends Controller
     {
         //
     }
+    public function sameCategoryProducts(Request $request){
+        $category=$request->category;
+        return Product::where('category',$category)->latest()->paginate(40);
+
+    }
 }
 
