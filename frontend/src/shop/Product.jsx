@@ -5,12 +5,12 @@ import { Context } from "../context/context";
 import { useParams } from "react-router-dom";
 
 export default function Product() {
+  const { api } = useContext(Context);
   const { id } = useParams();
   const [product, setProduct] = useState({});
   const [imageSrc, setImagesSrc] = useState("");
   const [recommenedProducts, setRecommendedProducts] = useState([]);
 
-  const { api } = useContext(Context);
   useEffect(() => {
     fetch(`${api}product/${id}`)
       .then((res) => res.ok && res.json())
@@ -70,7 +70,7 @@ export default function Product() {
                 ))}
             </div>
           </div>
-          <div className="productInfos">
+          <div className="oneProductInfos">
             <h1>{product.name}</h1>
             <div className="priceRow">
               <h2>${product.price}</h2>
@@ -96,7 +96,7 @@ export default function Product() {
               (size, soon...)
             </div>
             <div className="btns">
-              <Button />
+              <Button product={product} />
               <BuyButton />
             </div>
           </div>
@@ -128,7 +128,22 @@ export default function Product() {
 
 import styled from "styled-components";
 
-const Button = () => {
+const Button = ({ product }) => {
+  const { api } = useContext(Context);
+  const addToCart = () => {
+    fetch(`${api}cart`,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify({product_id:product.id,quantity:1})
+    })
+    .then(res=>res.ok&&res.json())
+    .then(data=>sessionStorage.setItem('cart',data))
+    .catch(err=>console.log(err))
+
+    }
+  
   return (
     <StyledWrapper>
       <div className="addToCartBtn">
@@ -138,7 +153,7 @@ const Button = () => {
           id="cart-toggle"
           type="checkbox"
         />
-        <label className="cart-button" htmlFor="cart-toggle">
+        <label className="cart-button" htmlFor="cart-toggle"  onClick={addToCart}>
           <span className="cart-icon">
             <svg
               strokeLinejoin="round"

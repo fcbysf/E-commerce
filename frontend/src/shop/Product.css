@@ -60,14 +60,14 @@
   border: 2px solid #1d546c60;
   border-radius: 10px;
 }
-.productInfos{
+.oneProductInfos{
   width: 45%;
   padding: 30px 50px;
   display: flex;
   flex-direction: column;
   font-family: Georgia, 'Times New Roman', Times, serif;
 }
-.productInfos h1{
+.oneProductInfos h1{
   margin: 0;
 }
 .priceRow{
@@ -102,5 +102,6 @@
   background-color: white;
   text-align: center;
   border-radius: 15px;
-  padding-bottom: 10px;;
+  object-fit: contain;
+  padding-bottom: 10px;
 }
