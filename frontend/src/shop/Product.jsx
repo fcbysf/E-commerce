@@ -2,10 +2,10 @@ import NavBar from "../layouts/ShopNavBar";
 import "./Product.css";
 import { useContext, useEffect, useState } from "react";
 import { Context } from "../context/context";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function Product() {
-  const { api } = useContext(Context);
+  const { api,token,isLoggedIn } = useContext(Context);
   const { id } = useParams();
   const [product, setProduct] = useState({});
   const [imageSrc, setImagesSrc] = useState("");
@@ -129,19 +129,25 @@ export default function Product() {
 import styled from "styled-components";
 
 const Button = ({ product }) => {
-  const { api } = useContext(Context);
+  const navigate = useNavigate()
+  const { api, token,isLoggedIn,userId } = useContext(Context);
   const addToCart = () => {
+    if(!isLoggedIn){
+      navigate("/login", { replace: true });
+      return
+    }
     fetch(`${api}cart`,{
       method:'POST',
       headers:{
-        'Content-Type':'application/json'
+        'accept':'application/json',
+        'Content-Type':'application/json',
+        'Authorization': `bearer ${token}`
       },
-      body:JSON.stringify({product_id:product.id,quantity:1})
+      body:JSON.stringify({user_id:userId,product_id:product.id,quantity:1})
     })
     .then(res=>res.ok&&res.json())
     .then(data=>sessionStorage.setItem('cart',data))
     .catch(err=>console.log(err))
-
     }
   
   return (

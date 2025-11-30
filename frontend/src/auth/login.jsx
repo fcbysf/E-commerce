@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
-import { Context } from "../../context/context";
+import { Context } from "../context/context";
 import { useNavigate } from "react-router-dom";
 
 const LogIn = () => {

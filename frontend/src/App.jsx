@@ -5,8 +5,8 @@ import Provider from "./context/context"
 import Shop from "./shop/Shop"
 import Product from "./shop/Product"
 import Cart from "./cart/cart"
-import LogIn from "./auth/login/login"
-import SignUp from "./auth/login/signup/signup"
+import LogIn from "./auth/login"
+import SignUp from "./auth/signup"
 export default function App (){
   return(
     <Provider >

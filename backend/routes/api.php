@@ -23,7 +23,7 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->name('logout');
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
-    return $request->user();
+    return $request->user()->id;
 });
 //  PRODUCT ROUTES
 Route::get('homeProducts', [ProductController::class,'homeProducts']);

@@ -5,7 +5,8 @@ export const Context = createContext();
 const Provider = ({ children }) => {
   const api = "http://localhost:8000/api/";
   const [token, setToken] = useState(sessionStorage.getItem("token") || null);
-  const [isLoggedIn,setIsLoggedIn] = useState(false)
+  const [isLoggedIn,setIsLoggedIn] = useState(sessionStorage.getItem("token") ? true : false)
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     const storedToken = sessionStorage.getItem("token");
@@ -21,28 +22,26 @@ const Provider = ({ children }) => {
       },
     })
     .then((res) =>{
-        if(res.ok){
-            res.json()
-            setIsLoggedIn(true)
+        if(res.status===200){
+          setIsLoggedIn(true)
+          return res.json()
         }
         else{
             setIsLoggedIn(false)
-            return
         }
     }) 
     .then((data) => {
-      console.log(data);
+      setUserId(data);
     })
     .catch((err) => console.log(err));
   },[token])
-
   const logout = () => {
     setToken(null);
     localStorage.removeItem("token");
   };
 
   return (
-    <Context.Provider value={{ api, token, logout,isLoggedIn,setIsLoggedIn }}>
+    <Context.Provider value={{ api, token, logout,isLoggedIn,setIsLoggedIn,userId }}>
       {children}
     </Context.Provider>
   );

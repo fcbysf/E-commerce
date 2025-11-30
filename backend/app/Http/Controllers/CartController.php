@@ -14,7 +14,7 @@ class CartController extends Controller
     public function index(Request $request)
     {
         $user_id = $request->user()->id;
-        return Cart::with('user')->where('user_id', $user_id)->get();
+        return Cart::with(['user','product'])->where('user_id', $user_id)->get();
     }
 
     /**
@@ -24,6 +24,7 @@ class CartController extends Controller
     {
         try{
             $cartData = $request->validate([
+                'user_id' => 'required',
                 'product_id' => 'required',
                 'quantity' => 'required'
             ]);
@@ -41,7 +42,6 @@ class CartController extends Controller
     public function show(Cart $cart)
     {
         return $cart->load('user');
-
     }
 
     /**
