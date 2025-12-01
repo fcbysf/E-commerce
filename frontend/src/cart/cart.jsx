@@ -1,22 +1,26 @@
 import { useContext, useEffect, useState } from "react";
 import NavBar from "../layouts/ShopNavBar";
 import { Context } from "../context/context";
-import { replace, useNavigate } from "react-router-dom";
+import { NavLink, replace, useNavigate } from "react-router-dom";
 import "./cart.css";
 export default function Cart() {
   const navigate = useNavigate();
   const [cart, setCart] = useState([]);
   const [total, setTotal] = useState(0);
+  const [address, setaddress] = useState("");
+  const [phone, setPhone] = useState("");
+  const [orderCompleted, setOrderCompleted] = useState(false);
   const { api, token, isLoggedIn } = useContext(Context);
-  useEffect(() =>{
+
+  useEffect(() => {
     let total = 0;
-    if(cart){
-      cart.forEach(c => {
-        total+=(c.product.price * c.quantity)
+    if (cart) {
+      cart.forEach((c) => {
+        total += c.product.price * c.quantity;
       });
-      setTotal(total+3.5)
+      setTotal(total + 3.5);
     }
-  },[cart])
+  }, [cart]);
   useEffect(() => {
     if (!isLoggedIn) {
       navigate("/login", replace);
@@ -33,13 +37,56 @@ export default function Cart() {
         .catch((err) => console.log(err));
     }
   }, [token, isLoggedIn]);
+  const finishOrder = () => {
+    fetch(`${api}order`, {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        cart: cart,
+        address,
+        phone,
+        total_price: total,
+      }),
+    })
+      .then((res) => {
+        if (res.ok) {
+          setOrderCompleted(true);
+        }
+      })
+      .then(() => {
+        fetch(`${api}cart`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+          .then((res) => res.json())
+          .then((data) => setCart(data))
+          .catch((err) => console.log(err));
+      })
+      .catch((err) => console.log(err));
+  };
   return (
     <div className="cartContainer">
       <NavBar />
       <main className="cartMain">
+        {cart.length === 0 && !orderCompleted && (
+          <div className="emptyCart">
+            <h1>cart is empty</h1>
+          </div>
+        )}
+        {orderCompleted && (
+          <h3>
+            order finished, see order status in{" "}
+            <NavLink to={"/orders"}>Orders</NavLink>
+          </h3>
+        )}
         <div className="cartProducts">
           {cart?.map((c) => (
-            <div className="cartP">
+            <div className="cartP" key={c.id}>
               <div className="cartPImg">
                 <img src={c.product.image} alt="" width={100} />
               </div>
@@ -56,46 +103,70 @@ export default function Cart() {
             </div>
           ))}
         </div>
-        <div className="cartCheckout">
-          {cart.map((c) => (
-            <div className="productAndPrice">
-              <p>{c.product.name}</p>
-              <p>${c.product.price}</p>
+        {cart.length !== 0 && (
+          <div className="cartCheckout">
+            {cart.map((c) => (
+              <div className="productAndPrice" key={c.id}>
+                <p>{c.product.name}</p>
+                <p>${c.product.price}</p>
+              </div>
+            ))}
+            <hr />
+            <div className="dilevry">
+              <p>dilevry : </p>
+              <p>$3.5</p>
             </div>
-          ))}
-          <hr />
-          <div className="dilevry">
-            <p>dilevry : </p>
-            <p>$3.5</p>
-          </div>
-          <hr />
-          <div className="total">
-            <p>total : </p>
-            <p>${total}</p>
-          </div>
-          <label className="order-wrapper">
-            <input type="checkbox" id="order-toggle" hidden />
-            <span className="order">
-              <span className="default">Click To Finish Checkout</span>
-              <span className="success">
-                Order Finished
+            <hr />
+            <div className="total">
+              <p>total : </p>
+              <p>${total}</p>
+            </div>
+            <hr />
+            <div className="inputs">
+              <label htmlFor="address">address : </label>
+              <textarea
+                name="address"
+                id="address"
+                placeholder="address"
+                onChange={(e) => setaddress(e.target.value)}
+              ></textarea>
+              <label htmlFor="phone">Phone : </label>
+              <input
+                type="number"
+                name="phone"
+                id="phone"
+                placeholder="Phone"
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            </div>
+            <label className="order-wrapper">
+               <input type={(address.length>=8&&phone.length>=8)?"checkbox":""} id="order-toggle" hidden onClick={finishOrder}/>
+            <span className={(address.length>=8&&phone.length>=8)?"order":"orderDisabled"}  >
+              <span className="default">{(address.length>=8&&phone.length>=8)?"Finish Checkout":"fill all inputs"}</span>
+              {(address.length>=8&&phone.length>=8)&&
+                <>
+                <span className="success">
+                {(address.length>=8&&phone.length>=8)&&"Order Finished"}
                 <svg viewBox="0 0 12 10">
                   <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
                 </svg>
               </span>
-              <div className="box"></div>
-              <div className="truck">
-                <div className="back"></div>
-                <div className="front">
-                  <div className="window"></div>
+                <div className="box"></div>
+                <div className="truck">
+                  <div className="back"></div>
+                  <div className="front">
+                    <div className="window"></div>
+                  </div>
+                  <div className="light top"></div>
+                  <div className="light bottom"></div>
                 </div>
-                <div className="light top"></div>
-                <div className="light bottom"></div>
-              </div>
-              <div className="lines"></div>
-            </span>
-          </label>
-        </div>
+                <div className="lines"></div>
+                </>
+                }
+              </span>
+            </label>
+          </div>
+        )}
       </main>
     </div>
   );

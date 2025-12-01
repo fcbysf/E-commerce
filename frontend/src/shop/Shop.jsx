@@ -11,9 +11,11 @@ export default function Shop() {
   const [products, setProducts] = useState([]);
   const [showStock, setShowStock] = useState(false);
   const [imageId, setImageId] = useState("");
-  const { api } = useContext(Context);
+  const { api, token, userId } = useContext(Context);
   const [checked, setChecked] = useState([]);
+  const [productAddedId, setProductAddedId] = useState(null);
   const [values, setValues] = useState([0, 9999]);
+  const [added, setAdded] = useState(false);
   const [priceFiltred, setPriceFiltered] = useState("0-9999");
   const [brands, setBrands] = useState([
     { brand: "nike", icon: "/nike-removebg-preview.png" },
@@ -34,6 +36,14 @@ export default function Shop() {
     "gaming",
     "tech",
   ];
+  useEffect(() => {
+    if (added) {
+      setTimeout(() => {
+        setAdded(false);
+      }, 3000);
+    }
+    return clearTimeout();
+  }, [added]);
   useEffect(() => {
     const timer = setTimeout(() => {
       setPriceFiltered(values.join("-"));
@@ -56,10 +66,30 @@ export default function Shop() {
       .then((data) => setProducts(data.data))
       .catch((err) => console.log(err));
   }, [category, priceFiltred]);
+  const addToCart = (product) => {
+    setProductAddedId(product.id);
+    fetch(`${api}cart`, {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `bearer ${token}`,
+      },
+      body: JSON.stringify({
+        user_id: userId,
+        product_id: product.id,
+        quantity: 1,
+      }),
+    })
+      .then((res) => res.ok && res.json())
+      .then((data) => sessionStorage.setItem("cart", data))
+      .then(() => setAdded(true))
+      .catch((err) => console.log(err));
+  };
 
   return (
     <div className="shopContainer">
-     <NavBar />
+      <NavBar />
       <main>
         <div className="categories">
           {categories.map((c) => (
@@ -173,7 +203,7 @@ export default function Shop() {
                   <i>$ {product.price}</i>
                   <button
                     className="cartBtn"
-                    onClick={() => navigate(`/product`)}
+                    onClick={() => addToCart(product)}
                   >
                     <svg
                       className="cart"
@@ -194,6 +224,29 @@ export default function Shop() {
                       <path d="M211.8 0c7.8 0 14.3 5.7 16.7 13.2C240.8 51.9 277.1 80 320 80s79.2-28.1 91.5-66.8C413.9 5.7 420.4 0 428.2 0h12.6c22.5 0 44.2 7.9 61.5 22.3L628.5 127.4c6.6 5.5 10.7 13.5 11.4 22.1s-2.1 17.1-7.8 23.6l-56 64c-11.4 13.1-31.2 14.6-44.6 3.5L480 197.7V448c0 35.3-28.7 64-64 64H224c-35.3 0-64-28.7-64-64V197.7l-51.5 42.9c-13.3 11.1-33.1 9.6-44.6-3.5l-56-64c-5.7-6.5-8.5-15-7.8-23.6s4.8-16.6 11.4-22.1L137.7 22.3C155 7.9 176.7 0 199.2 0h12.6z"></path>
                     </svg>
                   </button>
+                  {added && product.id === productAddedId &&
+                    <div className="success">
+                      <div className="success__icon">
+                        <svg
+                          fill="none"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          width="24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            clip-rule="evenodd"
+                            d="m12 1c-6.075 0-11 4.925-11 11s4.925 11 11 11 11-4.925 11-11-4.925-11-11-11zm4.768 9.14c.0878-.1004.1546-.21726.1966-.34383.0419-.12657.0581-.26026.0477-.39319-.0105-.13293-.0475-.26242-.1087-.38085-.0613-.11844-.1456-.22342-.2481-.30879-.1024-.08536-.2209-.14938-.3484-.18828s-.2616-.0519-.3942-.03823c-.1327.01366-.2612.05372-.3782.1178-.1169.06409-.2198.15091-.3027.25537l-4.3 5.159-2.225-2.226c-.1886-.1822-.4412-.283-.7034-.2807s-.51301.1075-.69842.2929-.29058.4362-.29285.6984c-.00228.2622.09851.5148.28067.7034l3 3c.0983.0982.2159.1748.3454.2251.1295.0502.2681.0729.4069.0665.1387-.0063.2747-.0414.3991-.1032.1244-.0617.2347-.1487.3236-.2554z"
+                            fill="#393a37"
+                            fill-rule="evenodd"
+                          ></path>
+                        </svg>
+                      </div>
+                      <div className="success__title">
+                        Product added to cart
+                      </div>
+                    </div>
+                  }
                 </div>
               </div>
             ))}
