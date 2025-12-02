@@ -14,8 +14,12 @@ class OrderController extends Controller
      */
     public function index()
     {
-        //
+        
     }
+    public function userOrders(Request $request){
+        return Order::with('items.product')->where('user_id',$request->user()->id)->get();
+    }
+
 
     /**
      * Store a newly created resource in storage.

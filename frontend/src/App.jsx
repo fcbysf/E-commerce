@@ -7,6 +7,7 @@ import Product from "./shop/Product"
 import Cart from "./cart/cart"
 import LogIn from "./auth/login"
 import SignUp from "./auth/signup"
+import Order from "./order/oder"
 export default function App (){
   return(
     <Provider >
@@ -19,6 +20,7 @@ export default function App (){
           <Route path="/cart" element={<Cart />} />
           <Route path="/login" element={<LogIn />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/orders" element={<Order />} />
           <Route path="*" element={<Home />} />
         </Routes>
       </BrowserRouter>

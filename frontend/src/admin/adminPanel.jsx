@@ -7,8 +7,6 @@ export default function AdminPanel() {
   const submit = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
-    const payload = Object.fromEntries(formData);
-    console.log(payload);
     formData.delete("images");
     images.forEach((image) => {
       formData.append("images[]", image);
@@ -20,8 +18,8 @@ export default function AdminPanel() {
       },
       body: formData,
     });
-  };
-
+  }
+  
   return (
     <form onSubmit={submit} encType="multipart/form-data">
       <input type="text" name="name" placeholder="name" />

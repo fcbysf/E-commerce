@@ -3,6 +3,7 @@ import NavBar from "../layouts/ShopNavBar";
 import { Context } from "../context/context";
 import { NavLink, replace, useNavigate } from "react-router-dom";
 import "./cart.css";
+
 export default function Cart() {
   const navigate = useNavigate();
   const [cart, setCart] = useState([]);
@@ -75,7 +76,7 @@ export default function Cart() {
       <main className="cartMain">
         {cart.length === 0 && !orderCompleted && (
           <div className="emptyCart">
-            <h1>cart is empty</h1>
+            <h1>cart is empty, <NavLink to={"/shop"}>shop now</NavLink></h1>
           </div>
         )}
         {orderCompleted && (
