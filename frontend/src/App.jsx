@@ -10,11 +10,11 @@ import SignUp from "./auth/signup"
 import Order from "./order/oder"
 export default function App (){
   return(
-    <Provider >
+    <Provider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home/>} />
-          <Route path="/admin" element={<AdminPanel/>} />
+          <Route path="/admin/:place?" element={<AdminPanel/>} />
           <Route path="/shop/:category?" element={<Shop/>} />
           <Route path="/product/:id" element={<Product />} />
           <Route path="/cart" element={<Cart />} />

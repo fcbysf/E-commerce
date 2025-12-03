@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\OrderController;
 
 //auth routes
@@ -35,5 +36,7 @@ Route::middleware(['auth:sanctum'])->apiResource('cart', CartController::class);
 
 //  ORDER ROUTES
 Route::middleware(['auth:sanctum'])->apiResource('order', OrderController::class);
+
 Route::middleware(['auth:sanctum'])->get('userOrders', [OrderController::class,'userOrders']);
+
 
