@@ -85,7 +85,7 @@ hr{
   gap :7px;
   margin-top: 10px;
 }
-.inputs input, textarea{
+.inputs input,.inputs textarea{
     min-width: 90%;
     max-width: 90%;
     max-height: 60px;

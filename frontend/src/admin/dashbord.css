@@ -1,0 +1,55 @@
+.dachbordContainer{
+    width: 80%;
+    min-height: 100vh;
+    max-height: 100%;
+    margin: 0;
+    padding: 0;
+}
+.generalInfos{
+    width: 60%;
+    padding: 20px;
+    background-color: rgba(235, 235, 235, 0.418);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    margin-top: 15px;
+    gap: 10px;
+}
+.generalInfos label{
+    font-weight: 550;
+}
+.generalInfos input,.generalInfos textarea{
+    max-width: 100%;
+    min-width: 100%;
+    max-height: 110px;
+    padding: 15px ;
+    outline: 0;
+    border-radius: 10px;
+    border: 0;
+    background-color: rgba(241, 241, 241, 0.842);
+    margin-top: 7px;
+}
+.generalInfos textarea{
+    resize: none;
+}
+.sizesBtns{
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+}
+.sizeBtn{
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(241, 241, 241, 0.842);
+    border-radius: 10px;
+    cursor: pointer;
+    padding: 25px;
+}
+.selectedSize{
+    background-color: #1a4c61ab;
+    color: #fff;
+    box-shadow: 4px 5Px 10px rgba(136, 136, 136, 0.603);
+}

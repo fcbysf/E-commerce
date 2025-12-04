@@ -1,0 +1,36 @@
+.adminSideBar{
+    width: 18%;
+    min-height: 100vh;
+    max-height: 100%;
+    background-color:#13323fce ;
+    color: #fff;
+    border-radius: 10px;
+    margin: 0;
+}
+.adminSideBar h2{
+    padding: 15px 5px 0 20px;
+}
+aside{
+    margin: 0;
+    padding: 0;
+}
+.sideLinks{
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.sideLinks a{
+    text-decoration: none;
+    color: #ffffffde;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 30px;
+}
+.activeLink{
+    background-color: rgba(245, 245, 245, 0.13);
+    width: 100%;
+    border-radius: 10px;
+    padding: 10px 30px !important;
+}

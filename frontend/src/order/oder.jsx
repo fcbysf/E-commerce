@@ -5,11 +5,16 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 import "./order.css";
+import { useNavigate } from "react-router-dom";
 
 export default function Order() {
+  const navigate =useNavigate()
   const [orders, setOrders] = useState([]);
-  const { api, userId, token } = useContext(Context);
+  const { api, token,isLoggedIn } = useContext(Context);
   useEffect(() => {
+    if(!isLoggedIn){
+      navigate("/login")
+    }
     fetch(`${api}userOrders`, {
       headers: {
         accept: "application/json",
@@ -37,7 +42,7 @@ export default function Order() {
             </tr>
           </thead>
           <tbody>
-            {orders.map((order) => (
+            {orders?.map((order) => (
               <Fragment key={order.id}>
                 <tr>
                   <td>#{order.id}</td>
@@ -69,7 +74,7 @@ export default function Order() {
                 orders items
             </h2>}
         <div className="ordredP">
-          {orders.map((order) =>
+          {orders?.map((order) =>
             order.items.map((item) => (
               <div className="ordredProduct" key={item.id}>
                 <div className="productImg">
