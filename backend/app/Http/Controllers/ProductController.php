@@ -32,18 +32,21 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $productData = $request->validate([
-            'name' => 'required',
-            'description' => 'required',
-            'image' => 'required',
-            'price' => 'required',
+            'name' => 'required|min:6',
+            'description' => 'required|min:10',
+            'image' => 'required|image|file',
+            'price' => 'required|numeric',
             'discount' => 'nullable',
-            'stock' => 'required',
+            'images'=>'required|array',
+            'images.*' => 'required|image|file',
+            'stock' => 'required|numeric',
             'category' => 'nullable'
         ]);
         $file= $request->file('image');
         $file->store('images', 'public');
         $productData['image'] = url('storage/images/' . $file->hashName());
         $product=Product::create($productData);
+        if($request->file('images')){
         foreach($request->file('images') as $file) {
             $file->store('images', 'public');
             $filePath = url('storage/images/' . $file->hashName());
@@ -52,6 +55,7 @@ class ProductController extends Controller
                 'image_url' => $filePath
             ]);
         }
+    }
         return response()->json($product->load('images'));
     }
     

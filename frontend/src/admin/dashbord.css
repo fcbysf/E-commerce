@@ -1,55 +1,209 @@
-.dachbordContainer{
-    width: 80%;
-    min-height: 100vh;
-    max-height: 100%;
-    margin: 0;
-    padding: 0;
+.dachbordContainer {
+  width: 80%;
+  min-height: 100vh;
+  max-height: 100%;
+  margin: 0;
+  padding: 0;
 }
-.generalInfos{
-    width: 60%;
-    padding: 20px;
-    background-color: rgba(235, 235, 235, 0.418);
-    border-radius: 20px;
+.generalInfos {
+  width: 100%;
+  padding: 20px;
+  background-color: rgba(235, 235, 235, 0.418);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 15px;
+  gap: 10px;
+}
+.generalInfos label {
+  font-weight: 550;
+}
+.generalInfos input,
+.generalInfos textarea {
+  max-width: 100%;
+  min-width: 100%;
+  max-height: 110px;
+  padding: 15px;
+  outline: 0;
+  border-radius: 10px;
+  border: 0;
+  background-color: rgba(241, 241, 241, 0.842);
+  margin-top: 7px;
+}
+.generalInfos textarea {
+  resize: none;
+}
+.sizesBtns {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.sizeBtn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(241, 241, 241, 0.842);
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 25px;
+}
+.selectedSize {
+  background-color: #1a4c6180;
+  color: #fff;
+  box-shadow: 4px 5px 10px rgba(136, 136, 136, 0.603);
+}
+.otherInfos {
+  width: 100%;
+  padding: 20px;
+  margin-top: 20px;
+  background-color: rgba(235, 235, 235, 0.699);
+  border-radius: 20px;
+}
+.addProductInofs {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.addProductInofs div {
+  width: 47%;
+}
+.addProductInofs input {
+  width: 100%;
+  padding: 15px;
+  outline: 0;
+  border-radius: 10px;
+  border: 0;
+  background-color: rgba(241, 241, 241, 0.842);
+  margin-top: 7px;
+}
+.dachbordContainer form {
+  display: flex;
+  justify-content: start;
+}
+.dachbordContainer .formRightSide {
+  width: 60%;
+  padding: 20px;
+  padding-top: 7px;
+}
+
+.custum-file-upload {
+  width: 100%;
+  height: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #f1f1f188;
+  background-color: rgba(255, 255, 255, 0.192);
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0px 48px 35px -48px rgba(0, 0, 0, 0.1);
+}
+
+.custum-file-upload .icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custum-file-upload .icon svg {
+  height: 80px;
+  fill: rgba(75, 85, 99, 1);
+}
+
+.custum-file-upload .text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custum-file-upload .text span {
+  font-weight: 400;
+  color: rgba(75, 85, 99, 1);
+}
+
+.custum-file-upload input {
+  display: none;
+}
+.custum-file-upload img {
+  width: 300px;
+  height: 160px;
+  object-fit: contain;
+}
+.otherImgs label {
+  width:125px;
+  height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed #f1f1f188;
+  background-color: rgba(255, 255, 255, 0.192);
+  color: rgba(75, 85, 99, 1);
+  font-size: 1.6rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.otherImgs label span {
+  font-weight: 550;
+  border-radius: 50%;
+  padding: 20px;
+}
+.otherImgs input {
+  display: none;
+}
+.formRightSide .otherImgs {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+.otherimgswrapper{
+    width:125px;
+    height: 120px;
     display: flex;
-    flex-direction: column;
-    margin-top: 15px;
-    gap: 10px;
-}
-.generalInfos label{
-    font-weight: 550;
-}
-.generalInfos input,.generalInfos textarea{
-    max-width: 100%;
-    min-width: 100%;
-    max-height: 110px;
-    padding: 15px ;
-    outline: 0;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.192);
     border-radius: 10px;
-    border: 0;
-    background-color: rgba(241, 241, 241, 0.842);
-    margin-top: 7px;
+    position: relative;
+    margin-left: 6.5px;
 }
-.generalInfos textarea{
-    resize: none;
+.formRightSide .otherImgs img {
+    width: 80px;
+    height: 110px;
+    object-fit: contain;
+    border-radius: 10px;
+    padding: 5px;
 }
-.sizesBtns{
-    margin-top: 10px;
-    display: flex;
-    gap: 10px;
+.formRightSide .otherImgs .deleteImg{
+    color: rgba(143, 143, 143, 0.788);
+    cursor: pointer;
+    position: absolute;
+    right: 5px;
+    top: 0;
+    
 }
-.sizeBtn{
-    width: 30px;
-    height: 30px;
+.fancy{
     display: flex;
     align-items: center;
-    justify-content: center;
-    background-color: rgba(241, 241, 241, 0.842);
-    border-radius: 10px;
+    width: 200px;
+    padding: 9px;
+    border: 0;
+    border-radius: 25px;
     cursor: pointer;
-    padding: 25px;
-}
-.selectedSize{
-    background-color: #1a4c61ab;
+    float: right;
+    margin-bottom: 6px;
+    background-color: #1a4c616e;
     color: #fff;
-    box-shadow: 4px 5Px 10px rgba(136, 136, 136, 0.603);
+}
+.errorInp{
+    color: rgba(241, 48, 48, 0.863);
+    margin:4px 10px;
 }

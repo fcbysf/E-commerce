@@ -39,36 +39,39 @@ export default function Cart() {
     }
   }, [token, isLoggedIn]);
   const finishOrder = () => {
-    fetch(`${api}order`, {
-      method: "POST",
-      headers: {
-        accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        cart: cart,
-        address,
-        phone,
-        total_price: total,
-      }),
-    })
-      .then((res) => {
-        if (res.ok) {
-          setOrderCompleted(true);
-        }
-      })
-      .then(() => {
-        fetch(`${api}cart`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-          .then((res) => res.json())
-          .then((data) => setCart(data))
-          .catch((err) => console.log(err));
-      })
-      .catch((err) => console.log(err));
+            setTimeout(()=>{
+
+              fetch(`${api}order`, {
+                method: "POST",
+                headers: {
+                  accept: "application/json",
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                  cart: cart,
+                  address,
+                  phone,
+                  total_price: total,
+                }),
+              })
+                .then((res) => {
+                  if (res.ok) {
+                      setOrderCompleted(true);
+                  }
+                })
+                .then(() => {
+                  fetch(`${api}cart`, {
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  })
+                    .then((res) => res.json())
+                    .then((data) => setCart(data))
+                    .catch((err) => console.log(err));
+                })
+                .catch((err) => console.log(err));
+        },6500)
   };
   return (
     <div className="cartContainer">
