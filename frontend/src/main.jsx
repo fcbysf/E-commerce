@@ -14,12 +14,16 @@ createRoot(document.getElementById("root")).render(
           fontSize: "1.2rem",
         },
         success: {
-          backgroundColor: "lightgreen",
-          color: "white",
+          style: {
+            backgroundColor: "lightgreen",
+            color: "white",
+          },
         },
         error: {
-          backgroundColor: "red",
-          color: "white",
+          style: {
+            backgroundColor: "red",
+            color: "white",
+          },
         },
       }}
     />

@@ -6,30 +6,32 @@
 .orderContainer .orders{
     padding: 20px 50px;
 }
-table{
+.orderContainer table{
     border-collapse: collapse;
     width: 100%;
     text-align: center;
     
 }
-table th,td{
+.orderContainer table th,td{
     border: 1px solid rgba(0, 0, 0, 0.11);
     padding:10px;
 }
-th{
+.orderContainer th{
     background-color: rgba(245, 245, 245, 0.507);
     padding: 10px;
 }
-td{
+.orderContainer td{
     padding: 0 10px;
+    background-color: #ffffffa1;
 }
-.orderItems{
-    width: 100%;
 
-}
 .ordredP{
-width: 100%;
+width: 90%;
+margin:30px auto;
 display: flex;
+background-color: #ffffffa1;
+padding: 20px;
+border-radius: 10px;
 flex-wrap: wrap;
 gap: 20px;
 padding-left: 30px;
@@ -37,7 +39,8 @@ padding-left: 30px;
 .ordredProduct img{
     width: 180px;
     height: 180px;
-    object-fit: contain
+    object-fit: contain;
+    border-right:2px solid rgba(0, 0, 0, 0.068) ;
 }
 .pNames{
     display: flex;

@@ -14,10 +14,11 @@ class OrderController extends Controller
      */
     public function index()
     {
-        
+     return Order::with('items.product','user')->latest()->get();
+       
     }
     public function userOrders(Request $request){
-        return Order::with('items.product')->where('user_id',$request->user()->id)->get();
+        return Order::with('items.product',)->where('user_id',$request->user()->id)->get();
     }
 
 
@@ -50,7 +51,7 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        //
+        return $order->load('items.product','user');
     }
 
     /**
@@ -66,6 +67,7 @@ class OrderController extends Controller
      */
     public function destroy(Order $order)
     {
-        //
+        $order->delete();
+        return response()->json("order deleted");
     }
 }

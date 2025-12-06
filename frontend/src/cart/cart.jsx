@@ -3,6 +3,7 @@ import NavBar from "../layouts/ShopNavBar";
 import { Context } from "../context/context";
 import { NavLink, replace, useNavigate } from "react-router-dom";
 import "./cart.css";
+import toast from "react-hot-toast";
 
 export default function Cart() {
   const navigate = useNavigate();
@@ -13,6 +14,17 @@ export default function Cart() {
   const [orderCompleted, setOrderCompleted] = useState(false);
   const { api, token, isLoggedIn } = useContext(Context);
 
+
+  function fetching(){
+      fetch(`${api}cart`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => setCart(data))
+        .catch((err) => console.log(err));
+  }
   useEffect(() => {
     let total = 0;
     if (cart) {
@@ -28,19 +40,11 @@ export default function Cart() {
       return;
     }
     if (token) {
-      fetch(`${api}cart`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => setCart(data))
-        .catch((err) => console.log(err));
+      fetching();
     }
   }, [token, isLoggedIn]);
   const finishOrder = () => {
             setTimeout(()=>{
-
               fetch(`${api}order`, {
                 method: "POST",
                 headers: {
@@ -61,18 +65,24 @@ export default function Cart() {
                   }
                 })
                 .then(() => {
-                  fetch(`${api}cart`, {
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                  })
-                    .then((res) => res.json())
-                    .then((data) => setCart(data))
-                    .catch((err) => console.log(err));
+                  fetching();
+                  toast.success("order finished");
                 })
                 .catch((err) => console.log(err));
         },6500)
   };
+  const removeFromCart = (c) => {
+    fetch(`${api}cart/${c.id}`, {
+      method: "DELETE",
+      headers: {
+        accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) =>res.ok  && toast.success("product removed from cart")||toast.error("product not removed from cart"))
+      .then(() => fetching())
+      .catch((err) => console.log(err));
+  }
   return (
     <div className="cartContainer">
       <NavBar />
@@ -97,7 +107,7 @@ export default function Cart() {
               <div className="cartDetails">
                 <div className="titleAndCancel">
                   <h2 style={{ marginBottom: 0 }}>{c.product.name}</h2>
-                  <small>X</small>
+                  <small onClick={()=>removeFromCart(c)}>X</small>
                 </div>
                 <p style={{ opacity: 0.6, textIndent: 10 }}>
                   ${c.product.price}

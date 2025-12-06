@@ -1,5 +1,7 @@
 .shopContainer {
+
   width: 100%;
+  min-height: 100vh;
   height: 100%;
 }
 
@@ -198,4 +200,12 @@
 
 .success__close path {
   fill: #2B641E;
+}
+
+.noProducts{
+  width: 100%;
+  height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

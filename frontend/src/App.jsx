@@ -14,7 +14,7 @@ export default function App (){
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home/>} />
-          <Route path="/admin/:place?" element={<AdminPanel/>} />
+          <Route path="/admin/:place?/:number?" element={<AdminPanel/>} />
           <Route path="/shop/:category?" element={<Shop/>} />
           <Route path="/product/:id" element={<Product />} />
           <Route path="/cart" element={<Cart />} />

@@ -1,0 +1,103 @@
+.adminOrdersContainer{
+  width: 80%;
+  min-height: 100vh;
+  max-height: 100%;
+  margin-top: 10px;
+}
+.loader{
+    width: 81%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.adminOrdersContainer h1{
+    margin: 0;
+}
+.adminOrdersContainer table{
+    width: 97%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    text-align: center;
+}
+.adminOrdersContainer table th,.adminOrdersContainer table td{
+    padding: 15px;
+    border: 0;
+}
+.adminOrdersContainer table tr:hover{
+    background-color: rgba(255, 255, 255, 0.377);
+    cursor: pointer;
+}
+.selected{
+    background-color: rgba(255, 255, 255, 0.377);
+}
+.adminOrdersContainer td{
+    background-color: rgba(255, 255, 255, 0.377);
+    
+}
+.adminOrdersContainer th{
+    background-color: rgba(255, 255, 255, 0.781);
+    border-bottom: 1px solid #6b6b6b49 !important;
+}
+.adminOrders{
+    width: 100%;
+    display: flex;
+    gap: 10px;
+}
+.orderDialog{
+    width: 30%;
+    min-height: 100vh;
+    max-height: 100%;
+    background-color: rgba(255, 255, 255, 0.89);
+    border-radius: 5px;
+    margin-top: 10px;
+    padding: 10px;
+    animation: slide .7s ease-in-out;
+
+}
+.stsAndDate{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 7px;
+}
+.stsAndDate small{
+    text-decoration: underline;
+}
+.pending,.done{
+    width: fit-content;;
+    padding: 5px 10px;
+    border-radius: 10px;
+}
+.pending{
+    background-color: rgba(247, 176, 45, 0.822);
+    color: #fff;
+}
+.done{
+    background-color: lightgreen;
+    color: #fff;
+}
+.orderUserInfs{
+    margin-top: 30px;
+    line-height: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.orderUserInfs p{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+}
+@keyframes slide {
+    from{
+        width: 0%;
+        opacity: 0;
+    }
+    to{
+        width: 30%;
+        opacity: 1;
+    }
+    
+}

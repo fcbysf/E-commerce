@@ -36,7 +36,6 @@ Route::middleware(['auth:sanctum'])->apiResource('cart', CartController::class);
 
 //  ORDER ROUTES
 Route::middleware(['auth:sanctum'])->apiResource('order', OrderController::class);
-
 Route::middleware(['auth:sanctum'])->get('userOrders', [OrderController::class,'userOrders']);
 
 

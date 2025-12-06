@@ -57,6 +57,7 @@ class CartController extends Controller
      */
     public function destroy(Cart $cart)
     {
-        //
+        $cart->delete();
+        return response()->json("cart deleted");
     }
 }

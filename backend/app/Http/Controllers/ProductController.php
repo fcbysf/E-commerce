@@ -34,11 +34,11 @@ class ProductController extends Controller
         $productData = $request->validate([
             'name' => 'required|min:6',
             'description' => 'required|min:10',
-            'image' => 'required|image|file',
+            'image' => 'required|image|file|max:2042',
             'price' => 'required|numeric',
             'discount' => 'nullable',
             'images'=>'required|array',
-            'images.*' => 'required|image|file',
+            'images.*' => 'required|image|file|max:2042',
             'stock' => 'required|numeric',
             'category' => 'nullable'
         ]);
@@ -82,7 +82,8 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        //
+        $product->delete();
+        return response()->json("product deleted");
     }
     public function sameCategoryProducts(Request $request){
         $category=$request->category;

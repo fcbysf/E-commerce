@@ -2,8 +2,7 @@
   width: 80%;
   min-height: 100vh;
   max-height: 100%;
-  margin: 0;
-  padding: 0;
+  margin-top: 25px;
 }
 .generalInfos {
   width: 100%;
@@ -161,12 +160,12 @@
   width: 100%;
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 5px;
   margin-top: 20px;
 }
 .otherimgswrapper{
     width:125px;
-    height: 120px;
+    height: 140px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -176,8 +175,8 @@
     margin-left: 6.5px;
 }
 .formRightSide .otherImgs img {
-    width: 80px;
-    height: 110px;
+    width: fit-content;
+    height: 130px;
     object-fit: contain;
     border-radius: 10px;
     padding: 5px;

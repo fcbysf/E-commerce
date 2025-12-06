@@ -70,13 +70,13 @@ export default function Order() {
         </table>
           {orders.length==0&&<h2 style={{textAlign:"center"}}>no orders yet</h2>
 ||
-            <h2 style={{margin:1}}>
+            <h2 style={{margin:20}}>
                 orders items
             </h2>}
-        <div className="ordredP">
+        {orders.length>0&&<div className="ordredP">
           {orders?.map((order) =>
             order.items.map((item) => (
-              <div className="ordredProduct" key={item.id}>
+              <div className="ordredProduct" key={item.id} onClick={()=>navigate(`/product/${item.product.id}`)}>
                 <div className="productImg">
                   <img src={item.product.image} alt="" />
                 </div>
@@ -87,7 +87,7 @@ export default function Order() {
               </div>
             ))
           )}
-        </div>
+        </div>}
       </div>
     </div>
   );
