@@ -6,15 +6,11 @@ import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 import Loader from "../layouts/loader";
 import "./admineOrders.css";
-import { useNavigate, useParams } from "react-router-dom";
 
 export default function AdminOrders() {
-  const navigate = useNavigate();
-  const { number } = useParams();
   const { api, token } = useContext(Context);
   const [loader, setLoader] = useState(true);
   const [orders, setOrders] = useState([]);
-  const [order, setOrder] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
   useEffect(() => {
     fetch(`${api}order`, {
@@ -34,23 +30,6 @@ export default function AdminOrders() {
       })
       .catch((err) => console.log(err));
   }, []);
-  useEffect(() => {
-    if (number) {
-      fetch(`${api}order/${number}`, {
-        headers: {
-          accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then((res) => {
-          if (res.ok) {
-            return res.json();
-          }
-        })
-        .then((data) => setOrder(data))
-        .catch((err) => console.log(err));
-    }
-  }, [number]);
   if (loader)
     return (
       <div className="loader">
@@ -76,10 +55,7 @@ export default function AdminOrders() {
             {orders.map((order) => (
               <tr
                 key={order.id}
-                onClick={() => {
-                    setSelectedOrder(order.id);
-                  navigate(`/admin/orders/${order.id}`);
-                }}
+                onClick={() => setSelectedOrder(order.id)}
                 className={selectedOrder === order.id ? "selected" : ""}
               >
                 <td>#{order.id}</td>
@@ -94,69 +70,153 @@ export default function AdminOrders() {
                   {order.status}
                 </td>
                 <td>${order.total_price}</td>
-                <td>{dayjs(order.createdAt).toString().slice(5, 17)}</td>
+                <td>{dayjs(order.created_at).toString().slice(5, 17)}</td>
                 <td>(delete...)</td>
               </tr>
             ))}
           </tbody>
         </table>
-        {order && number && (
-          <div className="orderDialog">
-            <h2>order #{order.id}</h2>
-            <div className="stsAndDate">
-              <p
-                className={`${order.status == "pending" ? "pending" : "done"}`}
-              >
-                {order.status}
-              </p>
-              <small>{dayjs(order.createdAt).toString().slice(5, 17)}</small>
-            </div>
-            <div className="orderUserInfs">
-              <p>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  class="icon icon-tabler icons-tabler-filled icon-tabler-user"
-                >
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                  <path d="M12 2a5 5 0 1 1 -5 5l.005 -.217a5 5 0 0 1 4.995 -4.783z" />
-                  <path d="M14 14a5 5 0 0 1 5 5v1a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-1a5 5 0 0 1 5 -5h4z" />
-                </svg>{" "}
-                {order.user.name}
-              </p>
-              <p>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  class="icon icon-tabler icons-tabler-filled icon-tabler-phone"
-                >
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                  <path d="M9 3a1 1 0 0 1 .877 .519l.051 .11l2 5a1 1 0 0 1 -.313 1.16l-.1 .068l-1.674 1.004l.063 .103a10 10 0 0 0 3.132 3.132l.102 .062l1.005 -1.672a1 1 0 0 1 1.113 -.453l.115 .039l5 2a1 1 0 0 1 .622 .807l.007 .121v4c0 1.657 -1.343 3 -3.06 2.998c-8.579 -.521 -15.418 -7.36 -15.94 -15.998a3 3 0 0 1 2.824 -2.995l.176 -.005h4z" />
-                </svg>
-                {order.phone}
-              </p>
-              <p>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  class="icon icon-tabler icons-tabler-filled icon-tabler-map-pin"
-                >
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                  <path d="M18.364 4.636a9 9 0 0 1 .203 12.519l-.203 .21l-4.243 4.242a3 3 0 0 1 -4.097 .135l-.144 -.135l-4.244 -4.243a9 9 0 0 1 12.728 -12.728zm-6.364 3.364a3 3 0 1 0 0 6a3 3 0 0 0 0 -6z" />
-                </svg>{" "}
-                {order.address}
-              </p>
-            </div>
-          </div>
+        {orders?.map(
+          (order) =>
+            order.id == selectedOrder && (
+              <div className="orderDialog">
+                <div className="orderNumAndCancel">
+                  <h2>order #{order.id}</h2>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="icon icon-tabler icons-tabler-outline icon-tabler-x"
+                    onClick={() => setSelectedOrder(null)}
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M18 6l-12 12" />
+                    <path d="M6 6l12 12" />
+                  </svg>
+                </div>
+                <div className="stsAndDate">
+                  <p
+                    className={`${
+                      order.status == "pending" ? "pending" : "done"
+                    }`}
+                  >
+                    {order.status}
+                  </p>
+                  <small>
+                    {dayjs(order.createdAt).toString().slice(5, 17)}
+                  </small>
+                </div>
+                <div className="orderUserInfs">
+                  <p>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      class="icon icon-tabler icons-tabler-filled icon-tabler-user"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M12 2a5 5 0 1 1 -5 5l.005 -.217a5 5 0 0 1 4.995 -4.783z" />
+                      <path d="M14 14a5 5 0 0 1 5 5v1a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-1a5 5 0 0 1 5 -5h4z" />
+                    </svg>{" "}
+                    {order.user.name}
+                  </p>
+                  <p>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      class="icon icon-tabler icons-tabler-filled icon-tabler-phone"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M9 3a1 1 0 0 1 .877 .519l.051 .11l2 5a1 1 0 0 1 -.313 1.16l-.1 .068l-1.674 1.004l.063 .103a10 10 0 0 0 3.132 3.132l.102 .062l1.005 -1.672a1 1 0 0 1 1.113 -.453l.115 .039l5 2a1 1 0 0 1 .622 .807l.007 .121v4c0 1.657 -1.343 3 -3.06 2.998c-8.579 -.521 -15.418 -7.36 -15.94 -15.998a3 3 0 0 1 2.824 -2.995l.176 -.005h4z" />
+                    </svg>
+                    {order.phone}
+                  </p>
+                  <p>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      class="icon icon-tabler icons-tabler-filled icon-tabler-map-pin"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M18.364 4.636a9 9 0 0 1 .203 12.519l-.203 .21l-4.243 4.242a3 3 0 0 1 -4.097 .135l-.144 -.135l-4.244 -4.243a9 9 0 0 1 12.728 -12.728zm-6.364 3.364a3 3 0 1 0 0 6a3 3 0 0 0 0 -6z" />
+                    </svg>{" "}
+                    {order.address}
+                  </p>
+                </div>
+                <div className="orderUserItems">
+                  {order.items.map((item) => (
+                    <div className="orderUserItem">
+                      <div className="imgWrapper">
+                        <img src={item.product.image} alt="" />
+                      </div>
+                      <div className="nameAndPrice">
+                        <p>{item.product.name}</p>
+                        <small>${item.product.price}</small>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="orderUserTotal">
+                  <small>total</small>
+                  <p>${order.total_price}</p>
+                </div>
+                <div className="orderBtns">
+                  <button>
+                    order done{" "}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="icon icon-tabler icons-tabler-outline icon-tabler-check"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M5 12l5 5l10 -10" />
+                    </svg>
+                  </button>
+                  <button>
+                    cancel order {" "}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                        stroke-linejoin="round"
+                      class="icon icon-tabler icons-tabler-outline icon-tabler-x"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M18 6l-12 12" />
+                      <path d="M6 6l12 12" />
+                    </svg>
+                  </button>
+                
+
+                </div>
+              </div>
+            )
         )}
       </div>
     </div>

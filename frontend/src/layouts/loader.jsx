@@ -22,8 +22,8 @@ const StyledWrapper = styled.div`
   }
 
   .circle1 {
-    width: 20px;
-    height: 20px;
+    width: 15px;
+    height: 15px;
     border-radius: 50%;
     margin: 0 10px;
     background-color: #333;

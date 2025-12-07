@@ -52,8 +52,7 @@
     border-radius: 5px;
     margin-top: 10px;
     padding: 10px;
-    animation: slide .7s ease-in-out;
-
+    box-shadow: 8px 8px 36px rgba(97, 97, 97, 0.514);
 }
 .stsAndDate{
     display: flex;
@@ -83,12 +82,32 @@
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+    position: relative;
 }
 .orderUserInfs p{
     display: flex;
     align-items: center;
     gap: 5px;
+}
+.orderNumAndCancel{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.orderUserInfs::after{
+    content: "";
+    display: block;
+    width: 100%;
+    position: absolute;
+    height: 2px;
+    border-radius: 20px;
+    background-color: rgba(180, 180, 180, 0.199);
+    bottom: -15px;
+}
 
+.orderNumAndCancel svg{
+    cursor: pointer;
+    opacity: .5;
 }
 @keyframes slide {
     from{
@@ -100,4 +119,76 @@
         opacity: 1;
     }
     
+}
+.orderUserItems{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 30px;
+}
+.orderUserItem{
+    display: flex;
+    gap: 10px;
+}
+.orderUserItems .imgWrapper{
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #6b6b6b49;
+}
+.orderUserItems img{
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    border-radius: 10px;
+}
+.orderUserItem .nameAndPrice p{
+    color: rgba(0, 0, 0, 0.747);
+}
+.orderUserTotal{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    align-items: center;
+    padding: 9px 5px;
+    border-top: 1px solid #6b6b6b1e;
+    border-bottom: 1px solid #6b6b6b1e; 
+}
+.orderUserTotal p{
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+.orderBtns{
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: center;
+}
+.orderBtns button{
+    color: white;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 105px;
+    padding: 5px 10px;
+    border: 0;
+    cursor: pointer
+}
+.orderBtns button:first-of-type{
+    background-color: rgba(69, 196, 69, 0.938)
+}
+.orderBtns button:first-of-type:hover{
+    background-color: rgb(69, 184, 69)
+}
+.orderBtns button:last-of-type{
+    background-color:rgba(209, 57, 57, 0.938)
+}
+.orderBtns button:last-of-type:hover{
+    background-color:rgb(189, 52, 52)
+
 }
