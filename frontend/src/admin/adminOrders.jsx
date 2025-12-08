@@ -6,13 +6,27 @@ import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 import Loader from "../layouts/loader";
 import "./admineOrders.css";
+import { toast } from "react-hot-toast";
 
 export default function AdminOrders() {
   const { api, token } = useContext(Context);
   const [loader, setLoader] = useState(true);
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  useEffect(() => {
+  const [menuId, setMenuId] = useState(null);
+  const [status, setStatus] = useState("all");
+  const [search, setSearch] = useState("");
+
+  const toggleMenu = (id) => {
+    if (menuId == id) {
+      setMenuId(null);
+      return;
+    } else {
+      setMenuId(id);
+      return;
+    }
+  };
+  function fetching() {
     fetch(`${api}order`, {
       headers: {
         accept: "application/json",
@@ -22,6 +36,7 @@ export default function AdminOrders() {
       .then((res) => {
         if (res.ok) {
           setLoader(false);
+          setMenuId(null);
           return res.json();
         }
       })
@@ -29,7 +44,63 @@ export default function AdminOrders() {
         setOrders(data);
       })
       .catch((err) => console.log(err));
+  }
+  useEffect(() => {
+    fetching();
   }, []);
+  const orderDone = (order) => {
+    if (order.status == "done") return;
+    fetch(`${api}order/${order.id}`, {
+      method: "PUT",
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ status: "done" }),
+    })
+      .then((res) => {
+        if (res.ok) {
+          toast.success("order done");
+          return res.json();
+        }
+      })
+      .then(() => {
+        fetching();
+      })
+      .catch((err) => console.log(err));
+  };
+  const cancelOrder = (order) => {
+    if (order.status == "canceled") return;
+    fetch(`${api}order/${order.id}`, {
+      method: "PUT",
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ status: "canceled" }),
+    })
+      .then((res) => {
+        if (res.ok) {
+          toast.error("order canceled");
+          return res.json();
+        }
+      })
+      .then(() => {
+        fetching();
+      })
+      .catch((err) => console.log(err));
+  };
+  const orderStyle = (status) => {
+    if (status == "pending") {
+      return "orange";
+    } else if (status == "done") {
+      return "green";
+    } else if (status == "canceled") {
+      return "red";
+    }
+  };
   if (loader)
     return (
       <div className="loader">
@@ -38,42 +109,247 @@ export default function AdminOrders() {
     );
   return (
     <div className="adminOrdersContainer">
-      <h1>orders</h1>
+      <div className="filterAndTitle">
+        <h1>orders</h1>
+        <div className="filtersCon">
+          <div className="filter">
+            <p>status: </p>
+            <select
+              defaultValue={status}
+              onChange={(e) => setStatus(e.target.value)}
+            >
+              <option value="all">all</option>
+              <option value="pending">pending</option>
+              <option value="done">done</option>
+              <option value="canceled">canceled</option>
+            </select>
+          </div>
+          <div class="input-container">
+            <input
+              type="text"
+              placeholder="Search Order"
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
       <div className="adminOrders">
         <table>
           <thead>
             <tr>
-              <th>Order Number</th>
-              <th>Customer</th>
-              <th>status</th>
-              <th>total</th>
-              <th>date</th>
-              <th>action</th>
+              <th>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="icon icon-tabler icons-tabler-outline icon-tabler-file-description"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                  <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+                  <path d="M9 17h6" />
+                  <path d="M9 13h6" />
+                </svg>
+                <p>Order Number</p>
+              </th>
+              <th>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  class="icon icon-tabler icons-tabler-filled icon-tabler-user"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M12 2a5 5 0 1 1 -5 5l.005 -.217a5 5 0 0 1 4.995 -4.783z" />
+                  <path d="M14 14a5 5 0 0 1 5 5v1a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-1a5 5 0 0 1 5 -5h4z" />
+                </svg>
+                <p>Customer</p>
+              </th>
+              <th>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  class="icon icon-tabler icons-tabler-filled icon-tabler-hourglass"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M17 2a2 2 0 0 1 1.995 1.85l.005 .15v2a6.996 6.996 0 0 1 -3.393 6a6.994 6.994 0 0 1 3.388 5.728l.005 .272v2a2 2 0 0 1 -1.85 1.995l-.15 .005h-10a2 2 0 0 1 -1.995 -1.85l-.005 -.15v-2a6.996 6.996 0 0 1 3.393 -6a6.994 6.994 0 0 1 -3.388 -5.728l-.005 -.272v-2a2 2 0 0 1 1.85 -1.995l.15 -.005h10z" />
+                </svg>
+                <p>Status</p>
+              </th>
+              <th>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  class="icon icon-tabler icons-tabler-filled icon-tabler-coin"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M17 3.34a10 10 0 1 1 -15 8.66l.005 -.324a10 10 0 0 1 14.995 -8.336zm-5 2.66a1 1 0 0 0 -1 1a3 3 0 1 0 0 6v2a1.024 1.024 0 0 1 -.866 -.398l-.068 -.101a1 1 0 0 0 -1.732 .998a3 3 0 0 0 2.505 1.5h.161a1 1 0 0 0 .883 .994l.117 .007a1 1 0 0 0 1 -1l.176 -.005a3 3 0 0 0 -.176 -5.995v-2c.358 -.012 .671 .14 .866 .398l.068 .101a1 1 0 0 0 1.732 -.998a3 3 0 0 0 -2.505 -1.501h-.161a1 1 0 0 0 -1 -1zm1 7a1 1 0 0 1 0 2v-2zm-2 -4v2a1 1 0 0 1 0 -2z" />
+                </svg>
+                <p>Total</p>
+              </th>
+              <th>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  class="icon icon-tabler icons-tabler-filled icon-tabler-calendar-event"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M16 2a1 1 0 0 1 .993 .883l.007 .117v1h1a3 3 0 0 1 2.995 2.824l.005 .176v12a3 3 0 0 1 -2.824 2.995l-.176 .005h-12a3 3 0 0 1 -2.995 -2.824l-.005 -.176v-12a3 3 0 0 1 2.824 -2.995l.176 -.005h1v-1a1 1 0 0 1 1.993 -.117l.007 .117v1h6v-1a1 1 0 0 1 1 -1m3 7h-14v9.625c0 .705 .386 1.286 .883 1.366l.117 .009h12c.513 0 .936 -.53 .993 -1.215l.007 -.16z" />
+                  <path d="M8 14h2v2h-2z" />
+                </svg>
+                <p>Date</p>
+              </th>
+              <th>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="icon icon-tabler icons-tabler-outline icon-tabler-activity"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M3 12h4l3 8l4 -16l3 8h4" />
+                </svg>
+                <p>Actions</p>
+              </th>
             </tr>
           </thead>
           <tbody>
-            {orders.map((order) => (
-              <tr
-                key={order.id}
-                onClick={() => setSelectedOrder(order.id)}
-                className={selectedOrder === order.id ? "selected" : ""}
-              >
-                <td>#{order.id}</td>
-                <td>{order.user.name}</td>
-                <td
-                  style={{
-                    color: `${
-                      order.status == "pending" ? "orange" : "lightgreen"
-                    }`,
-                  }}
-                >
-                  {order.status}
-                </td>
-                <td>${order.total_price}</td>
-                <td>{dayjs(order.created_at).toString().slice(5, 17)}</td>
-                <td>(delete...)</td>
-              </tr>
-            ))}
+            {orders.map(
+              (order) =>
+                ((status == "all" && order.id.toString().includes(search)) ||
+                  (status == order.status &&
+                    order.id.toString().includes(search))) && (
+                  <tr
+                    key={order.id}
+                    onClick={() => setSelectedOrder(order.id)}
+                    className={selectedOrder === order.id ? "selected" : ""}
+                  >
+                    <td>#{order.id}</td>
+                    <td>{order.user.name}</td>
+                    <td
+                      className="tdorderStatus"
+                      style={{ color: orderStyle(order.status) }}
+                    >
+                      {order.status}{" "}
+                      {order.status == "pending" && (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="icon icon-tabler icons-tabler-outline icon-tabler-hourglass-high"
+                        >
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                          <path d="M6.5 7h11" />
+                          <path d="M6 20v-2a6 6 0 1 1 12 0v2a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1z" />
+                          <path d="M6 4v2a6 6 0 1 0 12 0v-2a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1z" />
+                        </svg>
+                      )}
+                      {order.status == "canceled" && (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#ff3d3d"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="icon icon-tabler icons-tabler-outline icon-tabler-x"
+                        >
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                          <path d="M18 6l-12 12" />
+                          <path d="M6 6l12 12" />
+                        </svg>
+                      )}
+                      {order.status == "done" && (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="#2acb45"
+                          class="icon icon-tabler icons-tabler-filled icon-tabler-circle-check"
+                        >
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                          <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
+                        </svg>
+                      )}
+                    </td>
+                    <td>${order.total_price}</td>
+                    <td>{dayjs(order.created_at).toString().slice(5, 17)}</td>
+                    <td className="menuWrapper">
+                      {order.status !== "done" && (
+                        <label
+                          className="hamburger"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleMenu(order.id);
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            onClick={(e) => e.stopPropagation()}
+                            checked={menuId == order.id}
+                          />
+                          <svg viewBox="0 0 32 32">
+                            <path
+                              className="line line-top-bottom"
+                              d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"
+                            ></path>
+                            <path className="line" d="M7 16 27 16"></path>
+                          </svg>
+                        </label>
+                      )}
+                      <div
+                        className="menu"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {menuId == order.id && order.status == "pending" && (
+                          <>
+                            <span onClick={() => cancelOrder(order)}>
+                              cancel order❌
+                            </span>
+                            <span onClick={() => orderDone(order)}>
+                              order done✅
+                            </span>
+                          </>
+                        )}
+                        {order.id == menuId && <span>block user🚫</span>}
+                      </div>
+                    </td>
+                  </tr>
+                )
+            )}
           </tbody>
         </table>
         {orders?.map(
@@ -102,9 +378,8 @@ export default function AdminOrders() {
                 </div>
                 <div className="stsAndDate">
                   <p
-                    className={`${
-                      order.status == "pending" ? "pending" : "done"
-                    }`}
+                    style={{ backgroundColor: `${orderStyle(order.status)}` }}
+                    className="pending"
                   >
                     {order.status}
                   </p>
@@ -174,47 +449,47 @@ export default function AdminOrders() {
                   <small>total</small>
                   <p>${order.total_price}</p>
                 </div>
-                <div className="orderBtns">
-                  <button>
-                    order done{" "}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="icon icon-tabler icons-tabler-outline icon-tabler-check"
-                    >
-                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                      <path d="M5 12l5 5l10 -10" />
-                    </svg>
-                  </button>
-                  <button>
-                    cancel order {" "}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
+                {order.status == "pending" && (
+                  <div className="orderBtns">
+                    <button onClick={() => orderDone(order)}>
+                      order done{" "}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
                         stroke-linejoin="round"
-                      class="icon icon-tabler icons-tabler-outline icon-tabler-x"
-                    >
-                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                      <path d="M18 6l-12 12" />
-                      <path d="M6 6l12 12" />
-                    </svg>
-                  </button>
-                
-
-                </div>
+                        class="icon icon-tabler icons-tabler-outline icon-tabler-check"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M5 12l5 5l10 -10" />
+                      </svg>
+                    </button>
+                    <button onClick={() => cancelOrder(order)}>
+                      cancel order{" "}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="icon icon-tabler icons-tabler-outline icon-tabler-x"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M18 6l-12 12" />
+                        <path d="M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                )}
               </div>
             )
         )}

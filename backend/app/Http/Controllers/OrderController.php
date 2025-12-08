@@ -59,7 +59,12 @@ class OrderController extends Controller
      */
     public function update(Request $request, Order $order)
     {
-        //
+        $request->validate([
+            'status' =>'required'
+        ]);
+        $order->status = $request->input('status');
+        $order->save();
+        return response()->json("order updated");
     }
 
     /**
