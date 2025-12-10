@@ -8,6 +8,7 @@ import Cart from "./cart/cart"
 import LogIn from "./auth/login"
 import SignUp from "./auth/signup"
 import Order from "./order/oder"
+import AdminProducts from "./admin/adminProducts"
 export default function App (){
   return(
     <Provider>

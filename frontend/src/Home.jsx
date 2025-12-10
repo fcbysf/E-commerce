@@ -67,9 +67,11 @@ export default function Home() {
             className="puffer"
             src="puffer.gif"
             style={{ overflow: "hidden" }}
+            loading="lazy"
           />
           <img
             src="products_image-removebg-preview (2).png"
+            loading="lazy"
             className="productsImage"
           />
         </article>
@@ -79,6 +81,7 @@ export default function Home() {
         <div className="forLeft">
           <img
             src="vue-rapprochee-d-une-personne-portant-des-baskets-futuristes.jpg"
+            loading="lazy"
             alt=""
           />
           <small>
@@ -89,6 +92,7 @@ export default function Home() {
         <div className="forMiddle">
           <img
             src="gros-plan-sur-un-homme-devant-des-piles-de-vetements.jpg"
+            loading="lazy"
             alt=""
           />
         </div>
@@ -99,7 +103,7 @@ export default function Home() {
               click away.
             </small>
           </div>
-          <img src="f7af44fe62017af88857e939d7550b9f.jpg" alt="" />
+          <img src="f7af44fe62017af88857e939d7550b9f.jpg" alt="" loading="lazy" />
         </div>
       </section>
       <div className="lastProducts">
@@ -116,7 +120,7 @@ export default function Home() {
               onMouseOut={() => setShowStock(false)}
             >
               <div className="image-wrapper" onClick={()=>navigate(`/product/${product.id}`)}>
-                <img src={product.image} alt="" />
+                <img src={product.image} alt=""  loading="lazy"/>
                 {showStock && product.id === imageId && (
                   <p>{product.stock} left</p>
                 )}

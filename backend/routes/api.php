@@ -29,6 +29,7 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 //  PRODUCT ROUTES
 Route::get('homeProducts', [ProductController::class,'homeProducts']);
 Route::get('sameCategoryProducts', [ProductController::class,'sameCategoryProducts']);
+Route::get('adminProducts', [ProductController::class,'adminProducts']);
 Route::apiResource('product', ProductController::class);
 
 //  CART ROUTES

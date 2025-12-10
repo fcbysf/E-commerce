@@ -16,6 +16,7 @@
 }
 .adminOrdersContainer table{
     width: 97%;
+    height: fit-content;
     border-collapse: collapse;
     margin-top: 5px;
     text-align: center;
@@ -58,6 +59,7 @@
 .adminOrders{
     width: 100%;
     display: flex;
+    gap: 5px;
 }
 .orderDialog{
     width: 30%;

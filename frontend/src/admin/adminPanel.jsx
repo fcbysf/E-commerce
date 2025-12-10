@@ -3,6 +3,7 @@ import SideBAr from "./sideBar";
 import Dashbord from "./dashbord";
 import { useParams } from "react-router-dom";
 import AdminOrders from "./adminOrders";
+import AdminProducts from "./adminProducts";
 
 export default function AdminPanel() {
   const {place} = useParams()
@@ -11,6 +12,7 @@ export default function AdminPanel() {
       <SideBAr />
       {place === "dashbord" && <Dashbord />}
       {place==='orders'&& <AdminOrders />}
+      {place=='products' && <AdminProducts />}
     </div>
 
   );

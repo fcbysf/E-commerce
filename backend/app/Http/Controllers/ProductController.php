@@ -18,6 +18,9 @@ class ProductController extends Controller
             ->take(6)
             ->get();
     }
+    public function adminProducts(){
+        return Product::latest()->get();
+    }
     public function index(Request $request){
         $category=$request->category;
         if($category=='allCategories'||!$category){
