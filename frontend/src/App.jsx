@@ -8,20 +8,20 @@ import Cart from "./cart/cart"
 import LogIn from "./auth/login"
 import SignUp from "./auth/signup"
 import Order from "./order/oder"
-import AdminProducts from "./admin/adminProducts"
 export default function App (){
   return(
     <Provider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home/>} />
-          <Route path="/admin/:place?/:number?" element={<AdminPanel/>} />
+          <Route path="/admin/:place?/:id?" element={<AdminPanel/>} />
           <Route path="/shop/:category?" element={<Shop/>} />
           <Route path="/product/:id" element={<Product />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/login" element={<LogIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/orders" element={<Order />} />
+
           <Route path="*" element={<Home />} />
         </Routes>
       </BrowserRouter>

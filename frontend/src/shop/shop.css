@@ -1,78 +1,76 @@
 .shopContainer {
-
   width: 100%;
-  min-height: 100vh;
   height: 100%;
 }
 
-.shopContainer main{
-    padding: 0 20px;
-    margin-top: 20px;
+.shopContainer main {
+  padding: 0 20px;
+  margin-top: 20px;
 }
-.shopContainer main .categories{
-    display: flex;
-    align-items: center;
-    gap: 20px;
+.shopContainer main .categories {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
-.shopContainer main a{
-    text-decoration: 0;
-    font-family: cursive;
-    font-weight: 400;
-    color: black;
-    padding:4px 30px;
-    background-color: white;
-    border-radius: 20px;
-    text-align: center;
+.shopContainer main a {
+  text-decoration: 0;
+  font-family: cursive;
+  font-weight: 400;
+  color: black;
+  padding: 4px 30px;
+  background-color: white;
+  border-radius: 20px;
+  text-align: center;
 }
-.shopContainer section  {
-    width: 100%;
-    display: flex;
-    /* width: 40%; */
+.shopContainer section {
+  width: 100%;
+  display: flex;
+  /* width: 40%; */
 }
-.shopContainer section aside{
-    width: 17%;
-    height: 100%;
+.shopContainer section aside {
+  width: 17%;
+  height: 100%;
 }
-.filterByPrice{
-    width: 100%;
-    padding:0px 20px 15px 20px;
-    background-color: #fff;
-    border-radius: 15px;
-    margin-top: 20px;
-    font-family: cursive;
+.filterByPrice {
+  width: 100%;
+  padding: 0px 20px 15px 20px;
+  background-color: #fff;
+  border-radius: 15px;
+  margin-top: 20px;
+  font-family: cursive;
 }
-.topOfpriceDiv{
-    display: flex;
-    justify-content: space-between;
-    align-items: center; 
+.topOfpriceDiv {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-.minMax{
+.minMax {
   display: flex;
   justify-content: space-between;
   margin-top: 15px;
 }
-.filterByBrand{
-    width: 100%;
-    height: 100%;
-    padding:0px 20px 20px 20px;
-    background-color: #fff;
-    border-radius: 15px;
-    margin-top: 2px;
-    font-family: cursive;
+.filterByBrand {
+  width: 100%;
+  height: 100%;
+  padding: 0px 20px 20px 20px;
+  background-color: #fff;
+  border-radius: 15px;
+  margin-top: 2px;
+  font-family: cursive;
 }
-.brand{
-    display: flex;
-    justify-content: space-between;
+.brand {
+  display: flex;
+  justify-content: space-between;
 }
-.brand .leftBrand{
-    display: flex;
+.brand .leftBrand {
+  display: flex;
 }
-.brand .leftBrand img{
-    object-fit: contain;
-    margin-right: 15px;
+.brand .leftBrand img {
+  object-fit: contain;
+  margin-right: 15px;
 }
 .brand input {
-    accent-color:#437f99;
+  accent-color: #437f99;
 }
 .productsSide {
   width: 77%;
@@ -97,11 +95,7 @@
   justify-content: center;
   align-items: center;
   background: #dedede;
-  background: linear-gradient(
-    141deg,
-    hsla(240, 2%, 76%, 0.308) 10%,
-    #fff 90%
-  );
+  background: linear-gradient(141deg, hsla(240, 2%, 76%, 0.308) 10%, #fff 90%);
   box-shadow: 4px 4px 10px rgba(110, 110, 110, 0.274);
   transition: 0.5s ease;
 }
@@ -159,9 +153,9 @@
   padding-bottom: 10px;
 }
 
-
 .success {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   width: 80%;
   margin: auto;
   padding: 10px;
@@ -169,7 +163,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: start;
-  background: #EDFBD8;
+  background: #edfbd8;
   border-radius: 8px;
   box-shadow: 0px 0px 5px -3px #111;
 }
@@ -182,13 +176,13 @@
 }
 
 .success__icon path {
-  fill: #84D65A;
+  fill: #84d65a;
 }
 
 .success__title {
   font-weight: 500;
   font-size: 14px;
-  color: #2B641E;
+  color: #2b641e;
 }
 
 .success__close {
@@ -199,10 +193,10 @@
 }
 
 .success__close path {
-  fill: #2B641E;
+  fill: #2b641e;
 }
 
-.noProducts{
+.noProducts {
   width: 100%;
   height: 400px;
   display: flex;

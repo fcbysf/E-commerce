@@ -4,3 +4,57 @@
   max-height: 100%;
   margin-top: 10px;
 }
+.adminProductsContainer table{
+    width: 97%;
+    height: fit-content;
+    border-collapse: collapse;
+    margin-top: 5px;
+    text-align: center;
+}
+.adminProductsContainer table th,.adminProductsContainer table td{
+    padding: 13px;
+    border: 0;
+}
+.adminProductsContainer th{
+    background-color: rgba(255, 255, 255, 0.781);
+    border-bottom: 1px solid #6b6b6b49 !important;
+    text-transform: capitalize;
+}
+.adminProductsContainer table tr{
+    position: relative;
+}
+.adminProductsContainer table tr:hover{
+    background-color: rgba(255, 255, 255, 0.377);
+    cursor: pointer;
+}
+.prdctclmn{
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.prdctclmn img{
+  width: 50px;
+  scale: 1.6;
+  object-fit: contain;
+}
+.svgs{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+.icon-tabler-eye{
+  color: rgba(6, 85, 55, 0.397);
+  transition: .3s ease;
+}
+.icon-tabler-pencil{
+  color: rgba(69, 149, 223, 0.959);
+  transition: .3s ease;
+}
+.icon-tabler-trash{
+  transition: .3s ease;
+  color: rgba(231, 57, 57, 0.938);
+}
+.svgs svg:hover{
+  transform: translateY(-3px);
+}

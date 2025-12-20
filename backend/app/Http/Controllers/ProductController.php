@@ -77,7 +77,33 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        //
+         $productData = $request->validate([
+            'name' => 'sometimes|min:6',
+            'description' => 'sometimes|min:10',
+            'image' => 'sometimes|image|file|max:2042',
+            'price' => 'sometimes|numeric',
+            'discount' => 'nullable',
+            'images'=>'sometimes|array',
+            'images.*' => 'sometimes|image|file|max:2042',
+            'stock' => 'sometimes|numeric',
+            'category' => 'nullable'
+        ]);
+        $file= $request->file('image');
+        $file->store('images', 'public');
+        $productData['image'] = url('storage/images/' . $file->hashName());
+        $product->update($productData);
+        $product->deleteImages();
+        if($request->file('images')){
+        foreach($request->file('images') as $file) {
+            $file->store('images', 'public');
+            $filePath = url('storage/images/' . $file->hashName());
+            ProductImages::create([
+                'product_id' => $product->id,
+                'image_url' => $filePath
+            ]);
+        }
+    }
+        return response()->json($product->load('images'));
     }
 
     /**

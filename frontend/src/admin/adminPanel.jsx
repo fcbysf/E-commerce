@@ -4,16 +4,17 @@ import Dashbord from "./dashbord";
 import { useParams } from "react-router-dom";
 import AdminOrders from "./adminOrders";
 import AdminProducts from "./adminProducts";
+import EditeProduct from "./editProduct";
 
 export default function AdminPanel() {
-  const {place} = useParams()
+  const {place, id} = useParams();
   return (
     <div className="adminPanelContainer">
       <SideBAr />
       {place === "dashbord" && <Dashbord />}
       {place==='orders'&& <AdminOrders />}
       {place=='products' && <AdminProducts />}
+      {(place=='editProduct'&&id) && <EditeProduct />}
     </div>
-
   );
 }
