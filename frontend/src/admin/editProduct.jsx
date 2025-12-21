@@ -2,9 +2,10 @@ import { useContext, useEffect, useState } from "react";
 import { Context } from "../context/context";
 import "./dashbord.css";
 import toast from "react-hot-toast";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 function EditProduct() {
+  const navigate = useNavigate();
   const { id } = useParams();
   const [form, setForm] = useState({
     name: "",
@@ -14,9 +15,9 @@ function EditProduct() {
     category: "",
     discount: "",
   });
-  const [product, setProduct] = useState(null);
   const [notEditedImg, setNotEditedImg] = useState(null);
   const [notEditedImgs, setNotEditedImgs] = useState([]);
+  const [deletedImgsIds, setDeletedImgsIds] = useState([]);
   const [images, setImages] = useState([]);
   const { api, token } = useContext(Context);
   const [selectedSize, setSelectedSize] = useState([]);
@@ -34,7 +35,6 @@ function EditProduct() {
     })
       .then((res) => res.json())
       .then((data) => {
-        setProduct(data);
         setNotEditedImgs(data.images);
         setNotEditedImg(data.image);
         setForm({
@@ -56,7 +56,7 @@ function EditProduct() {
   }, [mainImg]);
   useEffect(() => {
     if (images) {
-      const urls = images.map((img) =>URL.createObjectURL(img));
+      const urls = images.map((img) => URL.createObjectURL(img));
       setImagsPreview([...imagsPreview, ...urls]);
     }
   }, [images]);
@@ -67,14 +67,16 @@ function EditProduct() {
     e.preventDefault();
     const formData = new FormData(e.target);
     formData.delete("images");
-    if(!mainImg){
-        formData.delete('image')
-        formData.append('image', notEditedImg)
+    if (!mainImg) {
+      formData.delete("image");
     }
     images.forEach((image) => {
       formData.append("images[]", image);
     });
-    formData.append('_method', 'put')
+    formData.append("_method", "put");
+    deletedImgsIds.forEach((id) => {
+      formData.append("deletedImgsIds[]", id);
+    });
     fetch(api + "product/" + id, {
       method: "POST",
       headers: {
@@ -87,12 +89,7 @@ function EditProduct() {
         if (res.ok) {
           toast.success("product updated successfully");
           setErrors([]);
-          e.target.reset();
-          setImages([]);
-          setMainImg(null);
-          setPreview(null);
-          setImagsPreview([]);
-          setSelectedSize([]);
+          navigate("/admin/products");
         }
         if (res.status == 422) {
           return res.json();
@@ -109,8 +106,17 @@ function EditProduct() {
     setSelectedSize([...selectedSize, size]);
   };
   const dlt = (img) => {
+    if (img.id){
+      setDeletedImgsIds([...deletedImgsIds, img.id]);
+      return;
+    }
     setImagsPreview(imagsPreview.filter((im) => im !== img));
   };
+  useEffect(()=>{
+    if(deletedImgsIds.length > 0){
+      setNotEditedImgs(notEditedImgs.filter((img) => !deletedImgsIds.includes(img.id)))
+    }
+  })
   return (
     <div className="dachbordContainer">
       <form onSubmit={submit} encType="multipart/form-data">
@@ -191,7 +197,7 @@ function EditProduct() {
                 <label htmlFor="">Price </label>
                 <br />
                 <input
-                    value={form.price}
+                  value={form.price}
                   onChange={handleChange}
                   type="text"
                   name="price"
@@ -303,7 +309,6 @@ function EditProduct() {
             />
           </label>
           {errors.image && <p className="errorInp">{errors.image}</p>}
-
           <div className="otherImgs">
             {notEditedImgs.length > 0 &&
               notEditedImgs.map((img) => (

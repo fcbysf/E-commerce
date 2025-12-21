@@ -12,7 +12,7 @@
     text-align: center;
     
 }
-.orderContainer table th,td{
+.orderContainer table th,.orderContainer td{
     border: 1px solid rgba(0, 0, 0, 0.11);
     padding:10px;
 }
@@ -21,7 +21,7 @@
     padding: 10px;
 }
 .orderContainer td{
-    padding: 0 10px;
+    padding: 0px 10px;
     background-color: #ffffffa1;
 }
 

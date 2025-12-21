@@ -86,13 +86,15 @@ class ProductController extends Controller
             'images'=>'sometimes|array',
             'images.*' => 'sometimes|image|file|max:2042',
             'stock' => 'sometimes|numeric',
-            'category' => 'nullable'
+            'category' => 'nullable',
+            'deletedImgsIds' => 'sometimes|array'
         ]);
-        $file= $request->file('image');
-        $file->store('images', 'public');
-        $productData['image'] = url('storage/images/' . $file->hashName());
+        if($request->file('image')){
+            $file= $request->file('image');
+            $file->store('images', 'public');
+            $productData['image'] = url('storage/images/' . $file->hashName());
+        }
         $product->update($productData);
-        $product->deleteImages();
         if($request->file('images')){
         foreach($request->file('images') as $file) {
             $file->store('images', 'public');
@@ -103,6 +105,12 @@ class ProductController extends Controller
             ]);
         }
     }
+    if($request->input('deletedImgsIds')){
+        foreach($request->input('deletedImgsIds') as $id) {
+            ProductImages::where('id', $id)->delete();
+        }
+    }
+
         return response()->json($product->load('images'));
     }
 
