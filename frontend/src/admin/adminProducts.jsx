@@ -11,7 +11,7 @@ export default function AdminProducts() {
   const [products, setProducts] = useState([]);
   const [category, setCategory] = useState("all categories");
   const [search, setSearch] = useState("");
-    const categories = [
+  const categories = [
     "all categories",
     "fashion",
     "health",
