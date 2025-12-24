@@ -6,6 +6,9 @@ const Provider = ({ children }) => {
   const [token, setToken] = useState(sessionStorage.getItem("token") || null);
   const [isLoggedIn,setIsLoggedIn] = useState(sessionStorage.getItem("token") ? true : false)
   const [userId, setUserId] = useState(null);
+  const [userRole, setUserRole] = useState(
+    sessionStorage.getItem("role") || null
+  );
 
   useEffect(() => {
     const storedToken = sessionStorage.getItem("token");
@@ -30,7 +33,9 @@ const Provider = ({ children }) => {
         }
     }) 
     .then((data) => {
-      setUserId(data);
+      setUserId(data.user_id);
+      setUserRole(data.role);
+      sessionStorage.setItem("role",data.role)
     })
     .catch((err) => console.log(err));
   },[token])
@@ -40,7 +45,7 @@ const Provider = ({ children }) => {
   };
 
   return (
-    <Context.Provider value={{ api, token, logout,isLoggedIn,setIsLoggedIn,userId }}>
+    <Context.Provider value={{ api, token, logout,isLoggedIn,setIsLoggedIn,userId, userRole, setUserId}}>
       {children}
     </Context.Provider>
   );

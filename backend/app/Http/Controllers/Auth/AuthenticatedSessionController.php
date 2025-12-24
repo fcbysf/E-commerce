@@ -20,7 +20,7 @@ class AuthenticatedSessionController extends Controller
         if(Auth::attempt($credentials)){
             $user = User::where('email', $credentials['email'])->first();
             $token = $user->createToken('auth_token')->plainTextToken;
-            return response()->json(['token' => $token]);
+            return response()->json(['token' => $token,'role' => $user->role]);
         }
         return response()->json(['error' => 'Invalid credentials'], 401);
     }

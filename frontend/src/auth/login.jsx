@@ -5,13 +5,17 @@ import { useNavigate } from "react-router-dom";
 
 const LogIn = () => {
   const navigate = useNavigate()
-  const { api,isLoggedIn,setIsLoggedIn } = useContext(Context);
+  const { api,isLoggedIn,setIsLoggedIn, userRole,setUserRole } = useContext(Context);
+  console.log(userRole)
   const [errors,setErrors] = useState({})
   useEffect(()=>{
-    if(isLoggedIn){
+    if(isLoggedIn&&userRole=='user'){
       navigate('/shop')
     }
-  },[isLoggedIn]
+    else if(isLoggedIn&&userRole=='admin'){
+      navigate('/admin/dashbord')
+    }
+  },[isLoggedIn,userRole]
 )
 
   const login = (e) => {
@@ -34,12 +38,21 @@ const LogIn = () => {
         else if(data.token){
           sessionStorage.setItem("token",data.token)
           setIsLoggedIn(true)
-          navigate('/shop')
         } 
+        if(data.role == 'admin'){
+          setUserRole(data.role)
+          sessionStorage.setItem('role','admin')
+          navigate('/admin/dashbord')
+        }
+        else if(data.role == 'user'){
+          navigate('/shop')
+        }
+        
       })
       .catch((err) => console.log(err));
   };
   return (
+    isLoggedIn==false &&
     <StyledWrapper>
       <div className="loginContainer">
         <form className="formm" onSubmit={login}>

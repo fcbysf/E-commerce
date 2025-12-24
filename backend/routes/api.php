@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\MessageController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
 
@@ -24,9 +23,10 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
 Route::get('/users', [UserController::class,'index']);
+Route::put('/user/{user}', [UserController::class,'update']);
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
-    return $request->user()->id;
+    return response()->json(['user_id'=>$request->user()->id, 'role'=>$request->user()->role]);
 });
 //  PRODUCT ROUTES
 Route::get('homeProducts', [ProductController::class,'homeProducts']);

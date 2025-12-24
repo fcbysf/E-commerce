@@ -13,6 +13,7 @@
 }
 .adminProductsContainer table th,.adminProductsContainer table td{
     padding: 13px;
+    border-bottom: 1px solid #b9b9b905 !important;
     border: 0;
 }
 .adminProductsContainer th{
@@ -27,6 +28,7 @@
     background-color: rgba(255, 255, 255, 0.377);
     cursor: pointer;
 }
+
 .prdctclmn{
   display: flex;
   align-items: center;

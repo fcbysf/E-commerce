@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
+        
+    
     public function index()
     {
         return User::with('orders')->latest()->get();
@@ -39,7 +39,12 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        //
+        if($request->role){
+            $user->update([
+                'role' => $request->role
+            ]);
+            return response()->json([$request->role,$user->id]);
+        }
     }
 
 

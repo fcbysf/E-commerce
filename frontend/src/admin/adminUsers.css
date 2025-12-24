@@ -5,6 +5,7 @@
   margin-top: 10px;
 }
 .adminUsersContainer .both{
+    width: 100%;
     display: flex;
     gap: 5px;
 }
@@ -31,4 +32,54 @@
 .adminUsersContainer table tr:hover {
   background-color: rgba(255, 255, 255, 0.377);
   cursor: pointer;
+}
+.adminUsersContainer  td{
+    border-bottom: 1px solid #6b6b6b05 !important;
+    background-color: rgba(255, 255, 255, 0.164);
+    
+}
+.adminUsersContainer .adminUserDetails{
+    width: 30%;
+    min-height: 100vh;
+    max-height: 100%;
+    background-color: rgba(255, 255, 255, 0.89);
+    border-radius: 5px;
+    margin-top: 5px;
+    padding: 10px;
+    box-shadow: 8px 8px 36px rgba(97, 97, 97, 0.514);
+    line-height: 1.9rem;
+}
+.adminUserDetails h2{
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+.adminUserDetails h2 svg{
+    cursor: pointer;
+    opacity: .3;
+}
+.adminUsersContainer hr{
+    margin: 10px 0;
+}
+.adminUserDetails p{
+    display:flex;
+    align-items: center;
+    text-indent: 10px;
+}
+.editRoles{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.editRoles h3{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.editRoles select{
+    padding: 3px;
+    outline: 0;
+}
+.editRoles button{
+    padding: 3px;
 }

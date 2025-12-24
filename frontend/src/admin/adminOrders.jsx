@@ -101,12 +101,6 @@ export default function AdminOrders() {
       return "red";
     }
   };
-  if (loader)
-    return (
-      <div className="loader">
-        <Loader />
-      </div>
-    );
   return (
     <div className="adminOrdersContainer">
       <div className="filterAndTitle">
