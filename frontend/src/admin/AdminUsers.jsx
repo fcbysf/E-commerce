@@ -6,10 +6,11 @@ import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 import {toast} from 'react-hot-toast'
 
+
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
-  const { api, token } = useContext(Context);
-  const [userId, setUserId] = useState(null);
+  const { api, token,userId } = useContext(Context);
+  const [selectedUserId, setselectedUserId] = useState(null);
   const [role, setRole] = useState('user');
 
 
@@ -31,7 +32,7 @@ export default function AdminUsers() {
     return orders.reduce((a, b) => a + b.total_price, 0).toFixed(2);
   }
   const changeRole = () => {
-    fetch(`${api}user/${userId}`, {
+    fetch(`${api}user/${selectedUserId}`, {
         method: "PUT",
         headers: {
           accept: "application/json",
@@ -43,7 +44,7 @@ export default function AdminUsers() {
         .then((res) => {
           if (res.ok) {
             fetching();
-            setUserId('user');
+            setselectedUserId('user');
             setRole(null);
             toast.success('role changed successfully')
             return res.json();
@@ -93,8 +94,8 @@ export default function AdminUsers() {
           </thead>
           <tbody>
             {users.map((user) => (
-              <tr key={user.id} onClick={() => setUserId(user.id)}>
-                <td>{user.id}</td>
+              <tr key={user.id} onClick={() => setselectedUserId(user.id)}>
+                <td>{user.id} {user.id === userId && <small>(you)</small>}</td>
                 <td>{user.name}</td>
                 <td>{user.email}</td>
                 <td>{user.role}</td>
@@ -102,7 +103,7 @@ export default function AdminUsers() {
                 <td
                   onClick={(e) => {
                     e.stopPropagation();
-                    setUserId(user.id);
+                    setselectedUserId(user.id);
                   }}
                 >
                   <div className="svgs">
@@ -147,11 +148,11 @@ export default function AdminUsers() {
             ))}
           </tbody>
         </table>
-        {userId &&
+        {selectedUserId &&
           users.map(
             (user) =>
-              user.id === userId && (
-                <div className="adminUserDetails">
+              user.id === selectedUserId && (
+                <div className="adminUserDetails" key={user.id}>
                   <h2>
                     user details{" "}
                     <svg
@@ -165,7 +166,7 @@ export default function AdminUsers() {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       className="icon icon-tabler icons-tabler-outline icon-tabler-x"
-                      onClick={() => setUserId(null)}
+                      onClick={() => setselectedUserId(null)}
                     >
                       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                       <path d="M18 6l-12 12" />
@@ -249,7 +250,7 @@ export default function AdminUsers() {
                         <option value="admin">Admin</option>
                     </select>
                     <button disabled={role==user.role} onClick={changeRole}>save</button>
-                    <button onClick={()=>setUserId(null)}>cancel</button>
+                    <button onClick={()=>setselectedUserId(null)}>cancel</button>
                   </div>
                 </div>
               )

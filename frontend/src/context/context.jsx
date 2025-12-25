@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useMemo } from "react";
 export const Context = createContext();
 
 const Provider = ({ children }) => {
@@ -45,9 +45,13 @@ const Provider = ({ children }) => {
   };
 
   return (
-    <Context.Provider value={{ api, token, logout,isLoggedIn,setIsLoggedIn,userId, userRole, setUserId}}>
+    useMemo(
+      () => (
+        <Context.Provider value={{ api, token, logout,isLoggedIn,setIsLoggedIn,userId, userRole, setUserId}}>
       {children}
     </Context.Provider>
+      ),
+    [userId, token, children, isLoggedIn,userRole])
   );
 };
 export default Provider;

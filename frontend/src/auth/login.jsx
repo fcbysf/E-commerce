@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 const LogIn = () => {
   const navigate = useNavigate()
   const { api,isLoggedIn,setIsLoggedIn, userRole,setUserRole } = useContext(Context);
-  console.log(userRole)
   const [errors,setErrors] = useState({})
   useEffect(()=>{
     if(isLoggedIn&&userRole=='user'){

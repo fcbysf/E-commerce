@@ -5,25 +5,12 @@ import toast from "react-hot-toast";
 
 function Dashbord() {
   const [images, setImages] = useState([]);
+  console.log(images);
   const { api, token } = useContext(Context);
   const [selectedSize, setSelectedSize] = useState([]);
   const [mainImg, setMainImg] = useState(null);
-  const [preview, setPreview] = useState(null);
-  const [imagsPreview, setImagsPreview] = useState([]);
   const [errors,setErrors] = useState([])
   const sizes = ["xs", "s", "m", "l", "xl", "xxl"];
-  useEffect(() => {
-    if (mainImg) {
-      const url = URL.createObjectURL(mainImg);
-      setPreview(url);
-    }
-  }, [mainImg]);
-  useEffect(() =>{    
-    if (images) {
-      const urls = images.map((img) => URL.createObjectURL(img));
-      setImagsPreview([...imagsPreview, ...urls]);
-    }
-  }, [images])
   const submit = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -64,8 +51,12 @@ function Dashbord() {
     setSelectedSize([...selectedSize, size]);
   };
   const dlt = (img) => {
-    setImagsPreview(imagsPreview.filter((im) => im !== img));
+    setImages(images.filter((im) => im !== img));
   };
+  const handleImgsChange = (e) => {
+    const files = [...e.target.files];
+    setImages([...images,...files.filter(file=>!images.includes(file))])
+  }
   return (
     <div className="dachbordContainer">
       <form onSubmit={submit} encType="multipart/form-data">
@@ -197,7 +188,7 @@ function Dashbord() {
                 </div>
               </>
             )}
-            {mainImg && <img src={preview} alt="" />}
+            {mainImg && <img src={URL.createObjectURL(mainImg)} alt="" />}
             <input
               type="file"
               id="file"
@@ -208,10 +199,10 @@ function Dashbord() {
                 {errors.image &&<p className="errorInp">{errors.image}</p>}
 
           <div className="otherImgs">
-            {imagsPreview.length > 0 &&
-              imagsPreview.map((img) => (
-                <div className="otherimgswrapper">
-                  <img src={img} alt="" />
+            {images.length > 0 &&
+              images.map((img) => (
+                <div className="otherimgswrapper" key={img}>
+                  <img src={URL.createObjectURL(img)} alt="" />
                   <span className="deleteImg" onClick={() => dlt(img)}>
                     X
                   </span>
@@ -225,7 +216,7 @@ function Dashbord() {
               type="file"
               id="imgs"
               name="images"
-              onChange={(e) => setImages([...e.target.files])}
+              onChange={handleImgsChange}
               multiple
               />
           </div>

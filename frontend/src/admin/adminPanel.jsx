@@ -11,7 +11,7 @@ import { Context } from "../context/context";
 
 export default function AdminPanel() {
   const {place, id} = useParams();
-  const {userRole} = useContext(Context)
+  const {userRole, userId} = useContext(Context)
 
   useEffect(()=>{
       if(userRole!='admin'){
