@@ -12,10 +12,10 @@ export default function Cart() {
   const [address, setaddress] = useState("");
   const [phone, setPhone] = useState("");
   const [orderCompleted, setOrderCompleted] = useState(false);
-  const { api, token, isLoggedIn } = useContext(Context);
+  const { api, token, isLoggedIn , fetching} = useContext(Context);
 
 
-  function fetching(){
+  function fitching(){
       fetch(`${api}cart`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -40,7 +40,7 @@ export default function Cart() {
       return;
     }
     if (token) {
-      fetching();
+      fitching();
     }
   }, [token, isLoggedIn]);
   const finishOrder = () => {
@@ -65,7 +65,8 @@ export default function Cart() {
                   }
                 })
                 .then(() => {
-                  fetching();
+                  fitching();
+                  fetching()
                   toast.success("order finished");
                 })
                 .catch((err) => console.log(err));
@@ -80,7 +81,7 @@ export default function Cart() {
       },
     })
       .then((res) =>res.ok  && toast.success("product removed from cart")||toast.error("product not removed from cart"))
-      .then(() => fetching())
+      .then(() => {fitching();fetching()})
       .catch((err) => console.log(err));
   }
   return (

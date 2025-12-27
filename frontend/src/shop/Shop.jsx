@@ -12,10 +12,11 @@ export default function Shop() {
   const [products, setProducts] = useState([]);
   const [showStock, setShowStock] = useState(false);
   const [imageId, setImageId] = useState("");
-  const { api, token, userId } = useContext(Context);
+  const { api, token, userId, fetching } = useContext(Context);
   const [checked, setChecked] = useState([]);
   const [values, setValues] = useState([0, 9999]);
   const [priceFiltred, setPriceFiltered] = useState("0-9999");
+  const [favourites, setFavourites] = useState([]);
   const [brands, setBrands] = useState([
     { brand: "nike", icon: "/nike-removebg-preview.png" },
     { brand: "adidas", icon: "/download-removebg-preview.png" },
@@ -35,11 +36,21 @@ export default function Shop() {
     "gaming",
     "tech",
   ];
+  function fetchFav(){
+    fetch(api + "favourites", {
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.ok && res.json())
+      .then((data) => setFavourites(data))
+      .catch((err) => console.log(err));
+  }
   useEffect(() => {
     const timer = setTimeout(() => {
       setPriceFiltered(values.join("-"));
     }, 600);
-
     return () => clearTimeout(timer);
   }, [values]);
 
@@ -74,6 +85,7 @@ export default function Shop() {
       .then((res) => {
         if (res.ok) {
           toast.success("product added to cart");
+          fetching();
           return res.json();
         }
       })
@@ -83,7 +95,41 @@ export default function Shop() {
   const resetPriceFilter = () => {
     setValues([0, 9999]);
     setPriceFiltered("0-9999");
+  };
+  const addToFav = (id) => {
+    fetch(`${api}favourites`, {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ product_id: id, user_id: userId}),
+    })
+    .then((res) => {
+      if (res.ok) {
+        fetchFav();
+      }
+    })
+    .catch((err) => console.log(err));
+  };
+  const removeFromFav = (id) => {
+    fetch(`${api}favourites/${id}`,{
+      method: "DELETE",
+      headers:{
+        accept: "application/json",
+        "Content-Type": "application/json",
+      }
+  })
+  .then((res) => {
+    if (res.ok) {
+      fetchFav();
+    }
+  })
+  .catch((err) => console.log(err));
   }
+  useEffect(() => {
+    fetchFav();
+  }, [favourites.length]);
   return (
     <div className="shopContainer">
       <NavBar />
@@ -110,7 +156,9 @@ export default function Shop() {
             <div className="filterByPrice">
               <div className="topOfpriceDiv">
                 <h3>price range</h3>
-                <small onClick={resetPriceFilter} style={{cursor:'pointer'}}>reset</small>
+                <small onClick={resetPriceFilter} style={{ cursor: "pointer" }}>
+                  reset
+                </small>
               </div>
               <Range
                 step={10}
@@ -175,11 +223,20 @@ export default function Shop() {
             </div>
           </aside>
           <div className="productsSide">
-
-              {products.length === 0&&<div className="noProducts">
-                {products.length === 0 &&priceFiltred == "0-9999"&&<h2>no products in <i style={{color:'#437f99'}}>{category}</i> category yet ! </h2>}
-                {products.length === 0 &&priceFiltred !== "0-9999"&&<h2>no products found</h2>}
-                </div>}
+            {products.length === 0 && (
+              <div className="noProducts">
+                {products.length === 0 && priceFiltred == "0-9999" && (
+                  <h2>
+                    no products in{" "}
+                    <i style={{ color: "#437f99" }}>{category}</i> category yet
+                    !{" "}
+                  </h2>
+                )}
+                {products.length === 0 && priceFiltred !== "0-9999" && (
+                  <h2>no products found</h2>
+                )}
+              </div>
+            )}
             {products.map((product) => (
               <div
                 key={product.id}
@@ -190,6 +247,39 @@ export default function Shop() {
                 }}
                 onMouseOut={() => setShowStock(false)}
               >
+                <div className="heartIcon">
+                {(!favourites.map(f=>f.product_id).includes(product.id) && (
+                  <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      onClick={() => addToFav(product.id)}
+                      className="icon icon-tabler icons-tabler-outline icon-tabler-heart"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
+                    </svg>
+                )) || 
+                <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                onClick = {()=>removeFromFav(favourites.find(f=>f.product_id === product.id).id)}
+                class="icon icon-tabler icons-tabler-filled icon-tabler-heart"
+                >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M6.979 3.074a6 6 0 0 1 4.988 1.425l.037 .033l.034 -.03a6 6 0 0 1 4.733 -1.44l.246 .036a6 6 0 0 1 3.364 10.008l-.18 .185l-.048 .041l-7.45 7.379a1 1 0 0 1 -1.313 .082l-.094 -.082l-7.493 -7.422a6 6 0 0 1 3.176 -10.215z" />
+                  </svg>
+                }
+                </div>
                 <div
                   className="image-wrapper"
                   onClick={() => navigate(`/product/${product.id}`)}

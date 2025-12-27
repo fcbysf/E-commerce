@@ -9,14 +9,10 @@ const Provider = ({ children }) => {
   const [userRole, setUserRole] = useState(
     sessionStorage.getItem("role") || null
   );
+  const [userShop, setUserShop] = useState({orders: 0,cart:0,favourites:0});
 
-  useEffect(() => {
-    const storedToken = sessionStorage.getItem("token");
-    if (storedToken) {
-      setToken(storedToken);
-    }
-  }, [isLoggedIn]);
-  useEffect(()=>{
+
+  function fetching(){
     fetch(api + "user",{
         headers: {
         "accept": "application/json",
@@ -35,9 +31,19 @@ const Provider = ({ children }) => {
     .then((data) => {
       setUserId(data.user_id);
       setUserRole(data.role);
+      setUserShop({orders: data.orders, cart: data.cart})
       sessionStorage.setItem("role",data.role)
     })
     .catch((err) => console.log(err));
+  }
+  useEffect(() => {
+    const storedToken = sessionStorage.getItem("token");
+    if (storedToken) {
+      setToken(storedToken);
+    }
+  }, [isLoggedIn]);
+  useEffect(()=>{
+    fetching()
   },[token])
   const logout = () => {
     setToken(null);
@@ -47,11 +53,11 @@ const Provider = ({ children }) => {
   return (
     useMemo(
       () => (
-        <Context.Provider value={{ api, token, logout,isLoggedIn,setIsLoggedIn,userId, userRole, setUserId}}>
+        <Context.Provider value={{ api, token, logout,isLoggedIn,setIsLoggedIn,userId, userRole, setUserId, userShop , fetching}}>
       {children}
     </Context.Provider>
       ),
-    [userId, token, children, isLoggedIn,userRole])
+    [userId, token, children, isLoggedIn,userRole, userShop])
   );
 };
 export default Provider;

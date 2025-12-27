@@ -5,7 +5,6 @@ import toast from "react-hot-toast";
 
 function Dashbord() {
   const [images, setImages] = useState([]);
-  console.log(images);
   const { api, token } = useContext(Context);
   const [selectedSize, setSelectedSize] = useState([]);
   const [mainImg, setMainImg] = useState(null);

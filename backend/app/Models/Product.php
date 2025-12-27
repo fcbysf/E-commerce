@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Controllers\FavouriteController;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
@@ -23,6 +24,9 @@ class Product extends Model
     }
     public function orders(){
         return $this->hasMany(OrderItem::class);
+    }
+    public function favourites()  {
+        return $this->hasMany(FavouriteController::class);
     }
 }
 

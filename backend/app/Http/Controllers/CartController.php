@@ -8,18 +8,12 @@ use League\Config\Exception\ValidationException;
 
 class CartController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $user_id = $request->user()->id;
         return Cart::with(['user','product'])->where('user_id', $user_id)->get();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         try{

@@ -5,7 +5,7 @@ import { Context } from "../context/context";
 import { useNavigate, useParams } from "react-router-dom";
 
 export default function Product() {
-  const { api,token,isLoggedIn } = useContext(Context);
+  const { api,} = useContext(Context);
   const { id } = useParams();
   const [product, setProduct] = useState({});
   const [imageSrc, setImagesSrc] = useState("");
@@ -130,7 +130,7 @@ import styled from "styled-components";
 
 const Button = ({ product }) => {
   const navigate = useNavigate()
-  const { api, token,isLoggedIn,userId } = useContext(Context);
+  const { api, token,isLoggedIn,userId, fetching } = useContext(Context);
   const addToCart = () => {
     if(!isLoggedIn){
       navigate("/login", { replace: true });
@@ -146,7 +146,7 @@ const Button = ({ product }) => {
       body:JSON.stringify({user_id:userId,product_id:product.id,quantity:1})
     })
     .then(res=>res.ok&&res.json())
-    .then(data=>sessionStorage.setItem('cart',data))
+    .then(data=>{sessionStorage.setItem('cart',data);fetching()})
     .catch(err=>console.log(err))
     }
   

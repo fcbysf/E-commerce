@@ -9,9 +9,7 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    
     public function index()
     {
      return Order::with('items.product','user')->latest()->get();
