@@ -223,3 +223,29 @@
 .heartIcon svg{
   scale: .8;
 }
+
+@media (max-width: 768px) {
+  .shopContainer .categories {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .shopContainer section {
+    flex-direction: column;
+  }
+  .shopContainer section aside {
+    width: 100%;
+  }
+  .productsSide {
+    width: 100%;
+    margin-top: 0;
+  }
+  .oneProduct {
+    width: 45%;
+  }
+}
+
+@media (max-width: 480px) {
+  .oneProduct {
+    width: 90%;
+  }
+}
