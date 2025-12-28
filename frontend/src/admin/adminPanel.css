@@ -14,3 +14,10 @@
     font-family: Georgia, 'Times New Roman', Times, serif;
     gap: 50px;
 }
+
+@media (max-width: 768px) {
+    .adminPanelContainer {
+        flex-direction: column;
+        gap: 20px;
+    }
+}

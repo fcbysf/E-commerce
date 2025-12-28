@@ -1,9 +1,17 @@
 import { NavLink } from "react-router-dom";
 import "./navbar.css";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Context } from "../context/context";
+import Sidebar from "./Sidebar.jsx";
+
 export default function NavBar() {
   const { userShop } = useContext(Context);
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!isSidebarOpen);
+  };
+
   return (
     <header className="navbar">
       <div className="logoAndsearch">
@@ -113,6 +121,7 @@ export default function NavBar() {
           <img src="me.jpg" alt="" />
         </NavLink>
       </div>
+      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
     </header>
   );
 }

@@ -37,3 +37,18 @@
 .favourites .oneFavourite:hover{
     transform: translateY(-3px);
 }
+
+@media (max-width: 768px) {
+    .favouritesP {
+        justify-content: center;
+    }
+    .favourites .oneFavourite {
+        width: 45%;
+    }
+}
+
+@media (max-width: 480px) {
+    .favourites .oneFavourite {
+        width: 90%;
+    }
+}

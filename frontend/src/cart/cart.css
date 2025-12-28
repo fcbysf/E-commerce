@@ -495,3 +495,27 @@ hr{
   margin-top: 200px;
   margin-left: 300px;
 }
+
+@media (max-width: 768px) {
+  .cartMain {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .cartProducts,
+  .cartCheckout {
+    width: 90%;
+  }
+
+  .cartP {
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+  }
+
+  .cartPImg,
+  .cartMain img {
+    width: 100%;
+    height: auto;
+  }
+}
