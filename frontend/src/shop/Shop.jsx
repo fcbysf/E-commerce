@@ -5,6 +5,7 @@ import { Context } from "../context/context";
 import { Range } from "react-range";
 import NavBar from "../layouts/ShopNavBar";
 import toast from "react-hot-toast";
+import '../home.css'
 
 export default function Shop() {
   const { category } = useParams();
