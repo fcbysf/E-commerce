@@ -429,7 +429,7 @@ button span {
   text-align: center;
 }
 .product img {
-  width: 400px;
+  max-width: 270px;
   height: 200px;
   object-fit: contain;
   border-radius: 10px;

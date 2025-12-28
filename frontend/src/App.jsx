@@ -1,32 +1,33 @@
-import {BrowserRouter, Routes, Route} from "react-router-dom"
-import Home from "./Home"
-import AdminPanel from "./admin/adminPanel"
-import Provider from "./context/context"
-import Shop from "./shop/Shop"
-import Product from "./shop/Product"
-import Cart from "./cart/cart"
-import LogIn from "./auth/login"
-import SignUp from "./auth/signup"
-import Order from "./order/oder"
-import Favourites from "./favourites/favourites"
-export default function App (){
-  return(
+import React, { Suspense } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+const Home = React.lazy(() => import("./home"));
+const AdminPanel = React.lazy(() => import("./admin/adminPanel"));
+const Shop = React.lazy(() => import("./shop/Shop"));
+const Product = React.lazy(() => import("./shop/Product"));
+const Cart = React.lazy(() => import("./cart/cart"));
+const LogIn = React.lazy(() => import("./auth/login"));
+const SignUp = React.lazy(() => import("./auth/signup"));
+const Order = React.lazy(() => import("./order/oder"));
+const Favourites = React.lazy(() => import("./favourites/favourites"));
+import Provider from "./context/context";
+
+export default function App() {
+  return (
     <Provider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home/>} />
-          <Route path="/admin/:place/:id?" element={<AdminPanel/>} />
-          <Route path="/shop/:category?" element={<Shop/>} />
-          <Route path="/product/:id" element={<Product />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/login" element={<LogIn />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/orders" element={<Order />} />
-          <Route path="/favourites" element={<Favourites />}/>
-          <Route path="*" element={<Home />} />
-        </Routes>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/admin/:place/:id?" element={<AdminPanel />} />
+            <Route path="/shop/:category?" element={<Shop />} />
+            <Route path="/product/:id" element={<Product />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/login" element={<LogIn />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/orders" element={<Order />} />
+            <Route path="/favourites" element={<Favourites />} />
+            <Route path="*" element={<Home />} />
+          </Routes>
       </BrowserRouter>
     </Provider>
-
-  )
+  );
 }
