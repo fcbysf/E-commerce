@@ -106,3 +106,23 @@
   object-fit: contain;
   padding-bottom: 10px;
 }
+
+@media (max-width: 768px) {
+  .productPage {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .productImgs,
+  .oneProductInfos {
+    width: 90%;
+  }
+
+  .productContainer img {
+    width: 100%;
+  }
+
+  .recommendedP {
+    padding: 10px 20px;
+  }
+}

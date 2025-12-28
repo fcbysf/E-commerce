@@ -583,3 +583,85 @@ button span {
   transition: transform 0.3s ease-in-out 0.1s;
   transform: translate(0);
 }
+
+@media (max-width: 768px) {
+  .homeContainer {
+    padding: 0 15px;
+  }
+
+  nav {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .leftLinks,
+  .rightLinks {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo h1 {
+    width: 100%;
+    clip-path: none;
+    font-size: 2rem;
+  }
+
+  .marketingText {
+    width: 100%;
+  }
+
+  .marketingText h1 {
+    font-size: 1.8rem;
+    line-height: 2.5rem;
+  }
+
+  .homeContainer article,
+  .homeContainer section {
+    flex-direction: column;
+  }
+
+  .puffer,
+  .productsImage {
+    left: 0;
+    scale: 1;
+  }
+
+  .forLeft img,
+  .forMiddle img,
+  .forRight img {
+    width: 100%;
+    scale: 1;
+    margin-left: 0;
+  }
+
+  .forMiddle {
+    padding-top: 20px;
+  }
+
+  .forRight {
+    padding-top: 20px;
+  }
+
+  .textFlowt,
+  .lastProducts h1 {
+    font-size: 5rem;
+    top: 0;
+    letter-spacing: 0;
+    text-align: center;
+    position: relative;
+  }
+  .lastProducts h1{
+    top:-50px;
+  }
+
+  .product {
+    width: 45%;
+  }
+}
+
+@media (max-width: 480px) {
+  .product {
+    width: 90%;
+  }
+}
