@@ -116,3 +116,9 @@ input:not(:placeholder-shown) ~ .reset {
   background-color: #ffd95b;
   border-radius: 50%;
 }
+
+@media (max-width: 768px) {
+  .Links {
+    display: none;
+  }
+}
