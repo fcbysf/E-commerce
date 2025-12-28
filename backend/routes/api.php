@@ -49,5 +49,4 @@ Route::middleware(['auth:sanctum'])->get('userOrders', [OrderController::class,'
 
 // favourite Routes
 Route::get('/favourites', [FavouriteController::class, 'index']);
-Route::post('/favourites', [FavouriteController::class, 'store']);
-Route::delete('/favourites/{favourite}', [FavouriteController::class, 'destroy']);
+Route::middleware(['throttle:favourites'])->post('/favourites', [FavouriteController::class, 'store']);

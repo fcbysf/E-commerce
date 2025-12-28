@@ -96,7 +96,16 @@ export default function Shop() {
     setValues([0, 9999]);
     setPriceFiltered("0-9999");
   };
-  const addToFav = (id) => {
+  const addAndDelFav = (id) => {
+      setFavourites((prev) => {
+    const exists = prev.some(f => f.product_id === id);
+
+    if (exists) {
+      return prev.filter(f => f.product_id !== id);
+    }
+
+    return [...prev, { product_id: id, user_id: userId}];
+  });
     fetch(`${api}favourites`, {
       method: "POST",
       headers: {
@@ -112,24 +121,9 @@ export default function Shop() {
     })
     .catch((err) => console.log(err));
   };
-  const removeFromFav = (id) => {
-    fetch(`${api}favourites/${id}`,{
-      method: "DELETE",
-      headers:{
-        accept: "application/json",
-        "Content-Type": "application/json",
-      }
-  })
-  .then((res) => {
-    if (res.ok) {
-      fetchFav();
-    }
-  })
-  .catch((err) => console.log(err));
-  }
   useEffect(() => {
     fetchFav();
-  }, [favourites.length]);
+  }, []);
   return (
     <div className="shopContainer">
       <NavBar />
@@ -247,7 +241,7 @@ export default function Shop() {
                 }}
                 onMouseOut={() => setShowStock(false)}
               >
-                <div className="heartIcon">
+                <div className="heartIcon" onClick={() => addAndDelFav(product.id)}>
                 {(!favourites.map(f=>f.product_id).includes(product.id) && (
                   <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -259,7 +253,6 @@ export default function Shop() {
                       stroke-width="2"
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                      onClick={() => addToFav(product.id)}
                       className="icon icon-tabler icons-tabler-outline icon-tabler-heart"
                     >
                       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -272,7 +265,6 @@ export default function Shop() {
                 height="24"
                 viewBox="0 0 24 24"
                 fill="currentColor"
-                onClick = {()=>removeFromFav(favourites.find(f=>f.product_id === product.id).id)}
                 class="icon icon-tabler icons-tabler-filled icon-tabler-heart"
                 >
                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />

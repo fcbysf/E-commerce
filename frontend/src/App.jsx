@@ -8,6 +8,7 @@ import Cart from "./cart/cart"
 import LogIn from "./auth/login"
 import SignUp from "./auth/signup"
 import Order from "./order/oder"
+import Favourites from "./favourites/favourites"
 export default function App (){
   return(
     <Provider>
@@ -21,7 +22,7 @@ export default function App (){
           <Route path="/login" element={<LogIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/orders" element={<Order />} />
-
+          <Route path="/favourites" element={<Favourites />}/>
           <Route path="*" element={<Home />} />
         </Routes>
       </BrowserRouter>

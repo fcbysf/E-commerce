@@ -1,0 +1,39 @@
+.FavouritesController {
+  min-height: 100vh;
+  max-height: 100%;
+}
+.FavouritesController .favourites h1{
+    margin: 0 0 10px 0;
+
+}
+.favourites .oneFavourite img{
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+}
+.favourites{
+    padding: 20px;
+}
+.favouritesP {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.favourites .oneFavourite{
+    width: 200px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: rgba(245, 245, 245, 0.301) 1px solid;
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.281);
+    box-shadow: 4px 4px 10px rgba(110, 110, 110, 0.274);
+    transition: 0.5s ease;
+    cursor: pointer;
+}
+.favourites .oneFavourite:hover{
+    transform: translateY(-3px);
+}

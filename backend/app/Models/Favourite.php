@@ -9,7 +9,7 @@ class Favourite extends Model
 {
     protected $fillable = ['product_id','user_id'];
     public function product(){
-        return $this->belongsTo(ProductController::class);
+        return $this->belongsTo(Product::class);
     }
     public function user(){
         return $this->belongsTo(User::class);
