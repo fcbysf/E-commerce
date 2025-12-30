@@ -1,5 +1,5 @@
-import React, { Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import React from "react";
 const Home = React.lazy(() => import("./home"));
 const AdminPanel = React.lazy(() => import("./admin/adminPanel"));
 const Shop = React.lazy(() => import("./shop/Shop"));

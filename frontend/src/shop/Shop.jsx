@@ -1,10 +1,10 @@
 import { NavLink, useNavigate, useParams } from "react-router-dom";
-import "./shop.css";
 import { useContext, useEffect, useState } from "react";
 import { Context } from "../context/context";
 import { Range } from "react-range";
 import NavBar from "../layouts/ShopNavBar";
 import toast from "react-hot-toast";
+import "./shop.css";
 import '../home.css'
 
 export default function Shop() {
