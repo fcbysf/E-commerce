@@ -25,6 +25,9 @@ const Provider = ({ children }) => {
           return res.json()
         }
         else{
+          setUserShop({orders: 0,cart:0,favourites:0})
+          setUserId(null)
+          setUserRole(null)
             setIsLoggedIn(false)
         }
     }) 

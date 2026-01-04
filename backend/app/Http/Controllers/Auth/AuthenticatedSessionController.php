@@ -31,7 +31,6 @@ class AuthenticatedSessionController extends Controller
     public function destroy(Request $request): Response
     {
         $request->user()->tokens()->delete();
-
-        return response()->noContent();
+        return response(200);
     }
 }

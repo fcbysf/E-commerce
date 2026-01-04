@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import { Context } from "../context/context";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const LogIn = () => {
   const navigate = useNavigate()
@@ -113,7 +113,7 @@ const LogIn = () => {
           </div>
           <button className="button-submit">Sign In</button>
           <p className="p">
-            Don't have an account? <span className="span">Sign Up</span>
+            Don't have an account? <Link to={"/signup"} className="span">Sign Up</Link>
           </p>
         </form>
       </div>

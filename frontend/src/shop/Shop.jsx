@@ -89,6 +89,10 @@ export default function Shop() {
           fetching();
           return res.json();
         }
+        else {
+          navigate('/login')
+          return
+        }
       })
       .then((data) => sessionStorage.setItem("cart", data))
       .catch((err) => console.log(err));
@@ -199,7 +203,7 @@ export default function Shop() {
             </div>
             <div className="filterByBrand">
               <div className="topOfpriceDiv">
-                <h3>brand</h3>
+                <h3>brand <small>(soon)</small></h3>
                 <small>reset</small>
               </div>
               {brands.map((b) => (

@@ -21,7 +21,7 @@ Route::post('/login', [AuthenticatedSessionController::class, 'store'])
     ->name('login');
 
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
-    ->middleware('auth')
+    ->middleware('auth:sanctum')
     ->name('logout');
 Route::get('/users', [UserController::class,'index']);
 Route::put('/user/{user}', [UserController::class,'update']);

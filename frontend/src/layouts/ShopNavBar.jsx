@@ -1,21 +1,42 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import "./navbar.css";
 import { useContext, useState } from "react";
 import { Context } from "../context/context";
 import Sidebar from "./Sidebar.jsx";
+import toast from "react-hot-toast";
 
 export default function NavBar() {
-  const { userShop } = useContext(Context);
+  const { userShop, userId,api,token ,fetching} = useContext(Context);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
 
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen);
   };
-
+  const logout = () => {
+    fetch(api + "logout", {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (res.ok) {
+          sessionStorage.clear()
+          toast.success("logged out successfully");
+          navigate("/");
+          fetching();
+        }
+      })
+      .catch((err) => console.log(err));
+  
+  }
   return (
     <header className="navbar">
       <div className="logoAndsearch">
-        <h1>YSF SHOOP</h1>
+        <h1 onClick={() => navigate("/shop")}>YSF SHOOP</h1>
         <form className="form">
           <button>
             <svg
@@ -117,9 +138,31 @@ export default function NavBar() {
           </svg>
           <small>{userShop.cart}</small>
         </NavLink>
-        <NavLink to={"/profile"}>
-          <img src="me.jpg" alt="" />
-        </NavLink>
+        {(!userId && (
+          <NavLink to={"/profile"}>
+            <img src="me.jpg" alt="" />
+          </NavLink>
+        )) || (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#f22c2c"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              className="icon icon-tabler icons-tabler-outline icon-tabler-logout"
+              style={{cursor:"pointer"}}
+              onClick={logout}
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" />
+              <path d="M9 12h12l-3 -3" />
+              <path d="M18 15l3 -3" />
+            </svg>
+        )}
       </div>
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
     </header>

@@ -109,7 +109,7 @@ export default function Home() {
       <div className="lastProducts">
         <h1>Last Products</h1>
         <div className="products">
-          {products.map((product) => (
+          {products?.map((product) => (
             <div
               key={product.id}
               className="product"

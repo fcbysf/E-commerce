@@ -88,8 +88,8 @@ function EditProduct() {
       .then((res) => {
         if (res.ok) {
           toast.success("product updated successfully");
-          setErrors([]);
           navigate("/admin/products");
+          setErrors([]);
         }
         if (res.status == 422) {
           return res.json();
@@ -266,7 +266,7 @@ function EditProduct() {
                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                 <path d="M5 12l5 5l10 -10" />
               </svg>
-              add product
+              Edit Product
             </button>
           </div>
           <label className="custum-file-upload" htmlFor="file">

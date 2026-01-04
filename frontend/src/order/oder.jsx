@@ -51,7 +51,8 @@ export default function Order() {
             </tr>
           </thead>
           <tbody>
-            {orders?.map((order) => (
+            {
+              orders?.map((order) => (
               <Fragment key={order.id}>
                 <tr>
                   <td>#{order.id}</td>
