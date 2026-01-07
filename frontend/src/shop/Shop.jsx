@@ -290,7 +290,7 @@ export default function Shop() {
                   <p>{product.name}</p>
                   <i>$ {product.price}</i>
                   <button
-                    className="cartBtn"
+                    className="cartBt"
                     onClick={() => addToCart(product)}
                   >
                     <svg
