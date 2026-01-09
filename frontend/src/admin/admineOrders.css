@@ -14,7 +14,7 @@
 .adminOrdersContainer h1{
     display: flex;
     align-items: center;
-    gap: 4px;;
+    gap: 4px;
     margin: 0;
 }
 .adminOrdersContainer h1 svg{

@@ -5,18 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    
+
     public function index()
     {
-     return Order::with('items.product','user')->latest()->get();
-       
+        return Order::with('items.product', 'user')->latest()->get();
     }
-    public function userOrders(Request $request){
-        return Order::with('items.product',)->where('user_id',$request->user()->id)->get();
+    public function userOrders(Request $request)
+    {
+        return Order::with('items.product',)->where('user_id', $request->user()->id)->get();
     }
 
 
@@ -31,8 +32,8 @@ class OrderController extends Controller
             'phone' => 'required|min:8'
         ]);
         $orderData['user_id'] = $request->user()->id;
-        $order=Order::create($orderData);
-        foreach($request->cart as $cart) {
+        $order = Order::create($orderData);
+        foreach ($request->cart as $cart) {
             OrderItem::create([
                 'order_id' => $order->id,
                 'product_id' => $cart['product']['id'],
@@ -40,16 +41,16 @@ class OrderController extends Controller
                 'unit_price' => $cart['product']['price']
             ]);
             Cart::destroy($cart['id']);
+        }
+        return response()->json("order done");
     }
-    return response()->json("order done");
-}
 
     /**
      * Display the specified resource.
      */
     public function show(Order $order)
     {
-        return $order->load('items.product','user');
+        return $order->load('items.product', 'user');
     }
 
     /**
@@ -58,11 +59,17 @@ class OrderController extends Controller
     public function update(Request $request, Order $order)
     {
         $request->validate([
-            'status' =>'required'
+            'status' => 'required',
+            'product' => 'required',
         ]);
         $order->status = $request->input('status');
         $order->save();
-        return response()->json("order updated");
+        foreach ($request->product as $product) {
+            $prd = Product::where('id', $product['id'])->first();
+            $prd->stock = $product['stock']-1;
+            $prd->save();
+        }
+        return $order;
     }
 
     /**

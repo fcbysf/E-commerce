@@ -4,40 +4,47 @@ export const Context = createContext();
 const Provider = ({ children }) => {
   const api = "http://localhost:8000/api/";
   const [token, setToken] = useState(sessionStorage.getItem("token") || null);
-  const [isLoggedIn,setIsLoggedIn] = useState(sessionStorage.getItem("token") ? true : false)
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    sessionStorage.getItem("token") ? true : false
+  );
   const [userId, setUserId] = useState(null);
   const [userRole, setUserRole] = useState(
     sessionStorage.getItem("role") || null
   );
-  const [userShop, setUserShop] = useState({orders: 0,cart:0,favourites:0});
+  const [userShop, setUserShop] = useState({
+    orders: 0,
+    cart: 0,
+    favourites: 0,
+  });
+  const [loading, setLoading] = useState(true);
 
-
-  function fetching(){
-    fetch(api + "user",{
-        headers: {
-        "accept": "application/json",
-        "Authorization": `Bearer ${token}`,
+  function fetching() {
+    fetch(api + "user", {
+      headers: {
+        accept: "application/json",
+        Authorization: `Bearer ${token}`,
       },
     })
-    .then((res) =>{
-        if(res.status===200){
-          setIsLoggedIn(true)
-          return res.json()
+      .then((res) => {
+        if (res.status === 200) {
+          setIsLoggedIn(true);
+          setLoading(false);
+          return res.json();
+        } else {
+          setUserShop({ orders: 0, cart: 0, favourites: 0 });
+          setUserId(null);
+          setUserRole(null);
+          setIsLoggedIn(false);
+          setLoading(false);
         }
-        else{
-          setUserShop({orders: 0,cart:0,favourites:0})
-          setUserId(null)
-          setUserRole(null)
-            setIsLoggedIn(false)
-        }
-    }) 
-    .then((data) => {
-      setUserId(data.user_id);
-      setUserRole(data.role);
-      setUserShop({orders: data.orders, cart: data.cart})
-      sessionStorage.setItem("role",data.role)
-    })
-    .catch((err) => console.log(err));
+      })
+      .then((data) => {
+        setUserId(data.user_id);
+        setUserRole(data.role);
+        setUserShop({ orders: data.orders, cart: data.cart });
+        sessionStorage.setItem("role", data.role);
+      })
+      .catch((err) => console.log(err));
   }
   useEffect(() => {
     const storedToken = sessionStorage.getItem("token");
@@ -45,22 +52,36 @@ const Provider = ({ children }) => {
       setToken(storedToken);
     }
   }, [isLoggedIn]);
-  useEffect(()=>{
-    fetching()
-  },[token])
+  useEffect(() => {
+    fetching();
+  }, [token]);
   const logout = () => {
     setToken(null);
-    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
   };
 
-  return (
-    useMemo(
-      () => (
-        <Context.Provider value={{ api, token, logout,isLoggedIn,setIsLoggedIn,userId, userRole, setUserId, userShop , fetching}}>
-      {children}
-    </Context.Provider>
-      ),
-    [userId, token, children, isLoggedIn,userRole, userShop])
+
+  return useMemo(
+    () => (
+      <Context.Provider
+        value={{
+          api,
+          token,
+          logout,
+          isLoggedIn,
+          setIsLoggedIn,
+          userId,
+          userRole,
+          setUserId,
+          userShop,
+          fetching,
+          loading,
+        }}
+      >
+        {children}
+      </Context.Provider>
+    ),
+    [userId, token, children, isLoggedIn, userRole, userShop]
   );
 };
 export default Provider;

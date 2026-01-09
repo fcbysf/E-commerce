@@ -2,20 +2,16 @@ import { NavLink, useNavigate } from "react-router-dom";
 import "./home.css";
 import { useContext, useEffect, useState } from "react";
 import { Context } from "./context/context";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Home() {
   const navigate = useNavigate();
   const [animateText, setAnimate] = useState(false);
   const [animateImg, setAnimateImg] = useState(false);
   const [imageId, setImageId] = useState("");
-  const [products, setProducts] = useState([]);
   const [showStock, setShowStock] = useState(false);
   const { api } = useContext(Context);
   useEffect(() => {
-    fetch(api + "homeProducts")
-      .then((res) => res.ok && res.json())
-      .then((data) => setProducts(data))
-      .catch((err) => console.log(err));
     setTimeout(() => {
       setAnimate(true);
     }, 1000);
@@ -23,6 +19,14 @@ export default function Home() {
       setAnimateImg(true);
     }, 1000);
   }, []);
+  const sixProducts =()=> fetch(api + "homeProducts").then((res) => res.ok && res.json())
+
+  const {data, isLoading, isError} = useQuery({
+    queryKey : ['6products'],
+    queryFn : sixProducts
+  })
+  
+
   return (
     <div className="homeContainer">
       <header>
@@ -109,7 +113,7 @@ export default function Home() {
       <div className="lastProducts">
         <h1>Last Products</h1>
         <div className="products">
-          {products?.map((product) => (
+          {data?.map((product) => (
             <div
               key={product.id}
               className="product"

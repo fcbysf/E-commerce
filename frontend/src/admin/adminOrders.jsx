@@ -4,7 +4,6 @@ import { Context } from "../context/context";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
-import Loader from "../layouts/loader";
 import "./admineOrders.css";
 import { toast } from "react-hot-toast";
 
@@ -57,7 +56,7 @@ export default function AdminOrders() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ status: "done" }),
+      body: JSON.stringify({ status: "done",product: order.items.map(i=>i.product)}),
     })
       .then((res) => {
         if (res.ok) {

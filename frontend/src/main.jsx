@@ -4,12 +4,22 @@ import App from "./App.jsx";
 import { Toaster } from "react-hot-toast";
 import { Suspense } from "react";
 import Loader from "./layouts/loader.jsx";
+import {QueryClient,  QueryClientProvider } from "@tanstack/react-query";
 
+const queryClient = new QueryClient();
 createRoot(document.getElementById("root")).render(
   <>
-    <Suspense fallback={<div><Loader /></div>}>
-    <App />
-  </Suspense>
+    <QueryClientProvider client={queryClient}>
+      <Suspense
+        fallback={
+          <div>
+            <Loader />
+          </div>
+        }
+      >
+        <App />
+      </Suspense>
+    </QueryClientProvider>
     <Toaster
       position="top-right"
       toastOptions={{

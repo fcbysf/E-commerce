@@ -107,7 +107,7 @@ export default function Product() {
             {
               recommenedProducts.map((p)=>(
                 p.id!==product.id&&
-                <div className="product">
+                <div className="product" key={p.id}>
                   <div className="image-wrapper">
                     <img src={p.image} alt="" />
                   </div>

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { Context } from "../context/context";
 import "./dashbord.css";
 import toast from "react-hot-toast";
