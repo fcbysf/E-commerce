@@ -8,9 +8,7 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function homeProducts()
     {
         return Product::with('images')
@@ -25,7 +23,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $category = $request->category;
-        if ($category == 'allCategories' || !$category) {
+        if ($category == 'allCategories') {
             return Product::whereBetween('price', [$request->min, $request->max])->latest()->paginate(40);
         } else {
             return Product::where('category', $category)->whereBetween('price', [$request->min, $request->max])->latest()->paginate(40);

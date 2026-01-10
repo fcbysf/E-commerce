@@ -22,13 +22,14 @@ class FavouriteController extends Controller
         $favourite= Favourite::where('product_id', $request->product_id)->where('user_id', $request->user_id)->first();
         if($favourite){
             $favourite->delete();
-            return 'removed from fav';
+            return response()->json('removed from fav');
         }
         Favourite::create([
             'product_id' => $request->product_id,
             'user_id' => $request->user_id
         ]);
-        return 'added';
+        return response()->json('added');
+    
     }
     public function destroy(Favourite $favourite)
     {

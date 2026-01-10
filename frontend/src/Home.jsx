@@ -19,20 +19,17 @@ export default function Home() {
       setAnimateImg(true);
     }, 1000);
   }, []);
-  const sixProducts =()=> fetch(api + "homeProducts").then((res) => res.ok && res.json())
-
-  const {data, isLoading, isError} = useQuery({
-    queryKey : ['6products'],
-    queryFn : sixProducts
+  const sixProducts = ()=> fetch(api + "homeProducts").then((res) => res.ok && res.json());
+  const {data} = useQuery({
+    queryKey : ['products'],
+    queryFn : sixProducts,
   })
-  
-
   return (
     <div className="homeContainer">
       <header>
         <nav>
           <div className="leftLinks">
-            <NavLink to={"/shop"}>Shop</NavLink>
+            <NavLink to={"/shop/allCategories"}>Shop</NavLink>
             <NavLink to={"/shop/men"}>Men</NavLink>
             <NavLink to={"/shop/women"}>women</NavLink>
             <NavLink to={"/shop/trending"}>Trending</NavLink>
@@ -59,7 +56,7 @@ export default function Home() {
             Discover the best deals on the products you love. Shop <b>smart</b>,
             shop <b>fast</b>
           </h1>
-          <button onClick={() => navigate("/shop")}>
+          <button onClick={() => navigate("/shop/allCategories")}>
             <span>shop now</span>
           </button>
         </div>
@@ -159,7 +156,7 @@ export default function Home() {
         <a
           className="button1"
           style={{ "--clr": "#7808d0" }}
-          onClick={() => navigate("/shop")}
+          onClick={() => navigate("/shop/allCategories")}
         >
           <span className="button1__icon-wrapper">
             <svg

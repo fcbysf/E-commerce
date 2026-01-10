@@ -1,31 +1,31 @@
 import { NavLink, useNavigate, useParams } from "react-router-dom";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { Context } from "../context/context";
 import { Range } from "react-range";
 import NavBar from "../layouts/ShopNavBar";
 import toast from "react-hot-toast";
 import "./shop.css";
-import '../home.css'
+import "../home.css";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function Shop() {
+  // VARS
   const { category } = useParams();
   const navigate = useNavigate();
-  const [products, setProducts] = useState([]);
+  const { api, token, userId, fetching } = useContext(Context);
   const [showStock, setShowStock] = useState(false);
   const [imageId, setImageId] = useState("");
-  const { api, token, userId, fetching } = useContext(Context);
   const [checked, setChecked] = useState([]);
   const [values, setValues] = useState([0, 9999]);
   const [priceFiltred, setPriceFiltered] = useState("0-9999");
-  const [favourites, setFavourites] = useState([]);
-  const [brands, setBrands] = useState([
+  const brands = [
     { brand: "nike", icon: "/nike-removebg-preview.png" },
     { brand: "adidas", icon: "/download-removebg-preview.png" },
     { brand: "asics", icon: "/download-removebg-preview (1).png" },
     { brand: "xiomi", icon: "/download-removebg-preview (2).png" },
     { brand: "new balance", icon: "/download-removebg-preview (4).png" },
     { brand: "Apple", icon: "/download-removebg-preview (3).png" },
-  ]);
+  ];
   const categories = [
     "all categories",
     "fashion",
@@ -37,40 +37,43 @@ export default function Shop() {
     "gaming",
     "tech",
   ];
-  function fetchFav(){
-    fetch(api + "favourites", {
-      headers: {
-        accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.ok && res.json())
-      .then((data) => setFavourites(data))
-      .catch((err) => console.log(err));
-  }
+  const queryClient = useQueryClient();
+
+  // PRICE FILTER
   useEffect(() => {
     const timer = setTimeout(() => {
       setPriceFiltered(values.join("-"));
     }, 600);
     return () => clearTimeout(timer);
   }, [values]);
+  const resetPriceFilter = () => {
+    setValues([0, 9999]);
+    setPriceFiltered("0-9999");
+  };
 
-  useEffect(() => {
-    const [min, max] = priceFiltred.split("-");
+  // PRODUCTS FETCHING
+  const [min, max] = priceFiltred.split("-");
+  const { data: ProductsResponse } = useQuery({
+    queryKey: ["products", category, priceFiltred],
+    queryFn: async () => {
+      const url = category
+        ? `${api}product?category=${decodeURIComponent(
+            category
+          )}&min=${min}&max=${max}`
+        : `${api}product?min=${min}&max=${max}`;
+      return await fetch(url).then((res) => res.ok && res.json());
+    },
+    staleTime: 1000 * 60 * 10,
+    keepPreviousData: true,
+  });
+  const products = useMemo(
+    () => ProductsResponse?.data ?? [],
+    [ProductsResponse]
+  );
 
-    const url = category
-      ? `${api}product?category=${decodeURIComponent(
-          category
-        )}&min=${min}&max=${max}`
-      : `${api}product?min=${min}&max=${max}`;
-
-    fetch(url)
-      .then((res) => res.ok && res.json())
-      .then((data) => setProducts(data.data))
-      .catch((err) => console.log(err));
-  }, [category, priceFiltred]);
-  const addToCart = (product) => {
-    fetch(`${api}cart`, {
+  // ADD TO CART
+  const addtocartFn = async (product) => {
+    return await fetch(`${api}cart`, {
       method: "POST",
       headers: {
         accept: "application/json",
@@ -82,53 +85,69 @@ export default function Shop() {
         product_id: product.id,
         quantity: 1,
       }),
-    })
-      .then((res) => {
-        if (res.ok) {
-          toast.success("product added to cart");
-          fetching();
-          return res.json();
-        }
-        else {
-          navigate('/login')
-          return
-        }
-      })
-      .then((data) => sessionStorage.setItem("cart", data))
-      .catch((err) => console.log(err));
+    }).then((res) => {
+      if (res.ok) {
+        return res.json();
+      }
+      throw new Error("authentification error");
+    });
   };
-  const resetPriceFilter = () => {
-    setValues([0, 9999]);
-    setPriceFiltered("0-9999");
-  };
-  const addAndDelFav = (id) => {
-      setFavourites((prev) => {
-    const exists = prev.some(f => f.product_id === id);
-
-    if (exists) {
-      return prev.filter(f => f.product_id !== id);
-    }
-
-    return [...prev, { product_id: id, user_id: userId}];
+  const addToCart = useMutation({
+    
+    mutationFn: addtocartFn,
+    onSuccess: (data) => {
+      toast.success("product added to cart");
+      sessionStorage.setItem("cart", data);
+      fetching();
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+    onError: (err) => {
+      toast.error("not authenticated");
+      navigate("/login");
+      console.log(err);
+    },
   });
-    fetch(`${api}favourites`, {
+
+  // FAVOURITES
+  const { data: favourites } = useQuery({
+    queryKey: ["favourites"],
+    queryFn: () =>
+      fetch(api + "favourites", {
+        headers: {
+          accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }).then((res) => res.ok && res.json()),
+  });
+  const postTofavFN = async (id) => {
+    return await fetch(`${api}favourites`, {
       method: "POST",
       headers: {
         accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ product_id: id, user_id: userId}),
-    })
-    .then((res) => {
-      if (res.ok) {
-        fetchFav();
-      }
-    })
-    .catch((err) => console.log(err));
+      body: JSON.stringify({ product_id: id, user_id: userId }),
+    }).then((res) => {
+      if (!res.ok) throw new Error("Network error");
+      return res.json();
+    });
   };
-  useEffect(() => {
-    fetchFav();
-  }, []);
+  const addAndDelFav = useMutation({
+    mutationFn: postTofavFN,
+    onSuccess: (data) => {
+      if (data == "added") {
+        toast.success("Product added to favourites");
+      } else {
+        toast("Product removed from favourites");
+      }
+      queryClient.invalidateQueries({ queryKey: ["favourites"] });
+    },
+    onError: (err) => {
+      toast.error("Something went wrong");
+      console.log(err);
+    },
+  });
+
   return (
     <div className="shopContainer">
       <NavBar />
@@ -203,7 +222,9 @@ export default function Shop() {
             </div>
             <div className="filterByBrand">
               <div className="topOfpriceDiv">
-                <h3>brand <small>(soon)</small></h3>
+                <h3>
+                  brand <small>(soon)</small>
+                </h3>
                 <small>reset</small>
               </div>
               {brands.map((b) => (
@@ -222,7 +243,7 @@ export default function Shop() {
             </div>
           </aside>
           <div className="productsSide">
-            {products.length === 0 && (
+            {products?.length === 0 && (
               <div className="noProducts">
                 {products.length === 0 && priceFiltred == "0-9999" && (
                   <h2>
@@ -236,7 +257,7 @@ export default function Shop() {
                 )}
               </div>
             )}
-            {products.map((product) => (
+            {products?.map((product) => (
               <div
                 key={product.id}
                 className="oneProduct"
@@ -246,9 +267,14 @@ export default function Shop() {
                 }}
                 onMouseOut={() => setShowStock(false)}
               >
-                <div className="heartIcon" onClick={() => addAndDelFav(product.id)}>
-                {(!favourites.map(f=>f.product_id).includes(product.id) && (
-                  <svg
+                <div
+                  className="heartIcon"
+                  onClick={() => addAndDelFav.mutate(product.id)}
+                >
+                  {(!favourites
+                    ?.map((f) => f.product_id)
+                    .includes(product.id) && (
+                    <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"
                       height="24"
@@ -263,19 +289,19 @@ export default function Shop() {
                       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                       <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
                     </svg>
-                )) || 
-                <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                class="icon icon-tabler icons-tabler-filled icon-tabler-heart"
-                >
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M6.979 3.074a6 6 0 0 1 4.988 1.425l.037 .033l.034 -.03a6 6 0 0 1 4.733 -1.44l.246 .036a6 6 0 0 1 3.364 10.008l-.18 .185l-.048 .041l-7.45 7.379a1 1 0 0 1 -1.313 .082l-.094 -.082l-7.493 -7.422a6 6 0 0 1 3.176 -10.215z" />
-                  </svg>
-                }
+                  )) || (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      class="icon icon-tabler icons-tabler-filled icon-tabler-heart"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M6.979 3.074a6 6 0 0 1 4.988 1.425l.037 .033l.034 -.03a6 6 0 0 1 4.733 -1.44l.246 .036a6 6 0 0 1 3.364 10.008l-.18 .185l-.048 .041l-7.45 7.379a1 1 0 0 1 -1.313 .082l-.094 -.082l-7.493 -7.422a6 6 0 0 1 3.176 -10.215z" />
+                    </svg>
+                  )}
                 </div>
                 <div
                   className="image-wrapper"
@@ -291,7 +317,8 @@ export default function Shop() {
                   <i>$ {product.price}</i>
                   <button
                     className="cartBtn"
-                    onClick={() => addToCart(product)}
+                    onClick={() => addToCart.mutate(product)}
+                    disabled={addToCart.isPending}
                   >
                     <svg
                       className="cart"

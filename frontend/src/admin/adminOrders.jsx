@@ -6,11 +6,12 @@ import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 import "./admineOrders.css";
 import { toast } from "react-hot-toast";
+import { useQuery } from "@tanstack/react-query";
 
 export default function AdminOrders() {
   const { api, token } = useContext(Context);
   const [loader, setLoader] = useState(true);
-  const [orders, setOrders] = useState([]);
+  // const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [menuId, setMenuId] = useState(null);
   const [status, setStatus] = useState("all");
@@ -26,7 +27,7 @@ export default function AdminOrders() {
     }
   };
   function fetching() {
-    fetch(`${api}order`, {
+    return fetch(`${api}order`, {
       headers: {
         accept: "application/json",
         Authorization: `Bearer ${token}`,
@@ -39,14 +40,11 @@ export default function AdminOrders() {
           return res.json();
         }
       })
-      .then((data) => {
-        setOrders(data);
-      })
-      .catch((err) => console.log(err));
   }
-  useEffect(() => {
-    fetching();
-  }, []);
+  const {data : orders} = useQuery({
+    queryKey : ['orders'],
+    queryFn : fetching,
+  })
   const orderDone = (order) => {
     if (order.status == "done") return;
     fetch(`${api}order/${order.id}`, {
@@ -230,7 +228,7 @@ export default function AdminOrders() {
             </tr>
           </thead>
           <tbody>
-            {orders.map(
+            {orders?.map(
               (order) =>
                 ((status == "all" && order.id.toString().includes(search)) ||
                   (status == order.status &&

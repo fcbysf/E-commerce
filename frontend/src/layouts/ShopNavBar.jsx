@@ -36,7 +36,7 @@ export default function NavBar() {
   return (
     <header className="navbar">
       <div className="logoAndsearch">
-        <h1 onClick={() => navigate("/shop")}>YSF SHOOP</h1>
+        <h1 onClick={() => navigate("/shop/allCategories")}>YSF SHOOP</h1>
         <form className="form">
           <button>
             <svg
