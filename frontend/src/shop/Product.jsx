@@ -5,31 +5,38 @@ import { Context } from "../context/context";
 import { useNavigate, useParams } from "react-router-dom";
 
 export default function Product() {
-  const { api,} = useContext(Context);
+  const { api } = useContext(Context);
   const { id } = useParams();
-  const [product, setProduct] = useState({});
   const [imageSrc, setImagesSrc] = useState("");
   const [recommenedProducts, setRecommendedProducts] = useState([]);
+  const QueryClient = useQueryClient();
+
+  // FETCH PRODUCT
+  const { data: product } = useQuery({
+    queryKey: ["product", "shop",id],
+    queryFn: () =>
+      fetch(`${api}product/${id}`)
+        .then((res) =>{
+          if(res.ok)return res.json();
+          else throw Error("product not found")
+
+        })
+  });
+  useEffect(() => {
+    if (product) {
+      setImagesSrc(product.image);
+    }
+  }, [product]);
 
   useEffect(() => {
-    fetch(`${api}product/${id}`)
-      .then((res) => res.ok && res.json())
-      .then((data) => {
-        setProduct(data);
-        setImagesSrc(data.image);
-      })
-      .catch((err) => console.log(err));
-  }, [id]);
-  useEffect(()=>{
-    product.category&&
-    fetch(`${api}sameCategoryProducts?category=${product.category}`)
-    .then((res)=>res.ok&&res.json())
-    .then((data)=>setRecommendedProducts(data.data))
-    .catch((err)=>console.log(err))
+    product?.category &&
+      fetch(`${api}sameCategoryProducts?category=${product.category}`)
+        .then((res) => res.ok && res.json())
+        .then((data) => setRecommendedProducts(data.data))
+        .catch((err) => console.log(err));
+  }, [product?.category]);
 
-  },[product.category])
-
-  return (
+  return (product&&
     <div className="productContainer">
       <div className="shopContainer">
         <NavBar />
@@ -104,21 +111,20 @@ export default function Product() {
         <div className="recommendedP">
           <h2>recommended products</h2>
           <div className="recommendedProducts">
-            {
-              recommenedProducts.map((p)=>(
-                p.id!==product.id&&
-                <div className="product" key={p.id}>
-                  <div className="image-wrapper">
-                    <img src={p.image} alt="" />
+            {recommenedProducts.map(
+              (p) =>
+                p.id !== product.id && (
+                  <div className="product" key={p.id}>
+                    <div className="image-wrapper">
+                      <img src={p.image} alt="" />
+                    </div>
+                    <div className="SCproductInfos">
+                      <p>{p.name}</p>
+                      <i>$ {p.price}</i>
+                    </div>
                   </div>
-                  <div className="SCproductInfos">
-                    <p>{p.name}</p>
-                    <i>$ {p.price}</i>
-                </div>
-                </div>
-              ))
-            }
-
+                )
+            )}
           </div>
         </div>
       </main>
@@ -127,29 +133,37 @@ export default function Product() {
 }
 
 import styled from "styled-components";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const Button = ({ product }) => {
-  const navigate = useNavigate()
-  const { api, token,isLoggedIn,userId, fetching } = useContext(Context);
+  const navigate = useNavigate();
+  const { api, token, isLoggedIn, userId, fetching } = useContext(Context);
   const addToCart = () => {
-    if(!isLoggedIn){
+    if (!isLoggedIn) {
       navigate("/login", { replace: true });
-      return
+      return;
     }
-    fetch(`${api}cart`,{
-      method:'POST',
-      headers:{
-        'accept':'application/json',
-        'Content-Type':'application/json',
-        'Authorization': `bearer ${token}`
+    fetch(`${api}cart`, {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `bearer ${token}`,
       },
-      body:JSON.stringify({user_id:userId,product_id:product.id,quantity:1})
+      body: JSON.stringify({
+        user_id: userId,
+        product_id: product.id,
+        quantity: 1,
+      }),
     })
-    .then(res=>res.ok&&res.json())
-    .then(data=>{sessionStorage.setItem('cart',data);fetching()})
-    .catch(err=>console.log(err))
-    }
-  
+      .then((res) => res.ok && res.json())
+      .then((data) => {
+        sessionStorage.setItem("cart", data);
+        fetching();
+      })
+      .catch((err) => console.log(err));
+  };
+
   return (
     <StyledWrapper>
       <div className="addToCartBtn">
@@ -159,7 +173,11 @@ const Button = ({ product }) => {
           id="cart-toggle"
           type="checkbox"
         />
-        <label className="cart-button" htmlFor="cart-toggle"  onClick={addToCart}>
+        <label
+          className="cart-button"
+          htmlFor="cart-toggle"
+          onClick={addToCart}
+        >
           <span className="cart-icon">
             <svg
               strokeLinejoin="round"

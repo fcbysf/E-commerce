@@ -6,24 +6,30 @@ import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 import "./order.css";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Order() {
   const navigate = useNavigate();
-  const [orders, setOrders] = useState([]);
   const { api, token, isLoggedIn } = useContext(Context);
-  useEffect(() => {
-    if (!isLoggedIn) {
-      navigate("/login");
-    }
-    fetch(`${api}userOrders`, {
+
+  // FETCH USER ORDERS
+  const {data : orders} = useQuery({
+    queryKey: ["orders", "userOrders"],
+    queryFn: () =>fetch(`${api}userOrders`, {
       headers: {
         accept: "application/json",
         Authorization: `Bearer ${token}`,
       },
     })
-      .then((res) => res.json())
-      .then((data) => setOrders(data))
-      .catch((err) => console.log(err));
+      .then((res) =>{
+        if (res.ok) return res.json();
+        else throw Error("something went wrong");
+      })
+  })
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate("/login");
+    }
   }, []);
   const orderStyle = (status) => {
     if (status == "pending") {
@@ -34,7 +40,7 @@ export default function Order() {
       return "red";
     }
   };
-  return (
+  return (orders&&
     <div className="orderContainer">
       <NavBar />
       <div className="orders">

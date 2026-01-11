@@ -4,35 +4,40 @@ import "./adminUsers.css";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
-import {toast} from 'react-hot-toast'
-
+import { toast } from "react-hot-toast";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function AdminUsers() {
-  const [users, setUsers] = useState([]);
-  const { api, token,userId } = useContext(Context);
+  const { api, token, userId } = useContext(Context);
   const [selectedUserId, setselectedUserId] = useState(null);
-  const [role, setRole] = useState('user');
+  const [role, setRole] = useState("user");
+  const queryClient = useQueryClient();
 
-
-  function fetching() {
-      fetch(`${api}users`, {
-        headers: {
-          accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => setUsers(data))
-        .catch((err) => console.log(err));
+  // FETCH USERS
+  async function fetching() {
+    return await fetch(`${api}users`, {
+      headers: {
+        accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }).then((res) =>{
+      if(res.ok) return res.json();
+      else throw Error("error fetching users");
+    });
   }
-  useEffect(() => {
-    fetching();
-  }, []);
+  const { data: users } = useQuery({
+    queryKey: ["users"],
+    queryFn: fetching,
+  });
+
   function totalSpent(orders) {
     return orders.reduce((a, b) => a + b.total_price, 0).toFixed(2);
   }
-  const changeRole = () => {
-    fetch(`${api}user/${selectedUserId}`, {
+
+  // CHANGE ROLE
+  const { mutate: changeRoleMutate, isError } = useMutation({
+    mutationFn: () =>
+      fetch(`${api}user/${selectedUserId}`, {
         method: "PUT",
         headers: {
           accept: "application/json",
@@ -40,17 +45,24 @@ export default function AdminUsers() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ role }),
-      })
-        .then((res) => {
-          if (res.ok) {
-            fetching();
-            setselectedUserId('user');
-            setRole(null);
-            toast.success('role changed successfully')
-            return res.json();
-          }
-        })
-  }
+      }).then((res) => {
+        if (res.ok) {
+          return res.json();
+        }
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["users"]);
+      setselectedUserId("user");
+      setRole(null);
+      toast.success("role changed successfully");
+    },
+    onError: () => {
+      toast.error("error changing role, try again later");
+    },
+  });
+  const changeRole = () => {
+    changeRoleMutate();
+  };
   return (
     <div className="adminUsersContainer">
       <div className="titleAndFilter">
@@ -76,7 +88,7 @@ export default function AdminUsers() {
             <path d="M3 13v-1a2 2 0 0 1 2 -2h2" />
           </svg>
           Users
-          <small>({users.length})</small>
+          <small>({users?.length})</small>
         </h1>
         <div className="filter"></div>
       </div>
@@ -93,9 +105,11 @@ export default function AdminUsers() {
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
+            {users?.map((user) => (
               <tr key={user.id} onClick={() => setselectedUserId(user.id)}>
-                <td>{user.id} {user.id === userId && <small>(you)</small>}</td>
+                <td>
+                  {user.id} {user.id === userId && <small>(you)</small>}
+                </td>
                 <td>{user.name}</td>
                 <td>{user.email}</td>
                 <td>{user.role}</td>
@@ -244,13 +258,33 @@ export default function AdminUsers() {
                   </div>
                   <hr />
                   <div className="editRoles">
-                    <h3>Edit Roles <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#f45757" class="icon icon-tabler icons-tabler-filled icon-tabler-alert-triangle"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 1.67c.955 0 1.845 .467 2.39 1.247l.105 .16l8.114 13.548a2.914 2.914 0 0 1 -2.307 4.363l-.195 .008h-16.225a2.914 2.914 0 0 1 -2.582 -4.2l.099 -.185l8.11 -13.538a2.914 2.914 0 0 1 2.491 -1.403zm.01 13.33l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007zm-.01 -7a1 1 0 0 0 -.993 .883l-.007 .117v4l.007 .117a1 1 0 0 0 1.986 0l.007 -.117v-4l-.007 -.117a1 1 0 0 0 -.993 -.883z" /></svg></h3>
-                    <select  onChange={(e)=>setRole(e.target.value)} defaultValue={role}>
-                        <option value="user">User</option>
-                        <option value="admin">Admin</option>
+                    <h3>
+                      Edit Roles{" "}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="#f45757"
+                        class="icon icon-tabler icons-tabler-filled icon-tabler-alert-triangle"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M12 1.67c.955 0 1.845 .467 2.39 1.247l.105 .16l8.114 13.548a2.914 2.914 0 0 1 -2.307 4.363l-.195 .008h-16.225a2.914 2.914 0 0 1 -2.582 -4.2l.099 -.185l8.11 -13.538a2.914 2.914 0 0 1 2.491 -1.403zm.01 13.33l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007zm-.01 -7a1 1 0 0 0 -.993 .883l-.007 .117v4l.007 .117a1 1 0 0 0 1.986 0l.007 -.117v-4l-.007 -.117a1 1 0 0 0 -.993 -.883z" />
+                      </svg>
+                    </h3>
+                    <select
+                      onChange={(e) => setRole(e.target.value)}
+                      defaultValue={role}
+                    >
+                      <option value="user">User</option>
+                      <option value="admin">Admin</option>
                     </select>
-                    <button disabled={role==user.role} onClick={changeRole}>save</button>
-                    <button onClick={()=>setselectedUserId(null)}>cancel</button>
+                    <button disabled={role == user.role} onClick={changeRole}>
+                      save
+                    </button>
+                    <button onClick={() => setselectedUserId(null)}>
+                      cancel
+                    </button>
                   </div>
                 </div>
               )

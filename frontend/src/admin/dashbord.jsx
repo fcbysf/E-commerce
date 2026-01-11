@@ -2,14 +2,47 @@ import { useContext, useState } from "react";
 import { Context } from "../context/context";
 import "./dashbord.css";
 import toast from "react-hot-toast";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 function Dashbord() {
   const [images, setImages] = useState([]);
   const { api, token } = useContext(Context);
   const [selectedSize, setSelectedSize] = useState([]);
   const [mainImg, setMainImg] = useState(null);
-  const [errors,setErrors] = useState([])
+  const [errors, setErrors] = useState([]);
   const sizes = ["xs", "s", "m", "l", "xl", "xxl"];
+  const queryClient = useQueryClient();
+  const { mutate,isError } = useMutation({
+    mutationFn: async (formData) => {
+      const res = await fetch(api + "product", {
+        method: "POST",
+        headers: {
+          accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw data;
+      }
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["products"]);
+      toast.success("product added successfully");
+      setErrors([]);
+      setImages([]);
+      setMainImg(null);
+      setPreview(null);
+      setImagsPreview([]);
+      setSelectedSize([]);
+    },
+    onError: (error) => {
+      setErrors(error.errors);
+    },
+  });
+
   const submit = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -17,31 +50,12 @@ function Dashbord() {
     images.forEach((image) => {
       formData.append("images[]", image);
     });
-    fetch(api + "product", {
-      method: "POST",
-      headers: {
-        "accept": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    })
-    .then(res=>{
-      if(res.ok){
-        toast.success("product added successfully")
-        setErrors([])
-        e.target.reset()
-        setImages([])
-        setMainImg(null)
-        setPreview(null)
-        setImagsPreview([]) 
-        setSelectedSize([])
-      }
-      if(res.status==422){
-        return res.json()
-      }
-    }).then(data=>data.errors&& setErrors(data.errors))
-    .catch(err=>console.log(err))
+    mutate(formData);
+    if(!isError){
+      e.target.reset();
+    }
   };
+
   const addSize = (size) => {
     if (selectedSize.includes(size)) {
       setSelectedSize(selectedSize.filter((s) => s !== size));
@@ -54,8 +68,8 @@ function Dashbord() {
   };
   const handleImgsChange = (e) => {
     const files = [...e.target.files];
-    setImages([...images,...files.filter(file=>!images.includes(file))])
-  }
+    setImages([...images, ...files.filter((file) => !images.includes(file))]);
+  };
   return (
     <div className="dachbordContainer">
       <form onSubmit={submit} encType="multipart/form-data">
@@ -88,7 +102,7 @@ function Dashbord() {
               <label htmlFor="">Product name: </label>
               <br />
               <input type="text" name="name" placeholder="name" />
-              {errors.name &&<p className="errorInp">{errors.name}</p>}
+              {errors?.name && <p className="errorInp">{errors.name}</p>}
             </div>
             <div className="description">
               <label htmlFor="">Product description: </label>
@@ -97,8 +111,10 @@ function Dashbord() {
                 name="description"
                 placeholder="description"
                 rows={4}
-                ></textarea>
-                {errors.description &&<p className="errorInp">{errors.description}</p>}
+              ></textarea>
+              {errors?.description && (
+                <p className="errorInp">{errors.description}</p>
+              )}
             </div>
             <div className="sizes">
               <label htmlFor="">Product sizes: </label>
@@ -126,25 +142,29 @@ function Dashbord() {
                 <label htmlFor="">Price </label>
                 <br />
                 <input type="text" name="price" placeholder="price" />
-                {errors.price &&<p className="errorInp">{errors.price}</p>}
+                {errors?.price && <p className="errorInp">{errors.price}</p>}
               </div>
               <div className="stock">
                 <label htmlFor="">Stock</label>
                 <br />
                 <input type="text" name="stock" placeholder="stock" />
-                {errors.stock &&<p className="errorInp">{errors.stock}</p>}
+                {errors?.stock && <p className="errorInp">{errors.stock}</p>}
               </div>
               <div className="category">
                 <label htmlFor="">Category</label>
                 <br />
                 <input type="text" name="category" placeholder="category" />
-                {errors.category &&<p className="errorInp">{errors.category}</p>}
+                {errors?.category && (
+                  <p className="errorInp">{errors.category}</p>
+                )}
               </div>
               <div className="discount">
                 <label htmlFor="">Discount</label>
                 <br />
                 <input type="number" name="discount" placeholder="discount" />
-                {errors.discount &&<p className="errorInp">{errors.discount}</p>}
+                {errors?.discount && (
+                  <p className="errorInp">{errors.discount}</p>
+                )}
               </div>
             </div>
           </div>
@@ -152,7 +172,21 @@ function Dashbord() {
         <div className="formRightSide">
           <div className="btnSubmit">
             <button type="submit" onSubmit={submit} className="fancy">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-check"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-check"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M5 12l5 5l10 -10" />
+              </svg>
               add product
             </button>
           </div>
@@ -195,7 +229,7 @@ function Dashbord() {
               onChange={(e) => setMainImg(e.target.files[0])}
             />
           </label>
-                {errors.image &&<p className="errorInp">{errors.image}</p>}
+          {errors?.image && <p className="errorInp">{errors.image}</p>}
 
           <div className="otherImgs">
             {images.length > 0 &&
@@ -217,9 +251,9 @@ function Dashbord() {
               name="images"
               onChange={handleImgsChange}
               multiple
-              />
+            />
           </div>
-              {errors.images &&<p className="errorInp">{errors.images}</p>}
+          {errors?.images && <p className="errorInp">{errors.images}</p>}
         </div>
       </form>
     </div>

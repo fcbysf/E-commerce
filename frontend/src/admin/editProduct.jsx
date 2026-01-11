@@ -3,18 +3,11 @@ import { Context } from "../context/context";
 import "./dashbord.css";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 function EditProduct() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [form, setForm] = useState({
-    name: "",
-    description: "",
-    price: "",
-    stock: "",
-    category: "",
-    discount: "",
-  });
   const [notEditedImg, setNotEditedImg] = useState(null);
   const [notEditedImgs, setNotEditedImgs] = useState([]);
   const [deletedImgsIds, setDeletedImgsIds] = useState([]);
@@ -25,29 +18,47 @@ function EditProduct() {
   const [preview, setPreview] = useState(null);
   const [imagsPreview, setImagsPreview] = useState([]);
   const [errors, setErrors] = useState([]);
+  const [form, setForm] = useState({
+    name: "",
+    description: "",
+    price: "",
+    stock: "",
+    category: "",
+    discount: "",
+  });
   const sizes = ["xs", "s", "m", "l", "xl", "xxl"];
+  const queryClient = useQueryClient();
+
+  // FETCH PRODUCT
+  const { data: product } = useQuery({
+    queryKey: ["product", "admin",id],
+    queryFn: () =>
+      fetch(`${api}product/${id}`, {
+        headers: {
+          accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }).then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else throw Error("something went wrong");
+      }),
+  });
   useEffect(() => {
-    fetch(`${api}product/${id}`, {
-      headers: {
-        accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setNotEditedImgs(data.images);
-        setNotEditedImg(data.image);
-        setForm({
-          name: data.name,
-          description: data.description,
-          price: data.price,
-          stock: data.stock,
-          category: data.category,
-          discount: data.discount,
-        });
-      })
-      .catch((err) => console.log(err));
-  }, []);
+    if (product) {
+      setNotEditedImgs(product.images);
+      setNotEditedImg(product.image);
+      setForm({
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        stock: product.stock,
+        category: product.category,
+        discount: product.discount,
+      });
+    }
+  }, [product]);
+
   useEffect(() => {
     if (mainImg) {
       const url = URL.createObjectURL(mainImg);
@@ -63,6 +74,32 @@ function EditProduct() {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+  const { mutate: updateProductMutation } = useMutation({
+    mutationFn: async (formData) => {
+      const res = await fetch(api + "product/" + id, {
+        method: "POST",
+        headers: {
+          accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw data;
+      }
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["products"]);
+      toast.success("product edited successfully");
+      setErrors([]);
+      navigate("/admin/products");
+    },
+    onError: (error) => {
+      setErrors(error.errors);
+    },
+  });
   const submit = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -77,26 +114,7 @@ function EditProduct() {
     deletedImgsIds.forEach((id) => {
       formData.append("deletedImgsIds[]", id);
     });
-    fetch(api + "product/" + id, {
-      method: "POST",
-      headers: {
-        accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    })
-      .then((res) => {
-        if (res.ok) {
-          toast.success("product updated successfully");
-          navigate("/admin/products");
-          setErrors([]);
-        }
-        if (res.status == 422) {
-          return res.json();
-        }
-      })
-      .then((data) => data.errors && setErrors(data.errors))
-      .catch((err) => console.log(err));
+    updateProductMutation(formData);
   };
   const addSize = (size) => {
     if (selectedSize.includes(size)) {
@@ -106,17 +124,19 @@ function EditProduct() {
     setSelectedSize([...selectedSize, size]);
   };
   const dlt = (img) => {
-    if (img.id){
+    if (img.id) {
       setDeletedImgsIds([...deletedImgsIds, img.id]);
       return;
     }
     setImagsPreview(imagsPreview.filter((im) => im !== img));
   };
-  useEffect(()=>{
-    if(deletedImgsIds.length > 0){
-      setNotEditedImgs(notEditedImgs.filter((img) => !deletedImgsIds.includes(img.id)))
+  useEffect(() => {
+    if (deletedImgsIds.length > 0) {
+      setNotEditedImgs(
+        notEditedImgs.filter((img) => !deletedImgsIds.includes(img.id))
+      );
     }
-  })
+  });
   return (
     <div className="dachbordContainer">
       <form onSubmit={submit} encType="multipart/form-data">

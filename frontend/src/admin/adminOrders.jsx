@@ -6,16 +6,16 @@ import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 import "./admineOrders.css";
 import { toast } from "react-hot-toast";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function AdminOrders() {
   const { api, token } = useContext(Context);
-  const [loader, setLoader] = useState(true);
-  // const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [menuId, setMenuId] = useState(null);
   const [status, setStatus] = useState("all");
   const [search, setSearch] = useState("");
+  const queryClient = useQueryClient();
+
 
   const toggleMenu = (id) => {
     if (menuId == id) {
@@ -26,8 +26,10 @@ export default function AdminOrders() {
       return;
     }
   };
-  function fetching() {
-    return fetch(`${api}order`, {
+
+  // FETCH ORDERS
+  async function fetching() {
+    return await fetch(`${api}order`, {
       headers: {
         accept: "application/json",
         Authorization: `Bearer ${token}`,
@@ -35,7 +37,6 @@ export default function AdminOrders() {
     })
       .then((res) => {
         if (res.ok) {
-          setLoader(false);
           setMenuId(null);
           return res.json();
         }
@@ -45,9 +46,10 @@ export default function AdminOrders() {
     queryKey : ['orders'],
     queryFn : fetching,
   })
-  const orderDone = (order) => {
-    if (order.status == "done") return;
-    fetch(`${api}order/${order.id}`, {
+
+  // FINISH ORDER
+  const {mutate : finishOrderMutation} = useMutation({
+    mutationFn : (order)=>fetch(`${api}order/${order.id}`, {
       method: "PUT",
       headers: {
         accept: "application/json",
@@ -58,18 +60,27 @@ export default function AdminOrders() {
     })
       .then((res) => {
         if (res.ok) {
-          toast.success("order done");
           return res.json();
         }
-      })
-      .then(() => {
-        fetching();
-      })
-      .catch((err) => console.log(err));
+        else throw Error("error finishing order");
+      }),
+      onSuccess : () => {
+        queryClient.invalidateQueries(["orders"]);
+        toast.success("order done");
+      },
+      onError : () => {
+        toast.error("error finishing order, try again later");
+      }
+
+  })
+  const orderDone = (order) => {
+    if (order.status == "done") return;
+    finishOrderMutation(order)
   };
-  const cancelOrder = (order) => {
-    if (order.status == "canceled") return;
-    fetch(`${api}order/${order.id}`, {
+
+  // CANCEL ORDER
+  const {mutate : cancelOrderMutation} = useMutation({
+    mutationFn : (order)=>fetch(`${api}order/${order.id}`, {
       method: "PUT",
       headers: {
         accept: "application/json",
@@ -80,14 +91,22 @@ export default function AdminOrders() {
     })
       .then((res) => {
         if (res.ok) {
-          toast.error("order canceled");
           return res.json();
         }
-      })
-      .then(() => {
-        fetching();
-      })
-      .catch((err) => console.log(err));
+        else throw Error("error canceling order");
+      }),
+      onSuccess : ()=>{
+        queryClient.invalidateQueries(["orders"]);
+        toast.success("order canceled");
+      },
+      onError : ()=>{
+        toast.error("error canceling order, try again later");
+      }
+    })
+
+  const cancelOrder = (order) => {
+    if (order.status == "canceled") return;
+    cancelOrderMutation(order);
   };
   const orderStyle = (status) => {
     if (status == "pending") {
