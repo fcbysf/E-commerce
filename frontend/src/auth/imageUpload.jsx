@@ -1,11 +1,10 @@
-import { useState } from "react";
-import { Upload, X, Check } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Upload, X } from "lucide-react";
 
-const ImageUploadInput = ({ imageSelected }) => {
+const ImageUploadInput = ({ imageSelected, dejaImg, setimg }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [preview, setPreview] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [ok, setOk] = useState(false);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -44,6 +43,9 @@ const ImageUploadInput = ({ imageSelected }) => {
   };
 
   const removeImage = () => {
+    if(dejaImg){
+      setimg(null)
+    }
     setSelectedImage(null);
     setPreview(null);
   };
@@ -55,7 +57,7 @@ const ImageUploadInput = ({ imageSelected }) => {
           Upload Image (optional)
         </label>
 
-        {!preview ? (
+        {(!preview && !dejaImg) ? (
           <div
             onDrop={handleDrop}
             onDragOver={handleDragOver}
@@ -101,36 +103,33 @@ const ImageUploadInput = ({ imageSelected }) => {
         ) : (
           <div className="relative rounded-2xl mt-2.5 overflow-hidden border-2 border-slate-200">
             <img
-              src={preview}
+              src={preview || dejaImg}
               alt="Preview"
-              className="w-full max-h-40 object-contain "
+              className="w-full max-h-40 rounded-xl object-contain "
             />
-
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-
-            (
-              <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div>
-                      <p className="font-semibold text-sm">
-                        {selectedImage.name}
-                      </p>
-                      <p className="text-xs text-white/80">
-                        {(selectedImage.size / 1024 / 1024).toFixed(2)} MB
-                      </p>
-                    </div>
-                  </div>
-
-                  <div
-                    onClick={removeImage}
-                    className="w-10 h-10 rounded-xl bg-red-500/90 hover:bg-red-600 backdrop-blur-sm flex items-center justify-center transition-colors"
-                  >
-                    <X className="w-5 h-5 border-0" />
+            ({
+            <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div>
+                    <p className="font-semibold text-sm">
+                      {!selectedImage?.name&&null || selectedImage?.name}
+                    </p>
+                    <p className="text-xs text-white/80">
+                      {(selectedImage?.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
                   </div>
                 </div>
+                <div
+                  onClick={removeImage}
+                  className="w-10 h-10 rounded-xl bg-red-500/90 hover:bg-red-600 backdrop-blur-sm flex items-center justify-center transition-colors"
+                >
+                  <X className="w-5 h-5 border-0" />
+                </div>
               </div>
-            )
+            </div>
+})
           </div>
         )}
       </div>

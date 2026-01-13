@@ -20,11 +20,39 @@ import Security from "./security";
 import WishList from "./wishList";
 import ProfileOrders from "./ProfileOrders";
 import ProfileSettings from "./ProfileSettings";
+import ImageUploadInput from "../auth/imageUpload";
 
 const UserProfile = () => {
   const navigate = useNavigate();
   const [activePage, setActivePage] = useState("profile");
   const { user, token, fetching, api, isLoggedIn } = useContext(Context);
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    adresse: "",
+  });
+  const [selectedImg, setSelectedImg] = useState(null);
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    adresse: "",
+  });
+
+
+  function imageSelected(image) {
+    setSelectedImg(image);
+  }
+  useEffect(() => {
+    setForm({
+      name: user?.name,
+      email: user?.email,
+      phone: user?.phone,
+      adresse: user?.adresse,
+    });
+    setSelectedImg(user?.image);
+  }, [user]);
   useEffect(() => {
     if (!isLoggedIn) {
       navigate("/login", replace);
@@ -42,14 +70,6 @@ const UserProfile = () => {
 
   // Navigation items
   const navItems = [
-    { id: "home", label: "Home", icon: Home, section: "menu" },
-    { id: "users", label: "Users", icon: Users, section: "menu" },
-    {
-      id: "organizations",
-      label: "Organizations",
-      icon: Building2,
-      section: "menu",
-    },
     { id: "profile", label: "Profile", icon: User, section: "account" },
     { id: "security", label: "Security", icon: Shield, section: "account" },
     { id: "wishlist", label: "Wishlist", icon: Heart, section: "account" },
@@ -63,7 +83,9 @@ const UserProfile = () => {
       isAction: true,
     },
   ];
-
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
   const handleLogout = async () => {
     if (!window.confirm("LogOut ?")) return;
     const res = await fetch(api + "logout", {
@@ -83,10 +105,56 @@ const UserProfile = () => {
       toast.error("something went wrong");
     }
   };
-
+  const updateUser = (e) => {
+    e.preventDefault()
+  if(form.name==user?.name && form.email==user?.email && form.adresse==user?.adresse && form.phone==user?.phone && user?.image==selectedImg){
+    toast.error('something went wrong')
+    return
+  }
+  if(!confirm('Save changes ?')){
+    return
+  }
+  const formData = new FormData(e.target)
+if (selectedImg instanceof File) {
+  formData.append('image', selectedImg);
+}
+if(selectedImg==null){
+  formData.append('removeImage', '1')
+}
+  formData.append('_method','PUT')
+  fetch(api+'user/'+user?.id, {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  })
+  .then(res =>{
+    if(res.ok){
+      fetching()
+      toast.success('updated successfully')
+      setErrors({})
+      return res.json()
+    }
+    else if(res.status == 422){
+      return res.json()
+    }
+    throw new Error('something went wrong')
+  })
+  .then(data =>{
+    if(data.errors){
+      setErrors(data.errors)
+    }
+    else{
+      console.log(data)
+    }
+  })
+  .catch(err => console.log(err))
+  };
   const renderProfilePage = () =>
     user && (
-      <div className="space-y-6 animate-fadeIn">
+      <div className="space-y-6 ">
         {/* User Header */}
         <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
           <div className="flex items-start gap-6">
@@ -115,7 +183,7 @@ const UserProfile = () => {
         </div>
 
         {/* Personal Information */}
-        <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
+        <form className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm" onSubmit={updateUser}>
           <h3 className="text-lg font-bold text-gray-900 mb-6">
             Personal Information
           </h3>
@@ -126,10 +194,13 @@ const UserProfile = () => {
               </label>
               <input
                 type="text"
-                value={user.name}
+                name="name"
+                value={form?.name}
+                onChange={handleChange}
                 className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
               />
             </div>
+            {errors?.name && <small className="text-red-500 ms-3">{errors?.name}</small>}
             <div className="col-span-2">
               <label className="block text-sm text-gray-500 mb-2">
                 Email Address
@@ -137,10 +208,28 @@ const UserProfile = () => {
               <div className="flex items-center gap-3">
                 <input
                   type="email"
-                  value={user.email}
+                  name="email"
+                  value={form?.email}
+                  onChange={handleChange}
                   className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                 />
               </div>
+            {errors?.email && <small className="text-red-500 ms-3">{errors?.email}</small>}
+            </div>
+            <div className="col-span-2">
+              <label className="block text-sm text-gray-500 mb-2">
+                Adresse
+              </label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="text"
+                  name="adresse"
+                  value={form?.adresse}
+                  onChange={handleChange}
+                  className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                />
+              </div>
+            {errors?.adresse && <small className="text-red-500 ms-3">{errors?.adresse}</small>}
             </div>
             <div className="col-span-2">
               <label className="block text-sm text-gray-500 mb-2">
@@ -148,14 +237,30 @@ const UserProfile = () => {
               </label>
               <div className="flex items-center gap-3">
                 <input
-                  type="tel"
-                  value={user.phone}
+                  type="number"
+                  name="phone"
+                  value={form?.phone}
+                  onChange={handleChange}
                   className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                 />
               </div>
+            {errors?.phone && <small className="text-red-500 ms-3">{errors?.phone}</small>}
             </div>
+            <ImageUploadInput
+              imageSelected={imageSelected}
+              dejaImg={selectedImg}
+              setimg={setSelectedImg}
+            />
           </div>
-        </div>
+            {errors?.image && <small className="text-red-500 ms-3">{errors?.image}</small>}
+          <div className="pt-2 mt-2 col-span-1">
+            <button
+              className="px-6 py-2.5 bg-[#28708fc5] text-white rounded-xl hover:bg-[#28708fc5]/100 transition-colors font-medium"
+            >
+              Save
+            </button>
+          </div>
+        </form>
 
         {/* Social Media Accounts */}
         <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
@@ -190,32 +295,7 @@ const UserProfile = () => {
           </div>
         </div>
 
-        {/* Other */}
-        <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-          <h3 className="text-lg font-bold text-gray-900 mb-6">Other</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm text-gray-500 mb-2">
-                Work Website
-              </label>
-              <input
-                type="url"
-                value={userData.website}
-                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-500 mb-2">
-                Enterprise Account
-              </label>
-              <input
-                type="url"
-                value={userData.enterprise}
-                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-              />
-            </div>
-          </div>
-        </div>
+      
       </div>
     );
 
@@ -234,21 +314,6 @@ const UserProfile = () => {
         
         * {
           font-family: 'DM Sans', sans-serif;
-        }
-        
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
         }
       `}</style>
 
