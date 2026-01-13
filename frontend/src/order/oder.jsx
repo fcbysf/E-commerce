@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 import "./order.css";
-import { useNavigate } from "react-router-dom";
+import { replace, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 export default function Order() {
@@ -28,9 +28,12 @@ export default function Order() {
   })
   useEffect(() => {
     if (!isLoggedIn) {
-      navigate("/login");
+      navigate("/login", replace);
+      return;
     }
-  }, []);
+  }, [token, isLoggedIn]);
+
+  // ORDER STATUS COLOR
   const orderStyle = (status) => {
     if (status == "pending") {
       return "orange";
@@ -40,7 +43,7 @@ export default function Order() {
       return "red";
     }
   };
-  return (orders&&
+  return (
     <div className="orderContainer">
       <NavBar />
       <div className="orders">
@@ -135,10 +138,10 @@ export default function Order() {
             ))}
           </tbody>
         </table>
-        {(orders.length == 0 && (
+        {(orders?.length == 0 && (
           <h2 style={{ textAlign: "center" }}>no orders yet</h2>
         )) || <h2 style={{ margin: 20 }}>orders items</h2>}
-        {orders.length > 0 && (
+        {orders?.length > 0 && (
           <div className="ordredP">
             {orders?.map((order) =>
               order.items.map((item) => (

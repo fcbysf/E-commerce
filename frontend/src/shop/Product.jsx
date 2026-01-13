@@ -28,6 +28,7 @@ export default function Product() {
     }
   }, [product]);
 
+  // FETCH SAME CATEGORY PRODUCTS
   useEffect(() => {
     product?.category &&
       fetch(`${api}sameCategoryProducts?category=${product.category}`)

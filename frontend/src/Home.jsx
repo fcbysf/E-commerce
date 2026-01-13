@@ -11,6 +11,8 @@ export default function Home() {
   const [imageId, setImageId] = useState("");
   const [showStock, setShowStock] = useState(false);
   const { api } = useContext(Context);
+
+  // ANIMATION
   useEffect(() => {
     setTimeout(() => {
       setAnimate(true);
@@ -19,6 +21,8 @@ export default function Home() {
       setAnimateImg(true);
     }, 1000);
   }, []);
+
+  // FETCH 6 PRODUCTS
   const sixProducts = ()=> fetch(api + "homeProducts").then((res) => res.ok && res.json());
   const {data} = useQuery({
     queryKey : ['products'],

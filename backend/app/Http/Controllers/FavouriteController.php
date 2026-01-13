@@ -8,9 +8,9 @@ use Illuminate\Http\Request;
 class FavouriteController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        return Favourite::with('product')->latest()->get();
+        return Favourite::where('user_id', $request->user_id)->with('product')->latest()->get();
     }
 
     public function store(Request $request)
@@ -31,9 +31,5 @@ class FavouriteController extends Controller
         return response()->json('added');
     
     }
-    public function destroy(Favourite $favourite)
-    {
-        $favourite->delete();
-        return $favourite;
-    }
+
 }

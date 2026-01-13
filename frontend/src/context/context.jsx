@@ -8,6 +8,7 @@ const Provider = ({ children }) => {
     sessionStorage.getItem("token") ? true : false
   );
   const [userId, setUserId] = useState(null);
+  const [user, setUser] = useState(null);
   const [userRole, setUserRole] = useState(
     sessionStorage.getItem("role") || null
   );
@@ -36,9 +37,13 @@ const Provider = ({ children }) => {
           setUserRole(null);
           setIsLoggedIn(false);
           setLoading(false);
+          setUser(null);
+          sessionStorage.removeItem("token");
+          sessionStorage.removeItem("role");
         }
       })
       .then((data) => {
+        setUser(data.user);
         setUserId(data.user_id);
         setUserRole(data.role);
         setUserShop({ orders: data.orders, cart: data.cart });
@@ -70,6 +75,7 @@ const Provider = ({ children }) => {
           logout,
           isLoggedIn,
           setIsLoggedIn,
+          user,
           userId,
           userRole,
           setUserId,
@@ -81,7 +87,7 @@ const Provider = ({ children }) => {
         {children}
       </Context.Provider>
     ),
-    [userId, token, children, isLoggedIn, userRole, userShop]
+    [user,userId, token, children, isLoggedIn, userRole, userShop]
   );
 };
 export default Provider;

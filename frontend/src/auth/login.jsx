@@ -10,6 +10,7 @@ const LogIn = () => {
   useEffect(()=>{
     if(isLoggedIn&&userRole=='user'){
       navigate('/shop')
+      return
     }
     else if(isLoggedIn&&userRole=='admin'){
       navigate('/admin/dashbord')

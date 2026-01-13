@@ -74,6 +74,8 @@ function EditProduct() {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+
+  // UPDATE PRODUCT
   const { mutate: updateProductMutation } = useMutation({
     mutationFn: async (formData) => {
       const res = await fetch(api + "product/" + id, {
@@ -116,6 +118,7 @@ function EditProduct() {
     });
     updateProductMutation(formData);
   };
+
   const addSize = (size) => {
     if (selectedSize.includes(size)) {
       setSelectedSize(selectedSize.filter((s) => s !== size));
@@ -123,6 +126,7 @@ function EditProduct() {
     }
     setSelectedSize([...selectedSize, size]);
   };
+  // DELETE PRODUCT
   const dlt = (img) => {
     if (img.id) {
       setDeletedImgsIds([...deletedImgsIds, img.id]);

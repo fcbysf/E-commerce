@@ -9,24 +9,26 @@ const LogIn = React.lazy(() => import("./auth/login"));
 const SignUp = React.lazy(() => import("./auth/signup"));
 const Order = React.lazy(() => import("./order/oder"));
 const Favourites = React.lazy(() => import("./favourites/favourites"));
+const UserProfile = React.lazy(() => import("./profile/user-profile"));
 import Provider from "./context/context";
 
 export default function App() {
   return (
     <Provider>
       <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/admin/:place/:id?" element={<AdminPanel />} />
-            <Route path="/shop/:category" element={<Shop />} />
-            <Route path="/product/:id" element={<Product />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/login" element={<LogIn />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/orders" element={<Order />} />
-            <Route path="/favourites" element={<Favourites />} />
-            <Route path="*" element={<Home />} />
-          </Routes>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/admin/:place/:id?" element={<AdminPanel />} />
+          <Route path="/shop/:category" element={<Shop />} />
+          <Route path="/product/:id" element={<Product />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/login" element={<LogIn />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/orders" element={<Order />} />
+          <Route path="/favourites" element={<Favourites />} />
+          <Route path="/profile" element={<UserProfile />} />
+          <Route path="*" element={<Home />} />
+        </Routes>
       </BrowserRouter>
     </Provider>
   );

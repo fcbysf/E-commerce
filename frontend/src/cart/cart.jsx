@@ -102,11 +102,11 @@ export default function Cart() {
     removeFromCartMutation(c);
   };
   return (
-    cart && (
+    (
       <div className="cartContainer">
         <NavBar />
         <main className="cartMain">
-          {cart.length === 0 && !orderCompleted && (
+          {cart?.length === 0 && !orderCompleted && (
             <div className="emptyCart">
               <h1>
                 cart is empty, <NavLink to={"/shop"}>shop now</NavLink>
@@ -138,9 +138,9 @@ export default function Cart() {
               </div>
             ))}
           </div>
-          {cart.length !== 0 && (
+          {cart?.length > 0&& (
             <div className="cartCheckout">
-              {cart.map((c) => (
+              {cart?.map((c) => (
                 <div className="productAndPrice" key={c.id}>
                   <p>{c.product.name}</p>
                   <p>${c.product.price}</p>

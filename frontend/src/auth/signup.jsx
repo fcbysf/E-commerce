@@ -2,28 +2,34 @@ import { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import { Context } from "../context/context";
 import { useNavigate } from "react-router-dom";
+import ImageUploadInput from "./imageUpload";
 
 const SignUp = () => {
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
   const { api, isLoggedIn } = useContext(Context);
+  const [selectedImg , setSelectedImg] = useState(null);
+
+  function imageSelected(image){
+    setSelectedImg(image);
+  }
   useEffect(() => {
     if (isLoggedIn) {
       navigate("/shop");
+      return
     }
   }, [isLoggedIn]);
 
   const register = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
-    const payload = Object.fromEntries(formData);
+    formData.append("image", selectedImg);
     fetch(api + "register", {
       method: "POST",
       headers: {
         accept: "application/json",
-        "Content-Type": "application/json",
       },
-      body: JSON.stringify(payload),
+      body: formData,
     })
       .then((res) => res.json())
       .then((data) => {
@@ -38,7 +44,7 @@ const SignUp = () => {
   return (
     <StyledWrapper>
       <div className="signupCon">
-        <form className="formm" onSubmit={register}>
+        <form className="formm" onSubmit={register} encType="multipart/form-data">
           <div className="flex-column">
             <label>Name </label>
           </div>
@@ -124,6 +130,7 @@ const SignUp = () => {
             />
           </div>
           {errors.password && <p style={{ color: "red" }}>{errors.password}</p>}
+          <ImageUploadInput imageSelected={imageSelected}/>
           <button className="button-submit">Sign Up</button>
           <p className="p">
             Already have a account?{" "}

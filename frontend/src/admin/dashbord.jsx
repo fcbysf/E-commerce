@@ -11,8 +11,10 @@ function Dashbord() {
   const [mainImg, setMainImg] = useState(null);
   const [errors, setErrors] = useState([]);
   const sizes = ["xs", "s", "m", "l", "xl", "xxl"];
+
+  // ADD PRODUCT
   const queryClient = useQueryClient();
-  const { mutate,isError } = useMutation({
+  const { mutate, isError } = useMutation({
     mutationFn: async (formData) => {
       const res = await fetch(api + "product", {
         method: "POST",
@@ -42,7 +44,6 @@ function Dashbord() {
       setErrors(error.errors);
     },
   });
-
   const submit = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -51,11 +52,12 @@ function Dashbord() {
       formData.append("images[]", image);
     });
     mutate(formData);
-    if(!isError){
+    if (!isError) {
       e.target.reset();
     }
   };
 
+  // ADD SIZE
   const addSize = (size) => {
     if (selectedSize.includes(size)) {
       setSelectedSize(selectedSize.filter((s) => s !== size));
@@ -63,9 +65,13 @@ function Dashbord() {
     }
     setSelectedSize([...selectedSize, size]);
   };
+
+  // DELETE IMAGE
   const dlt = (img) => {
     setImages(images.filter((im) => im !== img));
   };
+
+  // HANDLE IMAGES CHANGE
   const handleImgsChange = (e) => {
     const files = [...e.target.files];
     setImages([...images, ...files.filter((file) => !images.includes(file))]);

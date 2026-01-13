@@ -28,11 +28,11 @@ Route::put('/user/{user}', [UserController::class,'update']);
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     $user = $request->user();
-    $user->load('orders','cart');
+    $user->load('orders.items','cart');
     $orders_len = count($user->orders);
     $cart_len = count($user->cart);
 
-    return response()->json(['user_id'=>$request->user()->id, 'role'=>$request->user()->role, "orders"=>$orders_len, 'cart' => $cart_len]);
+    return response()->json(["user" =>$request->user(),'user_id'=>$request->user()->id, 'role'=>$request->user()->role, "orders"=>$orders_len, 'cart' => $cart_len]);
 });
 //  PRODUCT ROUTES
 Route::get('homeProducts', [ProductController::class,'homeProducts']);

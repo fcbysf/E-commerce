@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 export default function Favourites(){
     const navigate =useNavigate()
     const [favourites, setFavourites] = useState([]);
-    const {api,userId} = useContext(Context)
+    const {api} = useContext(Context)
     function fetchFav(){
         fetch(api + "favourites", {
             headers:{
