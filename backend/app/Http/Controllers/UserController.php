@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -45,6 +45,22 @@ class UserController extends Controller
                 'role' => $request->role
             ]);
             return response()->json([$request->role,$user->id]);
+        }
+        if($request->has('currentPassword')){
+            $request->validate([
+                'currentPassword' => 'required',
+                'newPassword' => 'required|min:6|confirmed'
+            ]);
+            if(Hash::check($request->newPassword, $user->password)){
+                return response()->json('same Password', 400);
+            };
+            if(password_verify($request->currentPassword, $user->password)){
+                $user->update([
+                    'password' => $request->newPassword
+                ]);
+                return response()->json('password updated', 200);
+            }
+            return response()->json('current password is wrong', 400);
         }
         $infos= $request->validate([
             'name' =>'min:3',

@@ -288,7 +288,7 @@ if(selectedImg==null){
                 className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
               />
             </div>
-            <button className="flex items-center gap-2 px-4 py-2.5 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors font-medium">
+            <button className="flex items-center gap-2 px-4 py-2.5 bg-[#28708fc5] text-white rounded-xl hover:bg-[#28708fc5]/100 transition-colors font-medium">
               <Plus className="w-4 h-4" />
               Add Social Media
             </button>
