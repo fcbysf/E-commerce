@@ -8,3 +8,12 @@ input{
 button{
     background-color: white;
 }
+
+.scroll-w::-webkit-scrollbar{
+    width: 5px;
+    background-color: #4d8da815;
+}
+.scroll-w::-webkit-scrollbar-thumb{
+    background-color: #36748f42;
+    border-radius: 10000px
+}

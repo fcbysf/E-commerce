@@ -4,7 +4,7 @@ import { useContext } from "react";
 import { Context } from "../context/context";
 
 export default function Sidebar({ isOpen, toggleSidebar }) {
-  const { userShop } = useContext(Context);
+  const { user } = useContext(Context);
 
   return (
     <>
@@ -31,11 +31,11 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
         </button>
         <div className="sidebar-links">
           <NavLink to={"/orders"}>
-            Orders <small>{userShop.orders}</small>
+            Orders <small>{user?.orders.lenght}</small>
           </NavLink>
           <NavLink to={"/favourites"}>Favourites</NavLink>
           <NavLink to={"/cart"}>
-            Cart <small>{userShop.cart}</small>
+            Cart <small>{user?.cart.lenght}</small>
           </NavLink>
           <NavLink to={"/profile"}>Profile</NavLink>
         </div>

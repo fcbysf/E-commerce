@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Http\Controllers\ProductController;
 use Illuminate\Database\Eloquent\Model;
 
 class Favourite extends Model

@@ -5,12 +5,12 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 import "./order.css";
-import { replace, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 export default function Order() {
   const navigate = useNavigate();
-  const { api, token, isLoggedIn } = useContext(Context);
+  const { api, token } = useContext(Context);
 
   // FETCH USER ORDERS
   const {data : orders} = useQuery({
@@ -26,12 +26,7 @@ export default function Order() {
         else throw Error("something went wrong");
       })
   })
-  useEffect(() => {
-    if (!isLoggedIn) {
-      navigate("/login", replace);
-      return;
-    }
-  }, [token, isLoggedIn]);
+
 
   // ORDER STATUS COLOR
   const orderStyle = (status) => {

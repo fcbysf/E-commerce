@@ -14,7 +14,7 @@ import {
 import NavBar from "../layouts/ShopNavBar";
 import "./profile.css";
 import { Context } from "../context/context";
-import { replace, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import Security from "./security";
 import WishList from "./wishList";
@@ -25,7 +25,7 @@ import ImageUploadInput from "../auth/imageUpload";
 const UserProfile = () => {
   const navigate = useNavigate();
   const [activePage, setActivePage] = useState("profile");
-  const { user, token, fetching, api, isLoggedIn } = useContext(Context);
+  const { user, token, fetching, api } = useContext(Context);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -53,12 +53,7 @@ const UserProfile = () => {
     });
     setSelectedImg(user?.image);
   }, [user]);
-  useEffect(() => {
-    if (!isLoggedIn) {
-      navigate("/login", replace);
-      return;
-    }
-  }, []);
+
   // Sample data
   const userData = {
     facebook: "https://www.facebook.com/cameronw",
@@ -333,7 +328,7 @@ if(selectedImg==null){
                 {navItems
                   .filter((item) => item.section === "account")
                   .map((item) => (
-                    <button
+                    <label
                       key={item.id}
                       onClick={() => {
                         if (item.isAction) {
@@ -342,7 +337,7 @@ if(selectedImg==null){
                           setActivePage(item.id);
                         }
                       }}
-                      className={`w-full flex items-center border-0 gap-3 px-4 py-2.5 rounded-xl transition-all ${
+                      className={`w-full text-sm flex items-center border-0 gap-3 px-4 py-2.5 rounded-xl transition-all ${
                         activePage === item.id
                           ? "bg-[#76bbd81a] text-[#287191]"
                           : item.id === "logout"
@@ -352,7 +347,7 @@ if(selectedImg==null){
                     >
                       <item.icon className="w-5 h-5" />
                       <span className="font-medium">{item.label}</span>
-                    </button>
+                    </label>
                   ))}
               </div>
             </div>

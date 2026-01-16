@@ -12,11 +12,6 @@ const Provider = ({ children }) => {
   const [userRole, setUserRole] = useState(
     sessionStorage.getItem("role") || null
   );
-  const [userShop, setUserShop] = useState({
-    orders: 0,
-    cart: 0,
-    favourites: 0,
-  });
   const [loading, setLoading] = useState(true);
 
   function fetching() {
@@ -32,7 +27,6 @@ const Provider = ({ children }) => {
           setLoading(false);
           return res.json();
         } else {
-          setUserShop({ orders: 0, cart: 0, favourites: 0 });
           setUserId(null);
           setUserRole(null);
           setIsLoggedIn(false);
@@ -46,7 +40,6 @@ const Provider = ({ children }) => {
         setUser(data.user);
         setUserId(data.user_id);
         setUserRole(data.role);
-        setUserShop({ orders: data.orders, cart: data.cart });
         sessionStorage.setItem("role", data.role);
       })
       .catch((err) => console.log(err));
@@ -79,7 +72,6 @@ const Provider = ({ children }) => {
           userId,
           userRole,
           setUserId,
-          userShop,
           fetching,
           loading,
         }}
@@ -87,7 +79,7 @@ const Provider = ({ children }) => {
         {children}
       </Context.Provider>
     ),
-    [user,userId, token, children, isLoggedIn, userRole, userShop]
+    [user,userId, token, children, isLoggedIn, userRole, loading]
   );
 };
 export default Provider;

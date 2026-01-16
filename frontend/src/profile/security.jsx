@@ -161,7 +161,7 @@ export default function Security() {
           <div className="pt-2">
             <button
               type="submit"
-              className="px-6 py-2.5 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors font-medium"
+              className="px-6 py-2.5 bg-[#28708fc5] text-white rounded-xl hover:bg-[#28708fc5]/100 transition-colors font-medium"
             >
               Update Password
             </button>
@@ -188,7 +188,7 @@ export default function Security() {
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Mail className="w-5 h-5 text-purple-600" />
+                <Mail className="w-5 h-5 text-[#28708fc5]" />
               </div>
               <div>
                 <p className="font-medium text-gray-900">
@@ -204,7 +204,7 @@ export default function Security() {
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Phone className="w-5 h-5 text-purple-600" />
+                <Phone className="w-5 h-5 text-[#28708fc5]" />
               </div>
               <div>
                 <p className="font-medium text-gray-900">SMS Authentication</p>

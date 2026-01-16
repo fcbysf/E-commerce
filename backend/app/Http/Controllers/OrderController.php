@@ -17,7 +17,7 @@ class OrderController extends Controller
     }
     public function userOrders(Request $request)
     {
-        return Order::with('items.product',)->where('user_id', $request->user()->id)->get();
+        return Order::with('items.product',)->where('user_id', $request->user()->id)->where('status', 'pending')->latest()->get();
     }
 
 
@@ -36,7 +36,7 @@ class OrderController extends Controller
         foreach ($request->cart as $cart) {
             OrderItem::create([
                 'order_id' => $order->id,
-                'product_id' => $cart['product']['id'],
+                'product_id' => $cart->product['product']['id'],
                 'quantity' => $cart['quantity'],
                 'unit_price' => $cart['product']['price']
             ]);

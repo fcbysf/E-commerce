@@ -1,18 +1,17 @@
 import { useContext, useEffect, useState } from "react";
 import NavBar from "../layouts/ShopNavBar";
 import { Context } from "../context/context";
-import { NavLink, replace, useNavigate } from "react-router-dom";
+import { NavLink} from "react-router-dom";
 import "./cart.css";
 import toast from "react-hot-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function Cart() {
-  const navigate = useNavigate();
   const [total, setTotal] = useState(0);
   const [address, setaddress] = useState("");
   const [phone, setPhone] = useState("");
   const [orderCompleted, setOrderCompleted] = useState(false);
-  const { api, token, isLoggedIn, fetching } = useContext(Context);
+  const { api, token,fetching } = useContext(Context);
   const queryClient = useQueryClient();
 
   // FETCH USER CART
@@ -39,12 +38,6 @@ export default function Cart() {
       setTotal(total + 3.5);
     }
   }, [cart]);
-  useEffect(() => {
-    if (!isLoggedIn) {
-      navigate("/login", replace);
-      return;
-    }
-  }, [token, isLoggedIn]);
 
   // FINISH ORDER
   const { mutate: finishOrderMutation } = useMutation({
@@ -92,6 +85,7 @@ export default function Cart() {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
+      fetching()
       toast.success("product removed from cart");
     },
     onError: () => {

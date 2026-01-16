@@ -10,6 +10,11 @@ const SignUp = React.lazy(() => import("./auth/signup"));
 const Order = React.lazy(() => import("./order/oder"));
 const Favourites = React.lazy(() => import("./favourites/favourites"));
 const UserProfile = React.lazy(() => import("./profile/user-profile"));
+const AuthRoute = React.lazy(() => import("./AuthRoutes"));
+const Marketplace = React.lazy(() => import("./marketplace/MarketplacePage"));
+const ProductDetailPage = React.lazy(() =>
+  import("./marketplace/ProductDetailPage")
+);
 import Provider from "./context/context";
 
 export default function App() {
@@ -17,16 +22,26 @@ export default function App() {
     <Provider>
       <BrowserRouter>
         <Routes>
+          {/* guest Routes */}
           <Route path="/" element={<Home />} />
-          <Route path="/admin/:place/:id?" element={<AdminPanel />} />
           <Route path="/shop/:category" element={<Shop />} />
           <Route path="/product/:id" element={<Product />} />
-          <Route path="/cart" element={<Cart />} />
           <Route path="/login" element={<LogIn />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/orders" element={<Order />} />
-          <Route path="/favourites" element={<Favourites />} />
-          <Route path="/profile" element={<UserProfile />} />
+          <Route path="marketplace" element={<Marketplace />} />
+          <Route
+            path="marketplace/product/:id?"
+            element={<ProductDetailPage />}
+          />
+
+          {/* Auth Routes */}
+          <Route element={<AuthRoute />}>
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/orders" element={<Order />} />
+            <Route path="/favourites" element={<Favourites />} />
+            <Route path="/profile" element={<UserProfile />} />
+          </Route>
+          <Route path="/admin/:place/:id?" element={<AdminPanel />} />
           <Route path="*" element={<Home />} />
         </Routes>
       </BrowserRouter>

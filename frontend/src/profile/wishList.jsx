@@ -5,7 +5,7 @@ import { useContext } from "react";
 import { Context } from "../context/context";
 export default function WishList() {
   const queryClient = useQueryClient();
-  const { api, userId } = useContext(Context);
+  const { api, userId,fetching,token } = useContext(Context);
   const { data: wishlistItems } = useQuery({
     queryKey: ["favourites", userId],
     queryFn: () =>
@@ -45,6 +45,41 @@ export default function WishList() {
     },
   });
 
+  // ADD TO CART
+  const addtocartFn = async (product) => {
+    return await fetch(`${api}cart`, {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `bearer ${token}`,
+      },
+      body: JSON.stringify({
+        user_id: userId,
+        product_id: product.id,
+        quantity: 1,
+      }),
+    }).then((res) => {
+      if (res.ok) {
+        return res.json();
+      }
+      throw new Error("authentification error");
+    });
+  };
+  const addToCart = useMutation({
+    mutationFn: addtocartFn,
+    onSuccess: (data) => {
+      toast.success("product added to cart");
+      sessionStorage.setItem("cart", data);
+      fetching();
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+    onError: (err) => {
+      toast.error("something went wrong");
+      console.log(err);
+    },
+  });
+
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* Header */}
@@ -58,7 +93,7 @@ export default function WishList() {
               You have {wishlistItems?.length} items in your wishlist
             </p>
           </div>
-          <button className="px-4 py-2 text-purple-600 hover:bg-purple-50 rounded-xl transition-colors font-medium">
+          <button className="px-4 py-2 text-[#28708fc5] hover:bg-purple-50 rounded-xl transition-colors font-medium">
             Clear All
           </button>
         </div>
@@ -98,6 +133,7 @@ export default function WishList() {
                 </span>
                 <button
                   disabled={!item.product.stock > 0}
+                  onClick={()=>addToCart.mutate(item.product)}
                   className={`px-4 py-2 rounded-xl font-medium transition-colors ${
                     item.product.stock > 0
                       ? "bg-[#28708fc5] text-white hover:bg-[#28708fc5]/100"

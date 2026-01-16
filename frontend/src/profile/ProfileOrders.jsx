@@ -1,8 +1,10 @@
-import { Calendar, ChevronRight, Package} from "lucide-react";
+import { Calendar, ChevronRight, Package } from "lucide-react";
+import { useState } from "react";
 
-export default function ProfileOrders({user}){
-    return(
-        <div className="space-y-6 animate-fadeIn">
+export default function ProfileOrders({ user }) {
+  const [filter, setFilter] = useState("all");
+  return (
+    <div className="space-y-6 animate-fadeIn">
       {/* Header with filters */}
       <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
         <div className="flex items-center justify-between mb-6">
@@ -13,13 +15,17 @@ export default function ProfileOrders({user}){
             <p className="text-gray-500">Track and manage your orders</p>
           </div>
           <div className="flex items-center gap-3">
-            <select className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm">
-              <option>All Orders</option>
-              <option>Delivered</option>
-              <option>In Transit</option>
-              <option>Processing</option>
+            <select
+              className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#28708fc5] text-sm"
+              defaultValue={filter}
+              onChange={(e) => setFilter(e.target.value)}
+            >
+              <option value={"all"}>All Orders</option>
+              <option value={"done"}>Done</option>
+              <option value={"pending"}>Pending</option>
+              <option value={"canceled"}>Canceled</option>
             </select>
-            <select className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm">
+            <select className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#28708fc5] text-sm">
               <option>Last 30 days</option>
               <option>Last 3 months</option>
               <option>Last 6 months</option>
@@ -45,7 +51,10 @@ export default function ProfileOrders({user}){
           <div className="p-4 bg-orange-50 rounded-xl">
             <p className="text-sm text-orange-600 mb-1">Pending</p>
             <p className="text-2xl font-bold text-orange-700">
-              {user?.orders.filter((order) => order.status === "pending").length}
+              {
+                user?.orders.filter((order) => order.status === "pending")
+                  .length
+              }
             </p>
           </div>
           <div className="p-4 bg-red-50 rounded-xl">
@@ -63,6 +72,7 @@ export default function ProfileOrders({user}){
       {/* Orders List */}
       <div className="space-y-4">
         {user?.orders.map((order) => (
+          (filter === order.status || filter === "all")&&
           <div
             key={order.id}
             className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow"
@@ -131,5 +141,5 @@ export default function ProfileOrders({user}){
         ))}
       </div>
     </div>
-    )
+  );
 }
