@@ -31,7 +31,7 @@ export default function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="marketplace" element={<Marketplace />} />
           <Route
-            path="marketplace/product/:id?"
+            path="marketplace/product/:id"
             element={<ProductDetailPage />}
           />
 

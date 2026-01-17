@@ -52,4 +52,4 @@ Route::get('/favourites', [FavouriteController::class, 'index']);
 Route::middleware(['throttle:favourites'])->post('/favourites', [FavouriteController::class, 'store']);
 
 // MarketPlace Routes
-Route::apiResource('listing', ListingsController::class)->middleware(['auth:sanctum'])->except('index');
+Route::middleware(['auth:sanctum'])->apiResource('listing', ListingsController::class);

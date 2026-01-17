@@ -12,9 +12,13 @@ class ListingsController extends Controller
     /**
      * Display a listing of the resource.
      */
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum')->except(['index', 'show']);
+    }
     public function index()
     {
-        //
+        return Listings::with("images")->latest()->paginate(40);
     }
 
     /**
@@ -47,9 +51,9 @@ class ListingsController extends Controller
         }
         return response()->json($listing);
     }
-    public function show(Listings $listings)
+    public function show(Listings $listing)
     {
-        //
+        return $listing->load(['images', 'user']);
     }
 
 

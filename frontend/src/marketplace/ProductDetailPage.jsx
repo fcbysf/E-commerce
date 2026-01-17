@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   X,
   ChevronLeft,
@@ -10,41 +10,64 @@ import {
   Info,
 } from "lucide-react";
 import "../profile/profile.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import NavBar from "../layouts/ShopNavBar";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import { useContext } from "react";
+import { Context } from "../context/context";
 const ProductDetailPage = () => {
+  const queryClient = useQueryClient();
+  const { api, token } = useContext(Context);
+  const { id } = useParams();
   const navigate = useNavigate();
 
-  const product = {
-    id: 1,
-    title: "Kangoo dci 2012 06*68*87*94*71",
-    price: "MAD77,000",
-    location: "الدار البيضاء, المغرب",
-    listedDate: "6 days ago",
-    description:
-      "Je met en vente une belle voiture Renault kangoo dCi modèle 2012 tout option 6ch diesel Nmra dyali (...See more)",
-    images: [
-      "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=1200&h=900&fit=crop",
-      "https://images.unsplash.com/photo-1611821064430-4a1e4e4f6c1a?w=1200&h=900&fit=crop",
-      "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=1200&h=900&fit=crop",
-      "https://images.unsplash.com/photo-1583267746897-c554a0084dc3?w=1200&h=900&fit=crop",
-      "https://images.unsplash.com/photo-1615906655593-ad0386982a0f?w=1200&h=900&fit=crop",
-      "https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=1200&h=900&fit=crop",
-      "https://images.unsplash.com/photo-1612538498613-d0c936720d88?w=1200&h=900&fit=crop",
-      "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=1200&h=900&fit=crop",
-    ],
-    // Single image scenario - uncomment to test
-    // images: [
-    //   'https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=1200&h=900&fit=crop'
-    // ],
-    seller: {
-      name: "Atif",
-      avatar: "https://i.pravatar.cc/150?img=12",
-      responseTime: "Usually responds within an hour",
+  const { data: product } = useQuery({
+    queryKey: ["product", id],
+    queryFn: async () => {
+      return await fetch(api + "listing/" + id, {
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }).then((res) => {
+        if (res.ok) return res.json();
+        else throw Error("Something went wrong");
+      });
     },
-  };
+  });
+
+  // const product = {
+  //   id: 1,
+  //   title: "Kangoo dci 2012 06*68*87*94*71",
+  //   price: "MAD77,000",
+  //   location: "الدار البيضاء, المغرب",
+  //   listedDate: "6 days ago",
+  //   description:
+  //     "Je met en vente une belle voiture Renault kangoo dCi modèle 2012 tout option 6ch diesel Nmra dyali (...See more)",
+  //   images: [
+  //     "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=1200&h=900&fit=crop",
+  //     "https://images.unsplash.com/photo-1611821064430-4a1e4e4f6c1a?w=1200&h=900&fit=crop",
+  //     "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=1200&h=900&fit=crop",
+  //     "https://images.unsplash.com/photo-1583267746897-c554a0084dc3?w=1200&h=900&fit=crop",
+  //     "https://images.unsplash.com/photo-1615906655593-ad0386982a0f?w=1200&h=900&fit=crop",
+  //     "https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=1200&h=900&fit=crop",
+  //     "https://images.unsplash.com/photo-1612538498613-d0c936720d88?w=1200&h=900&fit=crop",
+  //     "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=1200&h=900&fit=crop",
+  //   ],
+  //   // Single image scenario - uncomment to test
+  //   // images: [
+  //   //   'https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=1200&h=900&fit=crop'
+  //   // ],
+  //   seller: {
+  //     name: "Atif",
+  //     avatar: "https://i.pravatar.cc/150?img=12",
+  //     responseTime: "Usually responds within an hour",
+  //   },
+  // };
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const hasMultipleImages = product.images.length > 1;
+  const hasMultipleImages = product?.images.length > 1;
 
   // Keyboard navigation
   useEffect(() => {
@@ -66,39 +89,43 @@ const ProductDetailPage = () => {
 
   const goToPrevious = () => {
     setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? product.images.length - 1 : prevIndex - 1
+      prevIndex === 0 ? product?.images.length - 1 : prevIndex - 1,
     );
   };
 
   const goToNext = () => {
     setCurrentIndex((prevIndex) =>
-      prevIndex === product.images.length - 1 ? 0 : prevIndex + 1
+      prevIndex === product?.images.length - 1 ? 0 : prevIndex + 1,
     );
   };
 
   return (
-    <div className="fixed inset-0 bg-white z-50">
-      <div className="flex h-full">
+    <div className="fixed inset-0 bg-gray-50 z-50 ">
+      <NavBar />
+      <div className="flex h-full mt-3 gap-4">
         {/* Left Side - Image Section */}
-        <div className="flex-1 bg-black relative flex flex-col">
+        <div className="flex-1 bg-gray-50 relative flex flex-col">
           {/* Close Button */}
-          <button className="absolute top-4 left-4 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg z-20 transition-colors" onClick={()=>navigate(-1)}>
+          <button
+            className="absolute top-4 left-4 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg z-20 transition-colors"
+            onClick={() => navigate(-1)}
+          >
             <X className="w-6 h-6 text-gray-900" />
           </button>
 
           {/* Image Counter - Only show if multiple images */}
           {hasMultipleImages && (
             <div className="absolute top-4 right-4 bg-black/50  text-white/80 px-3 py-1.5 rounded-full text-sm font-medium z-20 ">
-              {currentIndex + 1} / {product.images.length}
+              {currentIndex + 1} / {product?.images.length}
             </div>
           )}
 
           {/* Main Image Display */}
-          <div className="flex-1 flex items-center justify-center p-8 relative">
+          <div className="flex-1 flex justify-center ps-3 relative">
             <img
-              src={product.images[currentIndex]}
+              src={product?.images[currentIndex].image}
               alt={`Product ${currentIndex + 1}`}
-              className="max-w-full max-h-full object-contain"
+              className="w-full h-[57%] object-contain rounded-lg "
             />
 
             {/* Navigation Arrows - Only show if multiple images */}
@@ -106,13 +133,13 @@ const ProductDetailPage = () => {
               <>
                 <button
                   onClick={goToPrevious}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all z-10"
+                  className="absolute left-7 bottom-[70%] -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all z-10"
                 >
                   <ChevronLeft className="w-6 h-6 text-gray-900" />
                 </button>
                 <button
                   onClick={goToNext}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all z-10"
+                  className="absolute right-7 bottom-[70%]  -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all z-10"
                 >
                   <ChevronRight className="w-6 h-6 text-gray-900" />
                 </button>
@@ -124,7 +151,7 @@ const ProductDetailPage = () => {
           {hasMultipleImages && (
             <div className="bg-black/80 p-4">
               <div className="flex gap-2 overflow-x-auto justify-center">
-                {product.images.map((image, idx) => (
+                {product?.images.map((image, idx) => (
                   <button
                     key={idx}
                     onClick={() => setCurrentIndex(idx)}
@@ -147,18 +174,18 @@ const ProductDetailPage = () => {
         </div>
 
         {/* Right Side - Product Details */}
-        <div className="w-[460px] bg-white overflow-y-auto flex-shrink-0 border-l border-gray-200 overflow-hidden">
+        <div className="w-[460px] bg-white rounded-md overflow-y-auto flex-shrink-0 border-l border-gray-200 overflow-hidden">
           <div className="px-6 ">
             {/* Product Title and Price */}
             <div className="mb-6">
               <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                {product.title}
+                {product?.title}
               </h1>
               <div className="text-3xl font-bold text-gray-900 mb-2">
-                {product.price}
+                {product?.price}
               </div>
               <div className="text-sm text-gray-600">
-                Listed {product.listedDate} in {product.location}
+                Listed {product?.listedDate} in {product?.location}
               </div>
             </div>
 
@@ -177,28 +204,13 @@ const ProductDetailPage = () => {
               </button>
             </div>
 
-            {/* Keyboard Shortcuts Hint */}
-            {hasMultipleImages && (
-              <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
-                <div className="text-xs text-blue-800 font-medium">
-                  💡 Use arrow keys (← →) to navigate between images
-                </div>
-              </div>
-            )}
-
             {/* Details Section */}
             <div className="mb-6 pb-6 border-b border-gray-200">
               <h3 className="font-semibold text-gray-900 mb-3">Details</h3>
               <div className="space-y-2">
                 <p className="text-gray-700 text-[15px] leading-relaxed">
-                  {product.description}
+                  {product?.description}
                 </p>
-                <button className="text-blue-600 text-sm font-medium hover:underline">
-                  See more
-                </button>
-                <button className="text-blue-600 text-sm font-medium hover:underline block">
-                  See translation
-                </button>
               </div>
             </div>
 
@@ -231,7 +243,7 @@ const ProductDetailPage = () => {
                 </div>
                 <div className="p-4">
                   <div className="font-semibold text-gray-900 mb-1">
-                    {product.location}
+                    {product?.city}
                   </div>
                   <div className="text-xs text-gray-600">
                     Location is approximate
@@ -248,16 +260,13 @@ const ProductDetailPage = () => {
 
               <div className="flex items-center gap-3 ">
                 <img
-                  src={product.seller.avatar}
-                  alt={product.seller.name}
+                  src={product?.user?.image || '/defaultprf.png'}
+                  alt={product?.user?.name}
                   className="w-12 h-12 rounded-full object-cover"
                 />
                 <div className="flex-1">
                   <div className="font-semibold text-gray-900">
-                    {product.seller.name}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    {product.seller.responseTime}
+                    {product?.user?.name}
                   </div>
                 </div>
                 <button className="text-blue-600 text-sm font-medium hover:underline">
@@ -267,9 +276,7 @@ const ProductDetailPage = () => {
             </div>
           </div>
           {/* Quick Message */}
-          <div
-            className="px-4 py-2 bg-gray-50  sticky rounded-lg  bottom-0 z-50 shadow-lg"
-          >
+          <div className="px-4 py-2 bg-gray-50  sticky rounded-lg  bottom-0 z-50 shadow-lg">
             <div>
               <p className="flex items-center">
                 <svg
@@ -287,11 +294,11 @@ const ProductDetailPage = () => {
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                   <path d="M3 20l1.3 -3.9c-2.324 -3.437 -1.426 -7.872 2.1 -10.374c3.526 -2.501 8.59 -2.296 11.845 .48c3.255 2.777 3.695 7.266 1.029 10.501c-2.666 3.235 -7.615 4.215 -11.574 2.293l-4.7 1" />
                 </svg>
-                send message to {product.seller.name}{" "}
+                send message to {product?.user?.name}{" "}
               </p>
             </div>
             <div className="text-sm text-gray-700 mb-3 leading-relaxed">
-              Bonjour {product.seller.name}, cet article est-il toujours
+              Bonjour {product?.user?.name}, cet article est-il toujours
               disponible ?
             </div>
             <button className="w-full bg-blue-600 hover:bg-blue-700 text-white text-center font-semibold py-2.5 rounded-lg transition-colors">

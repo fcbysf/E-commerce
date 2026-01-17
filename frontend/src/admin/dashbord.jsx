@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { Context } from "../context/context";
 import "./dashbord.css";
 import toast from "react-hot-toast";
@@ -10,6 +10,7 @@ function Dashbord() {
   const [selectedSize, setSelectedSize] = useState([]);
   const [mainImg, setMainImg] = useState(null);
   const [errors, setErrors] = useState([]);
+  const formRef = useRef(null)
   const sizes = ["xs", "s", "m", "l", "xl", "xxl"];
 
   // ADD PRODUCT
@@ -31,7 +32,7 @@ function Dashbord() {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["products"]);
+      formRef.current?.reset();
       toast.success("product added successfully");
       setErrors([]);
       setImages([]);
@@ -39,6 +40,7 @@ function Dashbord() {
       setPreview(null);
       setImagsPreview([]);
       setSelectedSize([]);
+      queryClient.invalidateQueries(["products"]);
     },
     onError: (error) => {
       setErrors(error.errors);
@@ -52,9 +54,6 @@ function Dashbord() {
       formData.append("images[]", image);
     });
     mutate(formData);
-    if (!isError) {
-      e.target.reset();
-    }
   };
 
   // ADD SIZE
@@ -78,7 +77,7 @@ function Dashbord() {
   };
   return (
     <div className="dachbordContainer">
-      <form onSubmit={submit} encType="multipart/form-data">
+      <form onSubmit={submit} encType="multipart/form-data" ref={formRef}>
         <div className="formLeftSide">
           <h1>
             <svg
