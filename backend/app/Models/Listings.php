@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Listings extends Model
 {
     protected $fillable = [
+        'user_id',
+        'category_id',
+        'city',
+        'country',
         'title',
         'description',
         'price',
@@ -16,7 +20,7 @@ class Listings extends Model
     }
     
     public function categorie()  {
-        return $this->belongsTo(Categories::class);
+        return $this->belongsTo(Category::class);
     }
 
 }

@@ -2,8 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Categories;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Category;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -36,7 +35,7 @@ class CategorySeeder extends Seeder
             'Buy and sell groups',
         ];
         foreach ($categories as $category) {
-            Categories::create([
+            Category::create([
                 'name' => $category,
                 'slug' => Str::slug($category)
             ]);

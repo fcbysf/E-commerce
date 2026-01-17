@@ -33,6 +33,7 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 
     return response()->json(["user" =>$request->user(),'user_id'=>$request->user()->id, 'role'=>$request->user()->role]);
 });
+
 //  PRODUCT ROUTES
 Route::get('homeProducts', [ProductController::class,'homeProducts']);
 Route::get('sameCategoryProducts', [ProductController::class,'sameCategoryProducts']);
@@ -51,4 +52,4 @@ Route::get('/favourites', [FavouriteController::class, 'index']);
 Route::middleware(['throttle:favourites'])->post('/favourites', [FavouriteController::class, 'store']);
 
 // MarketPlace Routes
-Route::apiResource('listing', ListingsController::class);
+Route::apiResource('listing', ListingsController::class)->middleware(['auth:sanctum'])->except('index');

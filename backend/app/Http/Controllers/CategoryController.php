@@ -2,15 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Categories;
+use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
-class CategoriesController extends Controller
+class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
+    {
+
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
     {
         //
     }
@@ -26,7 +35,15 @@ class CategoriesController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Categories $categories)
+    public function show(Category $category)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Category $category)
     {
         //
     }
@@ -34,7 +51,7 @@ class CategoriesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request,Categories $categories)
+    public function update(Request $request, Category $category)
     {
         //
     }
@@ -42,7 +59,7 @@ class CategoriesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Categories $categories)
+    public function destroy(Category $category)
     {
         //
     }

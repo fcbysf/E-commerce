@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class ListingsImages extends Model
 {
     protected $fillable = [
-        'listings_id',
-        'image_url',
+        'listing_id',
+        'image',
     ];
     public function listings(){
         return $this->belongsTo(Listings::class);

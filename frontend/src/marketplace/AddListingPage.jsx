@@ -3,9 +3,12 @@ import { X, Camera, ChevronDown, ChevronLeft, ChevronRight, Car, Home, Shirt, Fi
 import { useContext } from 'react';
 import { Context } from '../context/context';
 import '../profile/profile.css'
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from 'react-hot-toast';
 
 
 const AddListingPage = () => {
+
   const [formData, setFormData] = useState({
     title: '',
     price: '',
@@ -13,16 +16,14 @@ const AddListingPage = () => {
     condition: '',
     description: '',
     location: '',
-    boostListing: false,
-    hideFromFriends: false
   });
 
   const [images, setImages] = useState([]);
-  console.log(images)
   const [previewIndex, setPreviewIndex] = useState(0);
   const [errors, setErrors] = useState({});
   const maxImages = 10;
-  const {user}= useContext(Context)
+  const {api,token,user}= useContext(Context)
+  const queryClient = useQueryClient();
 
   const categories = [
     { value: '', label: 'Select a category', icon: null },
@@ -100,20 +101,50 @@ const AddListingPage = () => {
   const goToNext = () => {
     setPreviewIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
   };
-
+  const {mutate : addListing} = useMutation({
+    mutationFn: async(formData)=>{
+      const res =await fetch(api+"listing",{
+      method:'POST',
+      headers:{
+        Accept : 'application/json',
+        'Authorization':`Bearer ${token}`
+        
+      },
+      body:formData
+    })
+    const data = await res.json()
+      if(!res.ok){
+        throw data
+      }
+      return data
+  },
+  onSuccess:()=>{
+    toast.success('Listing added successfully')
+    queryClient.invalidateQueries({queryKey:['listings']})
+    setErrors({})
+    setFormData({title:'',price:'',category:'',condition:'',description:'',location:''})
+    setImages([])
+  },
+  onError:(error)=>{
+    setErrors(error.errors)
+    toast.error('something went wrong')
+  }
+  })
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newErrors = {};
-    if (!formData.title) newErrors.title = 'Title is required';
-    if (!formData.price) newErrors.price = 'Price is required';
-    if (!formData.category) newErrors.category = 'Category is required';
+    const formDataSubmit = new FormData();
+    formDataSubmit.append('title', formData.title);
+    formDataSubmit.append('price', formData.price);
+    formDataSubmit.append('category', formData.category);
+    formDataSubmit.append('condition', formData.condition);
+    formDataSubmit.append('location', formData.location);
+    formDataSubmit.append('description', formData.description);
+
+    images.forEach((image) => {
+      formDataSubmit.append('images[]', (image.file));
+    });
     
-    setErrors(newErrors);
-    
-    if (Object.keys(newErrors).length === 0) {
-      console.log('Form data:', formData);
-      console.log('Images:', images);
-    }
+    addListing(formDataSubmit)
   };
 
   const getCategoryIcon = () => {
@@ -160,7 +191,7 @@ const AddListingPage = () => {
 
             {/* Photos Upload */}
             <div className="">
-              <div className="text-sm font-semibold text-gray-900 mb-2">
+              <div className="text-sm font-semibold text-gray-900 mb-2 ">
                 Photos <span className="text-[#26799c]">· {images.length}/{maxImages}</span>
               </div>
               <div className="text-xs text-gray-600 mb-3">
@@ -217,32 +248,30 @@ const AddListingPage = () => {
                   <input
                     type="text"
                     placeholder="Title"
-                    value={formData.title}
+                    value={formData?.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className={`w-[320px] px-4 py-3.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                      errors.title ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-white hover:border-gray-300'
+                    className={`w-[320px] px-4 py-3.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all '
                     }`}
                   />
+                    {errors?.title && <small className='text-red-500 ms-3'>{errors?.title}</small>}
                 </div>
-
                 {/* Price */}
                 <div className="mb-4">
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 font-semibold">MAD</span>
                     <input
                       type="number"
+                      name="price"
                       placeholder="0.00"
-                      value={formData.price}
+                      value={formData?.price}
                       onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                      className={`w-[273px] pl-16 pr-4 py-3.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                        errors.price ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-white hover:border-gray-300'
+                      className={`w-[273px] pl-16 pr-4 py-3.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all'
                       }`}
                     />
                   </div>
-                  {errors.price && (
+                  {errors?.price && (
                     <div className="flex items-center gap-1 mt-2 text-red-600 text-sm font-medium">
-                      <div className="w-4 h-4 flex items-center justify-center">⚠</div>
-                      <span>{errors.price}</span>
+                      <span className='ms-3'>{errors?.price}</span>
                     </div>
                   )}
                 </div>
@@ -250,11 +279,10 @@ const AddListingPage = () => {
                 {/* Category */}
                 <div className="mb-4 relative">
                   <select
-                    value={formData.category}
+                    value={formData?.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     style={{border:'2px solid whitesmoke', outline:0}}
-                    className={`w-full pl-12 pr-12 py-3.5 border-2 rounded-xl appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-[#439ec538] focus:border-transparent cursor-pointer transition-all ${
-                      errors.category ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+                    className={`w-full pl-12 pr-12 py-3.5 border-2 rounded-xl appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-[#439ec538] focus:border-transparent cursor-pointer transition-all'
                     }`}
                   >
                     {categories.map((cat) => (
@@ -263,7 +291,9 @@ const AddListingPage = () => {
                       </option>
                     ))}
                   </select>
-                  {formData.category && getCategoryIcon() && (
+                    {errors?.category && <small className='text-red-500 ms-3'>{errors?.category}</small>}
+
+                  {formData?.category && getCategoryIcon() && (
                     React.createElement(getCategoryIcon(), {
                       className: "absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-600 pointer-events-none"
                     })
@@ -277,7 +307,7 @@ const AddListingPage = () => {
                 {/* Condition */}
                 <div className="mb-4 relative">
                   <select
-                    value={formData.condition}
+                    value={formData?.condition}
                     style={{border:'2px solid whitesmoke', outline:0}}
                     onChange={(e) => setFormData({ ...formData, condition: e.target.value })}
                     className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-[#439ec538]focus:border-transparent cursor-pointer hover:border-gray-300 transition-all"
@@ -299,7 +329,7 @@ const AddListingPage = () => {
                   <textarea
                     placeholder="Describe your item..."
                     rows="5"
-                    value={formData.description}
+                    value={formData?.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     className="w-11/12 px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#439ec538] focus:border-transparent resize-none hover:border-gray-300 transition-all"
                     style={{border:'2px whitesmoke solid', outline:0}}
@@ -307,6 +337,7 @@ const AddListingPage = () => {
                   <label className="absolute left-4 -top-2.5 bg-white px-2 text-xs font-semibold text-gray-700">
                     Description
                   </label>
+                    {errors?.description && <small className='text-red-500 ms-3'>{errors?.description}</small>}
                 </div>
 
                 {/* Location */}
@@ -314,7 +345,7 @@ const AddListingPage = () => {
                   <input
                     type="text"
                     placeholder="City, State"
-                    value={formData.location}
+                    value={formData?.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                     className="w-[299px] pl-12 pr-4 py-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-300 transition-all"
                   />
@@ -322,18 +353,20 @@ const AddListingPage = () => {
                   <label className="absolute left-4 -top-2.5 bg-white px-2 text-xs font-semibold text-gray-700">
                     Location
                   </label>
+                    {errors?.location && <small className='text-red-500 ms-3'>{errors?.location}</small>}
                 </div>
+
               </div>
 
               {/* Submit Button */}
               <button
                 type="submit"
                 className={`w-full py-4 rounded-xl font-bold transition-all text-lg ${
-                  formData.title && formData.price && formData.category
+                  formData?.title && formData?.price && formData?.category
                     ? 'bg-[#206e8f] hover:bg-[#1d546c] text-white shadow-md hover:shadow-lg'
                     : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 }`}
-                disabled={!formData.title || !formData.price || !formData.category}
+                // disabled={!formData?.title || !formData?.price || !formData?.category}
               >
                 Submit
               </button>
@@ -369,7 +402,7 @@ const AddListingPage = () => {
 
                         {/* Image Counter */}
                         {images.length > 1 && (
-                          <div className="absolute top-4 right-4 bg-black/70 text-white px-3 py-1.5 rounded-full text-sm font-semibold backdrop-blur-sm">
+                          <div className="absolute top-4 right-4 bg-black text-white px-3 py-1.5 rounded-full text-sm font-semibold backdrop-blur-sm opacity-40">
                             {previewIndex + 1} / {images.length}
                           </div>
                         )}
@@ -405,19 +438,19 @@ const AddListingPage = () => {
                   {/* Right - Details Section */}
                   <div className="flex-1 px-6 overflow-y-auto max-h-[600px]">
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                      {formData.title || 'Title'}
+                      {formData?.title || 'Title'}
                     </h3>
                     <div className="text-xl font-semibold text-gray-700 mb-2">
-                      {formData.price ? `MAD ${formData.price}` : 'Price'}
+                      {formData?.price ? `MAD ${formData?.price}` : 'Price'}
                     </div>
                     <div className="text-sm text-gray-600 mb-6">
-                      Listed a few seconds ago in {formData.location || 'الدار البيضاء'}
+                      Listed a few seconds ago in {formData?.location || 'الدار البيضاء'}
                     </div>
 
                     <div className="border-t border-gray-200">
                       <h4 className="font-semibold text-gray-900 mb-3">Details</h4>
                       <p className="text-gray-700 text-sm leading-relaxed">
-                        {formData.description || 'Description will appear here.'}
+                        {formData?.description || 'Description will appear here.'}
                       </p>
                     </div>
                     <div className="border-t border-gray-200 ">

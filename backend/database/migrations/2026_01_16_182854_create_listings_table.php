@@ -32,13 +32,7 @@ return new class extends Migration
             $table->string('city')->nullable();
             $table->timestamps();
         });
-        Schema::create('images', function (Blueprint $table) {
-            $table->id();
-            $table->string('image');
-            $table->unsignedBigInteger('listing_id');
-            $table->foreign('listing_id')->references('id')->on('listings')->onDelete('cascade');
-            $table->timestamps();
-        });
+
     
     }
 
