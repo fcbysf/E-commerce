@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\FavouriteController;
+use App\Http\Controllers\ListingsController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
 
@@ -48,3 +49,6 @@ Route::middleware(['auth:sanctum'])->get('userOrders', [OrderController::class,'
 // favourite Routes
 Route::get('/favourites', [FavouriteController::class, 'index']);
 Route::middleware(['throttle:favourites'])->post('/favourites', [FavouriteController::class, 'store']);
+
+// MarketPlace Routes
+Route::apiResource('listing', ListingsController::class);

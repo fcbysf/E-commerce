@@ -1,7 +1,9 @@
 import { Search, Settings, Bell, MessageSquare, ShieldCheck, ShoppingBag, Tag, ChevronRight, Plus, Car, Home, Shirt, FileText, Smartphone, Gamepad2, Baby, Gift, Flower2, Palette, Sofa, Hammer, PawPrint, Trophy, Puzzle } from 'lucide-react';
 import "../profile/profile.css"
+import { useNavigate } from 'react-router-dom';
 
 const MarketplacePage = () => {
+  const navigate = useNavigate();
   const menuItems = [
     { name: 'Browse all', icon: Search, active: true },
     { name: 'Notifications', icon: Bell },
@@ -155,7 +157,7 @@ const MarketplacePage = () => {
           </div>
 
           {/* Create New Listing */}
-          <button className="w-full flex items-center justify-center gap-2 py-2.5 text-[#1d546c] hover:bg-gray-100 rounded-lg font-medium mb-6 transition-colors">
+          <button className="w-full flex items-center justify-center gap-2 py-2.5 text-[#1d546c] hover:bg-gray-100 rounded-lg font-medium mb-6 transition-colors" onClick={()=>navigate('/marketplace/addListing')}>
             <Plus className="w-5 h-5" />
             Create new listing
           </button>
