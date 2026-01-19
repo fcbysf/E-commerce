@@ -23,3 +23,8 @@ body {
   padding: 0;
 }
 
+.listingsContainer::-webkit-scrollbar {
+  width: 10px;
+
+  display: none;
+}

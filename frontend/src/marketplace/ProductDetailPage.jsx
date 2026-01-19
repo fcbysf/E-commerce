@@ -12,12 +12,11 @@ import {
 import "../profile/profile.css";
 import { useNavigate, useParams } from "react-router-dom";
 import NavBar from "../layouts/ShopNavBar";
-import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useContext } from "react";
 import { Context } from "../context/context";
 const ProductDetailPage = () => {
-  const queryClient = useQueryClient();
   const { api, token } = useContext(Context);
   const { id } = useParams();
   const navigate = useNavigate();
@@ -37,34 +36,6 @@ const ProductDetailPage = () => {
     },
   });
 
-  // const product = {
-  //   id: 1,
-  //   title: "Kangoo dci 2012 06*68*87*94*71",
-  //   price: "MAD77,000",
-  //   location: "الدار البيضاء, المغرب",
-  //   listedDate: "6 days ago",
-  //   description:
-  //     "Je met en vente une belle voiture Renault kangoo dCi modèle 2012 tout option 6ch diesel Nmra dyali (...See more)",
-  //   images: [
-  //     "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=1200&h=900&fit=crop",
-  //     "https://images.unsplash.com/photo-1611821064430-4a1e4e4f6c1a?w=1200&h=900&fit=crop",
-  //     "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=1200&h=900&fit=crop",
-  //     "https://images.unsplash.com/photo-1583267746897-c554a0084dc3?w=1200&h=900&fit=crop",
-  //     "https://images.unsplash.com/photo-1615906655593-ad0386982a0f?w=1200&h=900&fit=crop",
-  //     "https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=1200&h=900&fit=crop",
-  //     "https://images.unsplash.com/photo-1612538498613-d0c936720d88?w=1200&h=900&fit=crop",
-  //     "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=1200&h=900&fit=crop",
-  //   ],
-  //   // Single image scenario - uncomment to test
-  //   // images: [
-  //   //   'https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=1200&h=900&fit=crop'
-  //   // ],
-  //   seller: {
-  //     name: "Atif",
-  //     avatar: "https://i.pravatar.cc/150?img=12",
-  //     responseTime: "Usually responds within an hour",
-  //   },
-  // };
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const hasMultipleImages = product?.images.length > 1;
@@ -125,7 +96,7 @@ const ProductDetailPage = () => {
             <img
               src={product?.images[currentIndex].image}
               alt={`Product ${currentIndex + 1}`}
-              className="w-full h-[57%] object-contain rounded-lg "
+              className="w-full h-[580px] object-contain rounded-lg"
             />
 
             {/* Navigation Arrows - Only show if multiple images */}
@@ -133,13 +104,13 @@ const ProductDetailPage = () => {
               <>
                 <button
                   onClick={goToPrevious}
-                  className="absolute left-7 bottom-[70%] -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all z-10"
+                  className="absolute left-7 bottom-[50%] -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all z-10"
                 >
                   <ChevronLeft className="w-6 h-6 text-gray-900" />
                 </button>
                 <button
                   onClick={goToNext}
-                  className="absolute right-7 bottom-[70%]  -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all z-10"
+                  className="absolute right-7 bottom-[50%]  -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all z-10"
                 >
                   <ChevronRight className="w-6 h-6 text-gray-900" />
                 </button>
@@ -150,7 +121,7 @@ const ProductDetailPage = () => {
           {/* Thumbnail Navigation - Only show if multiple images */}
           {hasMultipleImages && (
             <div className="bg-black/80 p-4">
-              <div className="flex gap-2 overflow-x-auto justify-center">
+              <div className="flex gap-2 overflow-auto justify-center">
                 {product?.images.map((image, idx) => (
                   <button
                     key={idx}
@@ -164,7 +135,7 @@ const ProductDetailPage = () => {
                     <img
                       src={image}
                       alt={`Thumbnail ${idx + 1}`}
-                      className="w-full h-full object-cover"
+                      className="w-fit h-fit object-cover"
                     />
                   </button>
                 ))}

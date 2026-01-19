@@ -1,34 +1,50 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { Context } from "../context/context";
 import "./adminUsers.css";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 import { toast } from "react-hot-toast";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useInView } from "react-intersection-observer";
+import Loader from "../layouts/loader";
 
 export default function AdminUsers() {
   const { api, token, userId } = useContext(Context);
   const [selectedUserId, setselectedUserId] = useState(null);
   const [role, setRole] = useState("user");
   const queryClient = useQueryClient();
+  const {ref, inView} = useInView({threshold: 0.5,});
+
 
   // FETCH USERS
-  async function fetching() {
-    return await fetch(`${api}users`, {
+  async function fetching({ pageParam = 1 }) {
+    return await fetch(`${api}users?page=${pageParam}`, {
       headers: {
         accept: "application/json",
         Authorization: `Bearer ${token}`,
       },
-    }).then((res) =>{
-      if(res.ok) return res.json();
+    }).then((res) => {
+      if (res.ok) return res.json();
       else throw Error("error fetching users");
     });
   }
-  const { data: users } = useQuery({
+  const { data, fetchNextPage, isFetchingNextPage, hasNextPage} = useInfiniteQuery({
     queryKey: ["users"],
     queryFn: fetching,
+    getNextPageParam: (lastPage) =>
+      lastPage.current_page < lastPage.last_page ? lastPage.current_page + 1 : undefined,
+    staleTime: 30000,
   });
+  const users= useMemo(() =>
+    data?.pages.flatMap((page) => page.data)
+    ?? []
+    , [data]);
+  useEffect(() => {
+    if (inView && !isFetchingNextPage&& hasNextPage)
+      fetchNextPage();
+    }, [fetchNextPage, inView, hasNextPage, isFetchingNextPage]);
+  
 
   function totalSpent(orders) {
     return orders.reduce((a, b) => a + b.total_price, 0).toFixed(2);
@@ -290,6 +306,7 @@ export default function AdminUsers() {
               )
           )}
       </div>
+      <div ref={ref} className="!mt-3">{isFetchingNextPage && <Loader />}</div>
     </div>
   );
 }

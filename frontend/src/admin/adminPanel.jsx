@@ -18,7 +18,12 @@ export default function AdminPanel() {
     window.location.href = "/";
     return null;
   }
-  if (loading)return <Loader />;
+  if (loading)return(
+    <div className="w-full h-screen flex justify-center items-center">
+
+      <Loader />
+    </div>
+);
 
   return (
     <div className="adminPanelContainer">

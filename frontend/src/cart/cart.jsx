@@ -133,7 +133,7 @@ export default function Cart() {
             ))}
           </div>
           {cart?.length > 0&& (
-            <div className="cartCheckout">
+            <div className="cartCheckout ">
               {cart?.map((c) => (
                 <div className="productAndPrice" key={c.id}>
                   <p>{c.product.name}</p>

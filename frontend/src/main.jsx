@@ -21,7 +21,7 @@ createRoot(document.getElementById("root")).render(
       <ReactQueryDevtools initialIsOpen={false} />
       <Suspense
         fallback={
-          <div>
+          <div className="w-full h-screen flex justify-center items-center">
             <Loader />
           </div>
         }

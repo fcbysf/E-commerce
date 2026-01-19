@@ -18,7 +18,7 @@ class ListingsController extends Controller
     }
     public function index()
     {
-        return Listings::with("images")->latest()->paginate(40);
+        return Listings::with("images")->latest()->paginate(6);
     }
 
     /**

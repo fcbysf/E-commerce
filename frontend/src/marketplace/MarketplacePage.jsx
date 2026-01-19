@@ -27,13 +27,18 @@ import {
 import "../profile/profile.css";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../layouts/ShopNavBar";
-import { useQuery } from "@tanstack/react-query";
-import { useContext, useMemo } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useContext, useEffect, useMemo } from "react";
 import { Context } from "../context/context";
+import Loader from "../layouts/loader";
+import toast from "react-hot-toast";
+import { useInView } from "react-intersection-observer";
+import '../index.css'
 
 const MarketplacePage = () => {
   const navigate = useNavigate();
-  const {api, token} = useContext(Context)
+  const { api, token } = useContext(Context)
+  const { ref, inView } = useInView({ threshold: 0.5});
   const menuItems = [
     { name: "Browse all", icon: Search, active: true },
     { name: "Notifications", icon: Bell },
@@ -61,121 +66,49 @@ const MarketplacePage = () => {
     { name: "Toys & Games", icon: Puzzle },
   ];
 
-  const { data, error, isLoading } = useQuery({
+  // Ferch Listings
+  const { data, error, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ["listings"],
-    queryFn: async () => {
-      const res= await fetch(api + "listing", {
+    queryFn: async ({ pageParam = 1 }) => {
+      const res = await fetch(api + `listing?page=${pageParam}`, {
         headers: {
           Accept: "application/json",
           Authorization: `Bearer ${token}`,
         },
       })
-      // .then(res=>{
-      //   if(res.ok) return res.json()
-      //   else throw Error("Something went wrong")
-      // });
       if (!res.ok) {
         throw "Something went wrong";
       }
       return res.json();
     },
+    getNextPageParam: (lastPage) => lastPage.current_page < lastPage.last_page ? lastPage.current_page + 1 : undefined,
+    staleTime: 30000,
   });
-
+  useEffect(() => {
+    if (inView && !isFetchingNextPage && hasNextPage)
+      fetchNextPage();
+  }, [fetchNextPage, inView, hasNextPage, isFetchingNextPage]);
   const products = useMemo(
-    () => data?.data ?? [],
+    () => data?.pages.flatMap((page) => page.data) ?? [],
     [data]
   );
-  // const products = [
-  //   {
-  //     id: 1,
-  //     title: "Kangoo dci 2012 06*68*87*94*71",
-  //     price: "MAD77,000",
-  //     image:
-  //       "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=600&h=600&fit=crop",
-  //     location: "Casablanca, Morocco",
-  //     justListed: false,
-  //   },
-  //   {
-  //     id: 2,
-  //     title: "Air tag original apple",
-  //     price: "MAD320",
-  //     image:
-  //       "https://images.unsplash.com/photo-1591290619762-d118c33d2e11?w=600&h=600&fit=crop",
-  //     location: "Casablanca, Morocco",
-  //     justListed: false,
-  //   },
-  //   {
-  //     id: 3,
-  //     title:
-  //       "خرط فرس خارجة عبر هوا خاصو راقم كنت ديجة صويت نكلا علي رقم 3000 درهم فيكس",
-  //     price: "MAD3,000",
-  //     image:
-  //       "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=600&fit=crop",
-  //     location: "Casablanca, Morocco",
-  //     justListed: true,
-  //   },
-  //   {
-  //     id: 4,
-  //     title: "Modern Office Desk Setup",
-  //     price: "MAD4,500",
-  //     image:
-  //       "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=600&h=600&fit=crop",
-  //     location: "Casablanca, Morocco",
-  //     justListed: false,
-  //   },
-  //   {
-  //     id: 5,
-  //     title: "Colorful Blankets Set",
-  //     price: "MAD850",
-  //     image:
-  //       "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&h=600&fit=crop",
-  //     location: "Casablanca, Morocco",
-  //     justListed: true,
-  //   },
-  //   {
-  //     id: 6,
-  //     title: "Black Hiking Boots",
-  //     price: "MAD1,200",
-  //     image:
-  //       "https://images.unsplash.com/photo-1542280756-74b2f55e73ab?w=600&h=600&fit=crop",
-  //     location: "Casablanca, Morocco",
-  //     justListed: false,
-  //   },
-  //   {
-  //     id: 7,
-  //     title: "Gaming Setup RGB Complete",
-  //     price: "MAD8,500",
-  //     image:
-  //       "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=600&h=600&fit=crop",
-  //     location: "Maarif, Casablanca",
-  //     justListed: false,
-  //   },
-  //   {
-  //     id: 8,
-  //     title: "Vintage Leather Sofa",
-  //     price: "MAD2,800",
-  //     image:
-  //       "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&h=600&fit=crop",
-  //     location: "Ain Chock, Casablanca",
-  //     justListed: true,
-  //   },
-  //   {
-  //     id: 9,
-  //     title: "Professional Camera Canon",
-  //     price: "MAD6,200",
-  //     image:
-  //       "https://images.unsplash.com/photo-1606980702020-9315f2a66a10?w=600&h=600&fit=crop",
-  //     location: "California, Casablanca",
-  //     justListed: false,
-  //   },
-  // ];
+  if (isPending) {
+    return (
+      <div className="w-full h-screen flex justify-center items-center">
+        <Loader />
+      </div>
+    );
+  }
+  if (error) {
+    toast.error("something went wrong");
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="h-screen bg-gray-50 ">
       <NavBar />
-      <div className="flex h-screen bg-gray-50 gap-3 mt-2">
+      <div className="flex  bg-gray-50 gap-3 mt-2 listingsContainer ">
         {/* Sidebar */}
-        <aside className="w-[340px] bg-white border-r border-gray-200 overflow-y-auto h-screen flex-shrink-0 scroll-w">
+        <aside className="w-[340px] bg-white border-r border-gray-200 overflow-y-auto h-screen flex-shrink-0 scroll-w sticky top-2" >
           <div className="p-4">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
@@ -202,15 +135,13 @@ const MarketplacePage = () => {
                 return (
                   <div
                     key={idx}
-                    className={`flex items-center justify-between px-2 py-2.5 rounded-lg cursor-pointer transition-colors ${
-                      item.active ? "bg-blue-50" : "hover:bg-gray-100"
-                    }`}
+                    className={`flex items-center justify-between px-2 py-2.5 rounded-lg cursor-pointer transition-colors ${item.active ? "bg-blue-50" : "hover:bg-gray-100"
+                      }`}
                   >
                     <div className="flex items-center gap-3">
                       <div
-                        className={`w-9 h-9 rounded-full flex items-center justify-center ${
-                          item.active ? "bg-[#1d546c]/60" : "bg-gray-200"
-                        }`}
+                        className={`w-9 h-9 rounded-full flex items-center justify-center ${item.active ? "bg-[#1d546c]/60" : "bg-gray-200"
+                          }`}
                       >
                         <Icon
                           className={`w-5 h-5 ${item.active ? "text-white" : "text-gray-700"}`}
@@ -275,7 +206,7 @@ const MarketplacePage = () => {
         </aside>
 
         {/* Main Content */}
-        <div className="flex-1 bg-white overflow-y-auto rounded-md">
+        <div className="flex-1 bg-white overflow-y-scroll rounded-md">
           <div className="max-w-6xl mx-auto py-2 px-4">
             {/* Header */}
             <div className="flex items-center justify-between ">
@@ -292,14 +223,14 @@ const MarketplacePage = () => {
               {products?.map((product) => (
                 <div
                   key={product.id}
-                  onClick={()=>navigate(`/marketplace/product/${product.id}`)}
+                  onClick={() => navigate(`/marketplace/product/${product.id}`)}
                   className="bg-white rounded-lg overflow-hidden cursor-pointer hover:shadow-lg  transition-shadow"
                 >
                   <div className="relative aspect-square bg-gray-100 overflow-hidden">
                     <img
                       src={product.images[0].image}
                       alt={product.title}
-                      className="w-full h-full object-cover hover:scale-105 transition-all"
+                      className="w-full h-[320px] object-contain hover:scale-105 transition-all"
                     />
                     {product.justListed && (
                       <div className="absolute top-3 left-3 bg-white px-2.5 py-1 rounded text-xs font-medium shadow-md">
@@ -309,7 +240,7 @@ const MarketplacePage = () => {
                   </div>
                   <div className="p-3">
                     <div className="text-lg font-semibold text-gray-900 mb-1">
-                      {product.price} DH 
+                      {product.price} DH
                     </div>
                     <div className="text-sm text-gray-900 mb-1 line-clamp-2">
                       {product.title}
@@ -321,6 +252,7 @@ const MarketplacePage = () => {
                 </div>
               ))}
             </div>
+            <div className="w-full flex justify-center !mt-5" ref={ref}>{isFetchingNextPage && <Loader />}</div>
           </div>
         </div>
       </div>

@@ -13,7 +13,7 @@ class OrderController extends Controller
 
     public function index()
     {
-        return Order::with('items.product', 'user')->latest()->get();
+        return Order::with('items.product', 'user')->latest()->paginate(10);
     }
     public function userOrders(Request $request)
     {
@@ -36,7 +36,7 @@ class OrderController extends Controller
         foreach ($request->cart as $cart) {
             OrderItem::create([
                 'order_id' => $order->id,
-                'product_id' => $cart->product['product']['id'],
+                'product_id' => $cart['product']['id'],
                 'quantity' => $cart['quantity'],
                 'unit_price' => $cart['product']['price']
             ]);

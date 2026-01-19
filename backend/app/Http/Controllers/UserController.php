@@ -13,16 +13,13 @@ class UserController extends Controller
     
     public function index()
     {
-        return User::with('orders')->latest()->get();
+        return User::with('orders')->latest()->paginate(10);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        //
-    }
+
 
     /**
      * Store a newly created resource in storage.

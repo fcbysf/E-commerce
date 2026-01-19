@@ -1,11 +1,13 @@
 .adminSideBar{
     width: 18%;
-    min-height: 100vh;
-    max-height: 100%;
+    height: 100vh;
     background-color:#13323fce ;
     color: #fff;
     border-radius: 10px;
     margin: 0;
+    position: sticky;
+    top: 0;
+
 }
 .adminSideBar h2{
     padding:25px 5px 0 20px;

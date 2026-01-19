@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useMemo } from "react";
 import { useState } from "react";
 import { Context } from "../context/context";
 import dayjs from "dayjs";
@@ -6,7 +6,9 @@ import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 import "./admineOrders.css";
 import { toast } from "react-hot-toast";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useInView } from "react-intersection-observer";
+import Loader from "../layouts/loader";
 
 export default function AdminOrders() {
   const { api, token } = useContext(Context);
@@ -15,6 +17,8 @@ export default function AdminOrders() {
   const [status, setStatus] = useState("all");
   const [search, setSearch] = useState("");
   const queryClient = useQueryClient();
+  const {ref, inView} = useInView({threshold: 0.5,});
+
 
 
   const toggleMenu = (id) => {
@@ -28,8 +32,8 @@ export default function AdminOrders() {
   };
 
   // FETCH ORDERS
-  async function fetching() {
-    return await fetch(`${api}order`, {
+  async function fetching({ pageParam = 1 }) {
+    return await fetch(`${api}order?page=${pageParam}`, {
       headers: {
         accept: "application/json",
         Authorization: `Bearer ${token}`,
@@ -42,21 +46,30 @@ export default function AdminOrders() {
         }
       })
   }
-  const {data : orders} = useQuery({
-    queryKey : ['orders'],
-    queryFn : fetching,
+  const { data, fetchNextPage, isFetchingNextPage, hasNextPage} = useInfiniteQuery({
+    queryKey: ['orders'],
+    queryFn: fetching,
+    getNextPageParam: (lastPage) => lastPage.current_page < lastPage.last_page ? lastPage.current_page + 1 : undefined,
+    staleTime: 30000
   })
+  const orders = useMemo(() => data?.pages.flatMap(page => page.data) ?? [], [data])
+  useEffect(() => {
+    if (inView && !isFetchingNextPage&& hasNextPage)
+      fetchNextPage();
+    }, [fetchNextPage, inView, hasNextPage, isFetchingNextPage]);
+
+  
 
   // FINISH ORDER
-  const {mutate : finishOrderMutation} = useMutation({
-    mutationFn : (order)=>fetch(`${api}order/${order.id}`, {
+  const { mutate: finishOrderMutation } = useMutation({
+    mutationFn: (order) => fetch(`${api}order/${order.id}`, {
       method: "PUT",
       headers: {
         accept: "application/json",
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ status: "done",product: order.items.map(i=>i.product)}),
+      body: JSON.stringify({ status: "done", product: order.items.map(i => i.product) }),
     })
       .then((res) => {
         if (res.ok) {
@@ -64,13 +77,13 @@ export default function AdminOrders() {
         }
         else throw Error("error finishing order");
       }),
-      onSuccess : () => {
-        queryClient.invalidateQueries(["orders"]);
-        toast.success("order done");
-      },
-      onError : () => {
-        toast.error("error finishing order, try again later");
-      }
+    onSuccess: () => {
+      queryClient.invalidateQueries(["orders"]);
+      toast.success("order done");
+    },
+    onError: () => {
+      toast.error("error finishing order, try again later");
+    }
 
   })
   const orderDone = (order) => {
@@ -79,8 +92,8 @@ export default function AdminOrders() {
   };
 
   // CANCEL ORDER
-  const {mutate : cancelOrderMutation} = useMutation({
-    mutationFn : (order)=>fetch(`${api}order/${order.id}`, {
+  const { mutate: cancelOrderMutation } = useMutation({
+    mutationFn: (order) => fetch(`${api}order/${order.id}`, {
       method: "PUT",
       headers: {
         accept: "application/json",
@@ -95,14 +108,14 @@ export default function AdminOrders() {
         }
         else throw Error("error canceling order");
       }),
-      onSuccess : ()=>{
-        queryClient.invalidateQueries(["orders"]);
-        toast.success("order canceled");
-      },
-      onError : ()=>{
-        toast.error("error canceling order, try again later");
-      }
-    })
+    onSuccess: () => {
+      queryClient.invalidateQueries(["orders"]);
+      toast.success("order canceled");
+    },
+    onError: () => {
+      toast.error("error canceling order, try again later");
+    }
+  })
 
   const cancelOrder = (order) => {
     if (order.status == "canceled") return;
@@ -120,7 +133,7 @@ export default function AdminOrders() {
   return (
     <div className="adminOrdersContainer">
       <div className="filterAndTitle">
-        <h1><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-package"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5" /><path d="M12 12l8 -4.5" /><path d="M12 12l0 9" /><path d="M12 12l-8 -4.5" /><path d="M16 5.25l-8 4.5" /></svg>orders</h1>
+        <h1><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-package"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5" /><path d="M12 12l8 -4.5" /><path d="M12 12l0 9" /><path d="M12 12l-8 -4.5" /><path d="M16 5.25l-8 4.5" /></svg>orders</h1>
         <div className="filtersCon">
           <div className="filter">
             <p>status: </p>
@@ -504,6 +517,7 @@ export default function AdminOrders() {
             )
         )}
       </div>
+        <div className="!mt-3" ref={ref} >{isFetchingNextPage && <Loader />}</div>
     </div>
   );
 }

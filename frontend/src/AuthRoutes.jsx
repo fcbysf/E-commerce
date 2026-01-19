@@ -15,6 +15,10 @@ export default function AuthRoute() {
     }
   }, [isLoggedIn, navigate])
 
-  if (loading) return <Loader />;
+  if (loading) return(
+    <div className="w-full h-screen flex justify-center items-center">
+      <Loader />
+    </div>
+  )
   return <Outlet />;
 }

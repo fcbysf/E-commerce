@@ -18,15 +18,15 @@ class ProductController extends Controller
     }
     public function adminProducts()
     {
-        return Product::latest()->get();
+        return Product::latest()->paginate(6);
     }
     public function index(Request $request)
     {
         $category = $request->category;
         if ($category == 'allCategories') {
-            return Product::whereBetween('price', [$request->min, $request->max])->latest()->paginate(40);
+            return Product::whereBetween('price', [$request->min, $request->max])->latest()->paginate(6);
         } else {
-            return Product::where('category', $category)->whereBetween('price', [$request->min, $request->max])->latest()->paginate(40);
+            return Product::where('category', $category)->whereBetween('price', [$request->min, $request->max])->latest()->paginate(6);
         }
     }
 

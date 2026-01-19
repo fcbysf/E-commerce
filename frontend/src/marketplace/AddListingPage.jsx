@@ -38,7 +38,7 @@ const AddListingPage = () => {
     category: "",
     condition: "",
     description: "",
-    location: "",
+    location: "Casablanca",
   });
 
   const [images, setImages] = useState([]);

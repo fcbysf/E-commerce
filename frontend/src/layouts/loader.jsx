@@ -7,8 +7,6 @@ const Loader = () => {
         <div className="circle1" />
         <div className="circle1" />
         <div className="circle1" />
-        <div className="circle1" />
-        <div className="circle1" />
       </div>
     </StyledWrapper>
   );
@@ -16,16 +14,14 @@ const Loader = () => {
 
 const StyledWrapper = styled.div`
   .loader3 {
-    width :100vw;
-    height :100vh;
     display: flex;
     justify-content: center;
     align-items: center;
   }
 
   .circle1 {
-    width: 15px;
-    height: 15px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     margin: 0 10px;
     background-color: #333;

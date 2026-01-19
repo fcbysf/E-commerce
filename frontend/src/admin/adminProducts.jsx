@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import "./adminProducts.css";
 import { Context } from "../context/context";
 import { useNavigate } from "react-router-dom";
@@ -6,11 +6,12 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 import toast from "react-hot-toast";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { useInView } from "react-intersection-observer";
+import Loader from "../layouts/loader";
 export default function AdminProducts() {
   const navigate = useNavigate();
   const [category, setCategory] = useState("all categories");
-  const [search, setSearch] = useState("");
   const categories = [
     "all categories",
     "fashion",
@@ -23,21 +24,35 @@ export default function AdminProducts() {
     "tech",
   ];
   const { api, token } = useContext(Context);
+  const queryClient = useQueryClient();
+  const { ref, inView } = useInView({threshold: 0.5,});
 
   // FETCH PRODUCTS
-  const queryClient = useQueryClient();
-  async function fetching() {
-    return await fetch(`${api}adminProducts`, {
+  async function fetching({ pageParam = 1 }) {
+    return await fetch(`${api}adminProducts?page=${pageParam}`, {
       headers: {
         accept: "application/json",
         Authorization: `Bearer ${token}`,
       },
     }).then((res) => res.json());
   }
-  const { data: products } = useQuery({
+  const { data, fetchNextPage, isFetchingNextPage, hasNextPage, } = useInfiniteQuery({
     queryKey: ["products"],
     queryFn: fetching,
+    getNextPageParam: (lastPage) =>
+      lastPage.current_page < lastPage.last_page ? lastPage.current_page + 1 : undefined,
+    staleTime: 30000,
   });
+  const products = useMemo(() =>
+    data?.pages.flatMap((page) => page.data)
+    ?? []
+    , [data]);
+    
+  useEffect(() => {
+    if (inView && !isFetchingNextPage&& hasNextPage)
+      fetchNextPage();
+    }, [fetchNextPage, inView, hasNextPage, isFetchingNextPage]);
+  
 
   // DELETE PRODUCT
   const { mutate } = useMutation({
@@ -352,6 +367,7 @@ export default function AdminProducts() {
           </tbody>
         </table>
       </div>
+      <div className="w-full flex justify-center mt-5" ref={ref}>{isFetchingNextPage && <Loader />}</div>
     </div>
   );
 }

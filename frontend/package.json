@@ -17,6 +17,7 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hot-toast": "^2.6.0",
+    "react-intersection-observer": "^10.0.2",
     "react-range": "^1.10.0",
     "react-router-dom": "^7.9.6",
     "styled-components": "^6.1.19"
