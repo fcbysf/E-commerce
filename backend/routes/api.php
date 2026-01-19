@@ -53,3 +53,4 @@ Route::middleware(['throttle:favourites'])->post('/favourites', [FavouriteContro
 
 // MarketPlace Routes
 Route::apiResource('listing', ListingsController::class);
+Route::get('userlistings', [ListingsController::class, 'userlistings']);

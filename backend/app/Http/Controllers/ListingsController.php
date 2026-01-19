@@ -20,6 +20,10 @@ class ListingsController extends Controller
     {
         return Listings::with("images")->latest()->paginate(6);
     }
+    public function userlistings(Request $request)
+    {
+        return Listings::with("images",)->where('user_id', $request->user()->id)->latest()->get();
+    }
 
     /**
      * Show the form for creating a new resource.

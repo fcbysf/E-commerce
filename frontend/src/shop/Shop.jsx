@@ -361,7 +361,7 @@ export default function Shop() {
             ))}
           </div>
         </section>
-        <div className="flex justify-center w-10  my-10 mx-auto" ref={ref}>{isFetchingNextPage && <Loader />}</div>
+        <div className="flex justify-center items-center my-10 ms-44" ref={ref}>{isFetchingNextPage && <Loader />}</div>
       </main>
     </div>
   );

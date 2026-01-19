@@ -16,8 +16,11 @@ import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useContext } from "react";
 import { Context } from "../context/context";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
 const ProductDetailPage = () => {
-  const { api, token } = useContext(Context);
+  const { api, token, user } = useContext(Context);
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -126,11 +129,10 @@ const ProductDetailPage = () => {
                   <button
                     key={idx}
                     onClick={() => setCurrentIndex(idx)}
-                    className={`flex-shrink-0 w-20 h-16 rounded-lg overflow-hidden border-2 transition-all ${
-                      idx === currentIndex
-                        ? "border-white"
-                        : "border-transparent opacity-60 hover:opacity-100"
-                    }`}
+                    className={`flex-shrink-0 w-20 h-16 rounded-lg overflow-hidden border-2 transition-all ${idx === currentIndex
+                      ? "border-white"
+                      : "border-transparent opacity-60 hover:opacity-100"
+                      }`}
                   >
                     <img
                       src={image}
@@ -145,7 +147,7 @@ const ProductDetailPage = () => {
         </div>
 
         {/* Right Side - Product Details */}
-        <div className="w-[460px] bg-white rounded-md overflow-y-auto flex-shrink-0 border-l border-gray-200 overflow-hidden">
+        <div className="w-[460px] bg-white rounded-md overflow-y-auto flex-shrink-0 border-l border-gray-200">
           <div className="px-6 ">
             {/* Product Title and Price */}
             <div className="mb-6">
@@ -153,10 +155,10 @@ const ProductDetailPage = () => {
                 {product?.title}
               </h1>
               <div className="text-3xl font-bold text-gray-900 mb-2">
-                {product?.price}
+                MAD {product?.price}
               </div>
               <div className="text-sm text-gray-600">
-                Listed {product?.listedDate} in {product?.location}
+                Listed {dayjs(product?.created_at).fromNow()} in {product?.city}
               </div>
             </div>
 
@@ -224,7 +226,7 @@ const ProductDetailPage = () => {
             </div>
 
             {/* Seller Information */}
-            <div>
+            <div className="mb-[100px]">
               <h3 className="font-semibold text-gray-900 mb-4">
                 Seller information
               </h3>
@@ -240,42 +242,42 @@ const ProductDetailPage = () => {
                     {product?.user?.name}
                   </div>
                 </div>
-                <button className="text-blue-600 text-sm font-medium hover:underline">
-                  Seller details
-                </button>
+                <small className="text-gray-700 max-w-28">joined in {dayjs(product?.user?.created_at).year()}</small>
+
               </div>
             </div>
           </div>
           {/* Quick Message */}
-          <div className="px-4 py-2 bg-gray-50  sticky rounded-lg  bottom-0 z-50 shadow-lg">
-            <div>
-              <p className="flex items-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="icon icon-tabler icons-tabler-outline icon-tabler-message-circle"
-                >
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                  <path d="M3 20l1.3 -3.9c-2.324 -3.437 -1.426 -7.872 2.1 -10.374c3.526 -2.501 8.59 -2.296 11.845 .48c3.255 2.777 3.695 7.266 1.029 10.501c-2.666 3.235 -7.615 4.215 -11.574 2.293l-4.7 1" />
-                </svg>
-                send message to {product?.user?.name}{" "}
-              </p>
-            </div>
-            <div className="text-sm text-gray-700 mb-3 leading-relaxed">
-              Bonjour {product?.user?.name}, cet article est-il toujours
-              disponible ?
-            </div>
-            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white text-center font-semibold py-2.5 rounded-lg transition-colors">
-              Send
-            </button>
-          </div>
+          {product?.user?._id !== user?._id &&
+            <div className="px-4 py-2 bg-gray-50  sticky rounded-lg bottom-24 z-50 shadow-lg ">
+              <div>
+                <p className="flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="icon icon-tabler icons-tabler-outline icon-tabler-message-circle"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M3 20l1.3 -3.9c-2.324 -3.437 -1.426 -7.872 2.1 -10.374c3.526 -2.501 8.59 -2.296 11.845 .48c3.255 2.777 3.695 7.266 1.029 10.501c-2.666 3.235 -7.615 4.215 -11.574 2.293l-4.7 1" />
+                  </svg>
+                  send message to {product?.user?.name}{" "}
+                </p>
+              </div>
+              <div className="text-sm text-gray-700 mb-3 leading-relaxed">
+                Bonjour {product?.user?.name}, cet article est-il toujours
+                disponible ?
+              </div>
+              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white text-center font-semibold py-2.5 rounded-lg transition-colors">
+                Send
+              </button>
+            </div>}
         </div>
       </div>
     </div>

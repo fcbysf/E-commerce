@@ -11,7 +11,7 @@ const Order = lazy(() => import("./order/oder"));
 const Favourites = lazy(() => import("./favourites/favourites"));
 const UserProfile = lazy(() => import("./profile/user-profile"));
 const AuthRoute = lazy(() => import("./AuthRoutes"));
-const Marketplace = lazy(() => import("./marketplace/MarketplacePage"));
+const MarkttPlaceLayout = lazy(() => import("./marketplace/marketPlaceLayout"));
 const ProductDetailPage = lazy(() =>
   import("./marketplace/ProductDetailPage")
 );
@@ -29,7 +29,7 @@ export default function App() {
           <Route path="/product/:id" element={<Product />} />
           <Route path="/login" element={<LogIn />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="marketplace" element={<Marketplace />} />
+          <Route path="marketplace/:place?" element={<MarkttPlaceLayout />} />
           <Route
             path="marketplace/product/:id"
             element={<ProductDetailPage />}
