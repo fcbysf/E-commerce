@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 export default function MarketplaceListings() {
     const navigate = useNavigate();
-    const { api, token } = useContext(Context)
+    const { api, token, user } = useContext(Context)
     const { data: listings } = useQuery({
         queryKey: ['userListings'],
         queryFn: async () => {
@@ -48,91 +48,93 @@ export default function MarketplaceListings() {
 
                 {/* Listings */}
                 <div className="flex flex-col gap-3">
-                    {listings?.map((listing, index) => (
-                        <div
-                            key={listing.id}
-                            className="bg-white rounded-lg p-4 shadow-sm animate-slideIn"
-                            style={{ animationDelay: `${index * 0.1}s` }}
-                        >
-                            {/* Tip Banner */}
-                            {listing.showTip && (
-                                <div className="flex items-center gap-2 bg-blue-50 px-3 py-2 rounded-md mb-3 text-xs text-blue-600">
-                                    <div className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
-                                        i
+                    {listings?.length === 0 && <div className='w-full h-full flex items-center justify-center mt-3'>You have no listings yet.</div>
+                        ||
+                        listings?.map((listing, index) => (
+                            <div
+                                key={listing.id}
+                                className="bg-white rounded-lg p-4 shadow-sm animate-slideIn"
+                                style={{ animationDelay: `${index * 0.1}s` }}
+                            >
+                                {/* Tip Banner */}
+                                {listing.showTip && (
+                                    <div className="flex items-center gap-2 bg-blue-50 px-3 py-2 rounded-md mb-3 text-xs text-blue-600">
+                                        <div className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
+                                            i
+                                        </div>
+                                        <span className="font-semibold">Tip: Improve the description</span>
                                     </div>
-                                    <span className="font-semibold">Tip: Improve the description</span>
-                                </div>
-                            )}
+                                )}
 
-                            <div className="flex gap-4">
-                                {/* Image */}
-                                <div className="w-32 h-32 rounded-lg overflow-hidden shrink-0 bg-gray-100">
-                                    <img
-                                        src={listing.images[0].image}
-                                        alt={listing.title}
-                                        className="w-full h-full object-contain"
-                                    />
-                                </div>
-
-                                {/* Content */}
-                                <div className="flex-1 flex flex-col">
-                                    <h3 className="text-base font-semibold text-gray-900 m-0 mb-1">
-                                        {listing.title}
-                                    </h3>
-
-                                    <div className="text-xl font-semibold text-gray-900 m-0 mb-2">
-                                        MAD {listing.price}
+                                <div className="flex gap-4">
+                                    {/* Image */}
+                                    <div className="w-32 h-32 rounded-lg overflow-hidden shrink-0 bg-gray-100">
+                                        <img
+                                            src={listing.images[0].image}
+                                            alt={listing.title}
+                                            className="w-full h-full object-contain"
+                                        />
                                     </div>
 
-                                    <div className="text-xs text-gray-500 mb-1">
-                                        {listing.status === 'active' ? 'Active' : 'Sold'} · Listed on {new Date(listing.created_at).toLocaleDateString()}
-                                    </div>
+                                    {/* Content */}
+                                    <div className="flex-1 flex flex-col">
+                                        <h3 className="text-base font-semibold text-gray-900 m-0 mb-1">
+                                            {listing.title}
+                                        </h3>
 
-                                    <div className="flex items-center gap-1 text-xs text-gray-500 mb-3">
-                                        <span>Listed on Marketplace ·</span>
-                                    </div>
+                                        <div className="text-xl font-semibold text-gray-900 m-0 mb-2">
+                                            MAD {listing.price}
+                                        </div>
 
-                                    {/* Action Buttons */}
-                                    <div className="flex gap-2 mt-auto">
-                                        {listing.status === 'active' ? (
-                                            <>
-                                                <button className="py-2 px-4 bg-[#56acd115] border border-gray-300 rounded-md text-sm font-semibold cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100 text-[#1d546c]">
-                                                    <CheckCircle size={16} />
-                                                    Mark as sold
-                                                </button>
-                                                <button className="py-2 px-4 bg-white border border-gray-300 rounded-md text-sm font-semibold text-gray-900 cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100" onClick={() => navigate(`/marketplace/product/${listing.id}`)}>
-                                                    <TrendingUp size={16} />
-                                                    View Listing
-                                                </button>
-                                                <button className="py-2 px-4 bg-white border border-gray-300 rounded-md text-sm font-semibold text-gray-900 cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100">
-                                                    <Edit2 size={16} />
-                                                    Edit 
-                                                </button>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <button className="py-2 px-4 bg-white border border-gray-300 rounded-md text-sm font-semibold text-blue-600 cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100">
-                                                    <CheckCircle size={16} />
-                                                    Mark as available
-                                                </button>
-                                                <button className="py-2 px-4 bg-white border border-gray-300 rounded-md text-sm font-semibold text-gray-900 cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100">
-                                                    <RotateCcw size={16} />
-                                                    Relist This Item
-                                                </button>
-                                                <button className="py-2 px-4 bg-white border border-gray-300 rounded-md text-sm font-semibold text-gray-900 cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100">
-                                                    <Edit size={16} />
-                                                    Edit Listing
-                                                </button>
-                                            </>
-                                        )}
-                                        <button className="py-2 px-3 bg-white border border-gray-300 rounded-md cursor-pointer flex items-center transition-colors hover:bg-gray-100">
-                                            <MoreHorizontal size={16} className="text-gray-500" />
-                                        </button>
+                                        <div className={`text-xs text-gray-500 mb-1 ${listing.status === 'sold' ? 'text-green-500' : ''}`}>
+                                            {listing.status} · Listed on {new Date(listing.created_at).toLocaleDateString()}
+                                        </div>
+
+                                        <div className="flex items-center gap-1 text-xs text-gray-500 mb-3">
+                                            <span>Listed on Marketplace ·</span>
+                                        </div>
+
+                                        {/* Action Buttons */}
+                                        <div className="flex gap-2 mt-auto">
+                                            {listing.status === 'active' ? (
+                                                <>
+                                                    <button className="py-2 px-4 bg-[#56acd115] border border-gray-300 rounded-md text-sm font-semibold cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100 text-[#1d546c]">
+                                                        <CheckCircle size={16} />
+                                                        Mark as sold
+                                                    </button>
+                                                    <button className="py-2 px-4 bg-white border border-gray-300 rounded-md text-sm font-semibold text-gray-900 cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100" onClick={() => navigate(`/marketplace/product/${listing.id}`)}>
+                                                        <TrendingUp size={16} />
+                                                        View Listing
+                                                    </button>
+                                                    <button className="py-2 px-4 bg-white border border-gray-300 rounded-md text-sm font-semibold text-gray-900 cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100">
+                                                        <Edit2 size={16} />
+                                                        Edit
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <button className="py-2 px-4 bg-[#56acd115] border border-gray-300 rounded-md text-sm font-semibold text-[#1d546c] cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100">
+                                                        <CheckCircle size={16} />
+                                                        Mark as available
+                                                    </button>
+                                                    <button className="py-2 px-4 bg-white border border-gray-300 rounded-md text-sm font-semibold text-gray-900 cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100">
+                                                        <RotateCcw size={16} />
+                                                        Relist This Item
+                                                    </button>
+                                                    <button className="py-2 px-4 bg-white border border-gray-300 rounded-md text-sm font-semibold text-gray-900 cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100">
+                                                        <Edit size={16} />
+                                                        Edit Listing
+                                                    </button>
+                                                </>
+                                            )}
+                                            <button className="py-2 px-3 bg-white border border-gray-300 rounded-md cursor-pointer flex items-center transition-colors hover:bg-gray-100">
+                                                <MoreHorizontal size={16} className="text-gray-500" />
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
                 </div>
             </div>
 
@@ -147,11 +149,14 @@ export default function MarketplaceListings() {
                     {/* Profile Card */}
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center">
-                            <User size={32} className="text-gray-500" />
+                            {user?.image &&
+                                <img src={user?.image || "/defaultprf.png"} alt="user image" className="w-full h-full object-cover rounded-full" />
+                                || <User size={32} className="text-gray-500" />
+                            }
                         </div>
                         <div>
                             <div className="text-base font-semibold text-gray-900 mb-0.5">
-                                Youssef Ahmed
+                                {user?.name}
                             </div>
                             <div className="text-xs text-gray-500">
                                 {listings?.filter((listing) => listing.status === 'active').length} Active Listings

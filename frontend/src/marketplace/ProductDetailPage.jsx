@@ -8,6 +8,7 @@ import {
   MoreHorizontal,
   MapPin,
   Info,
+  LucideMessageCircle,
 } from "lucide-react";
 import "../profile/profile.css";
 import { useNavigate, useParams } from "react-router-dom";
@@ -23,6 +24,7 @@ const ProductDetailPage = () => {
   const { api, token, user } = useContext(Context);
   const { id } = useParams();
   const navigate = useNavigate();
+  const [message, setMessage] = useState(`Bonjour, cet article est-il toujours disponible ?`);
 
   const { data: product } = useQuery({
     queryKey: ["product", id],
@@ -72,7 +74,6 @@ const ProductDetailPage = () => {
       prevIndex === product?.images.length - 1 ? 0 : prevIndex + 1,
     );
   };
-
   return (
     <div className="fixed inset-0 bg-gray-50 z-50 ">
       <NavBar />
@@ -248,33 +249,17 @@ const ProductDetailPage = () => {
             </div>
           </div>
           {/* Quick Message */}
-          {product?.user?._id !== user?._id &&
-            <div className="px-4 py-2 bg-gray-50  sticky rounded-lg bottom-24 z-50 shadow-lg ">
+          {product?.user?.id !== user?.id &&
+            <div className="px-6 bg-gray-50  sticky bottom-24 z-50 shadow-lg !border-t !border-gray-400 !border-solid">
               <div>
-                <p className="flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="icon icon-tabler icons-tabler-outline icon-tabler-message-circle"
-                  >
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M3 20l1.3 -3.9c-2.324 -3.437 -1.426 -7.872 2.1 -10.374c3.526 -2.501 8.59 -2.296 11.845 .48c3.255 2.777 3.695 7.266 1.029 10.501c-2.666 3.235 -7.615 4.215 -11.574 2.293l-4.7 1" />
-                  </svg>
-                  send message to {product?.user?.name}{" "}
+                <p className="flex items-center gap-2">
+                  <LucideMessageCircle className="w-5 h-5 "/>
+                  send message to {product?.user?.name}
                 </p>
               </div>
-              <div className="text-sm text-gray-700 mb-3 leading-relaxed">
-                Bonjour {product?.user?.name}, cet article est-il toujours
-                disponible ?
-              </div>
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white text-center font-semibold py-2.5 rounded-lg transition-colors">
+              <textarea className="text-sm min-w-[380px] max-w-[380px] px-2 py-2 min-h-16 rounded-xl text-black mb-3 !border !border-gray-300 !border-solid resize-none" value={message} onChange={(e)=>setMessage(e.target.value)} placeholder="Your Message" />
+
+              <button className="w-full cursor-pointer bg-[#357f9ef1] hover:bg-[#2e7594f1] text-white text-center font-semibold py-2.5 rounded-lg transition-colors">
                 Send
               </button>
             </div>}

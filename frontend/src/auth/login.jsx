@@ -9,7 +9,7 @@ const LogIn = () => {
   const [errors,setErrors] = useState({})
   useEffect(()=>{
     if(isLoggedIn&&userRole=='user'){
-      navigate('/shop')
+      navigate('/shop/allCategories')
       return
     }
     else if(isLoggedIn&&userRole=='admin'){
@@ -45,7 +45,7 @@ const LogIn = () => {
           navigate('/admin/dashbord')
         }
         else if(data.role == 'user'){
-          navigate('/shop')
+          navigate('/shop/allCategories')
         }
         
       })
