@@ -29,7 +29,6 @@ export default function App() {
           <Route path="/product/:id" element={<Product />} />
           <Route path="/login" element={<LogIn />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="marketplace/:place?" element={<MarkttPlaceLayout />} />
           <Route
             path="marketplace/product/:id"
             element={<ProductDetailPage />}
@@ -41,7 +40,9 @@ export default function App() {
             <Route path="/orders" element={<Order />} />
             <Route path="/favourites" element={<Favourites />} />
             <Route path="/profile" element={<UserProfile />} />
+            <Route path="marketplace/:place?" element={<MarkttPlaceLayout />} />
             <Route path="/marketplace/addListing" element={<AddListingPage />} />
+            
           </Route>
           <Route path="/admin/:place/:id?" element={<AdminPanel />} />
           <Route path="*" element={<Home />} />

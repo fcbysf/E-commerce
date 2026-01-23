@@ -1,13 +1,41 @@
-import { useContext, useState } from 'react';
-import { User, Plus, HelpCircle, Search, Share2, MoreHorizontal, TrendingUp, RotateCcw, CheckCircle, Edit, Edit2 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { User, Plus, HelpCircle, Link, Search, Share2, MoreHorizontal, TrendingUp, RotateCcw, CheckCircle, Edit, Edit2, Eye, Delete, Trash, Trash2 } from 'lucide-react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Context } from '../context/context';
 import { useNavigate } from 'react-router-dom';
+import ListingModal from './Marketplace layouts/listingModal';
+import { toast } from 'react-hot-toast'
+
 
 
 export default function MarketplaceListings() {
+    const menuRef = useRef(null);
+    const [isMenuOpen, setIsMenuOpen] = useState(null);
+    const queryClient = useQueryClient()
     const navigate = useNavigate();
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const { api, token, user } = useContext(Context)
+    const [search, setSearch] = useState('');
+    const [listing, setListing] = useState(null);
+
+    // Close menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setIsMenuOpen(null);
+            }
+        };
+
+        if (isMenuOpen) {
+            document.addEventListener('click', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, [isMenuOpen]);
+
+    // Fetch user listings
     const { data: listings } = useQuery({
         queryKey: ['userListings'],
         queryFn: async () => {
@@ -24,11 +52,74 @@ export default function MarketplaceListings() {
         },
         staleTime: 30000
     })
+    // Mark as sold mutation
+    const { mutate: markAsSoldMutation } = useMutation({
+        mutationFn: (id) => fetch(api + "listing/" + id, {
+            method: 'PUT',
+            headers: {
+                Accept: 'application/json',
+                "Content-type": 'application/json',
+                Authorization: 'bearer ' + token
+            },
+            body: JSON.stringify({ status: "sold" })
+        }).then(res => {
+            if (res.ok) return res.json()
+            else throw 'something went wrong'
+        }),
+        onSuccess: () => {
+            queryClient.invalidateQueries('userListings')
+        },
+        onError: (err) => {
+            toast.error(err)
+        }
+    })
+    // Mark as availaible mutation
+    const { mutate: markAsAvailaibleMutation } = useMutation({
+        mutationFn: (id) => fetch(api + "listing/" + id, {
+            method: 'PUT',
+            headers: {
+                Accept: 'application/json',
+                "Content-type": 'application/json',
+                Authorization: 'bearer ' + token
+            },
+            body: JSON.stringify({ status: "active" })
+        }).then(res => {
+            if (res.ok) return res.json()
+            else throw 'something went wrong'
+        }),
+        onSuccess: () => {
+            queryClient.invalidateQueries('listings')
+        },
+        onError: (err) => {
+            toast.error(err)
+        }
+    })
+    // Delete listing mutation
+    const { mutate: deleteListingMutation } = useMutation({
+        mutationFn: (id) => fetch(api + "listing/" + id, {
+            method: 'DELETE',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'bearer ' + token
+            }
+        }).then(res=>{
+            if(res.ok) return res.json()
+            else throw 'something went wrong'
+        }),
+        onSuccess: ()=>{
+            setIsModalOpen(null)
+            toast.success('Listing deleted successfully')
+            queryClient.invalidateQueries('listings')
+        },
+        onError: (err)=>{
+            toast.error(err)
+        }
+    })
 
     return (
-        <div className="flex  bg-gray-50">
+        <div className="flex bg-gray-50">
             {/* Center - Your Listings */}
-            <div className="flex-1 px-2 py-1">
+            <div className="flex-1 px-2 pt-1">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-3 bg-white p-3 rounded-lg">
                     <h1 className="text-2xl font-bold text-gray-900 m-0">Your listings</h1>
@@ -51,24 +142,17 @@ export default function MarketplaceListings() {
                     {listings?.length === 0 && <div className='w-full h-full flex items-center justify-center mt-3'>You have no listings yet.</div>
                         ||
                         listings?.map((listing, index) => (
+
                             <div
                                 key={listing.id}
-                                className="bg-white rounded-lg p-4 shadow-sm animate-slideIn"
+                                className="bg-white rounded-lg p-4 shadow-sm "
                                 style={{ animationDelay: `${index * 0.1}s` }}
+                                onClick={() => { setIsModalOpen(true); setListing(listing) }}
                             >
-                                {/* Tip Banner */}
-                                {listing.showTip && (
-                                    <div className="flex items-center gap-2 bg-blue-50 px-3 py-2 rounded-md mb-3 text-xs text-blue-600">
-                                        <div className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
-                                            i
-                                        </div>
-                                        <span className="font-semibold">Tip: Improve the description</span>
-                                    </div>
-                                )}
 
                                 <div className="flex gap-4">
                                     {/* Image */}
-                                    <div className="w-32 h-32 rounded-lg overflow-hidden shrink-0 bg-gray-100">
+                                    <div className="w-32 h-32 rounded-lg overflow-hidden shrink-0 bg-gray-100 cursor-pointer">
                                         <img
                                             src={listing.images[0].image}
                                             alt={listing.title}
@@ -77,7 +161,7 @@ export default function MarketplaceListings() {
                                     </div>
 
                                     {/* Content */}
-                                    <div className="flex-1 flex flex-col">
+                                    <div className="flex-1 flex flex-col cursor-pointer">
                                         <h3 className="text-base font-semibold text-gray-900 m-0 mb-1">
                                             {listing.title}
                                         </h3>
@@ -95,15 +179,15 @@ export default function MarketplaceListings() {
                                         </div>
 
                                         {/* Action Buttons */}
-                                        <div className="flex gap-2 mt-auto">
+                                        <div className="flex gap-2 mt-auto" onClick={(e) => e.stopPropagation()}>
                                             {listing.status === 'active' ? (
                                                 <>
-                                                    <button className="py-2 px-4 bg-[#56acd115] border border-gray-300 rounded-md text-sm font-semibold cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100 text-[#1d546c]">
+                                                    <button className="py-2 px-4 bg-[#56acd115] border border-gray-300 rounded-md text-sm font-semibold cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100 text-[#1d546c]" onClick={() => markAsSoldMutation(listing.id)}>
                                                         <CheckCircle size={16} />
                                                         Mark as sold
                                                     </button>
                                                     <button className="py-2 px-4 bg-white border border-gray-300 rounded-md text-sm font-semibold text-gray-900 cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100" onClick={() => navigate(`/marketplace/product/${listing.id}`)}>
-                                                        <TrendingUp size={16} />
+                                                        <Eye size={18} className="text-gray-500" />
                                                         View Listing
                                                     </button>
                                                     <button className="py-2 px-4 bg-white border border-gray-300 rounded-md text-sm font-semibold text-gray-900 cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100">
@@ -113,33 +197,67 @@ export default function MarketplaceListings() {
                                                 </>
                                             ) : (
                                                 <>
-                                                    <button className="py-2 px-4 bg-[#56acd115] border border-gray-300 rounded-md text-sm font-semibold text-[#1d546c] cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100">
+                                                    <button className="py-2 px-4 bg-[#56acd115] border border-gray-300 rounded-md text-sm font-semibold text-[#1d546c] cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100" onClick={() => markAsAvailaibleMutation(listing.id)}>
                                                         <CheckCircle size={16} />
                                                         Mark as available
                                                     </button>
                                                     <button className="py-2 px-4 bg-white border border-gray-300 rounded-md text-sm font-semibold text-gray-900 cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100">
                                                         <RotateCcw size={16} />
-                                                        Relist This Item
+                                                        Relist Item
                                                     </button>
                                                     <button className="py-2 px-4 bg-white border border-gray-300 rounded-md text-sm font-semibold text-gray-900 cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100">
-                                                        <Edit size={16} />
-                                                        Edit Listing
+                                                        <Edit2 size={16} />
+                                                        Edit 
                                                     </button>
                                                 </>
                                             )}
-                                            <button className="py-2 px-3 bg-white border border-gray-300 rounded-md cursor-pointer flex items-center transition-colors hover:bg-gray-100">
-                                                <MoreHorizontal size={16} className="text-gray-500" />
-                                            </button>
+                                            <div className="relative" ref={menuRef}>
+                                                <button
+                                                    onClick={() => {
+                                                        setIsMenuOpen(isMenuOpen === listing.id ? null : listing.id)
+                                                    }
+                                                    } className="flex flex-col items-center justify-center mt-2.5 gap-1 text-gray-600 hover:text-gray-800"
+                                                >
+                                                    <div>
+                                                        <MoreHorizontal size={17} />
+
+                                                    </div>
+                                                </button>
+
+                                                {/* Dropdown Menu */}
+                                                {isMenuOpen === listing.id && (
+                                                    <div className="absolute bottom-full mb-2 right-0 bg-white rounded-lg shadow-xl border border-gray-200 py-2 w-64 z-10" onClick={(e)=>e.stopPropagation()}>
+
+                                                        <button className="w-full px-4 py-3 hover:bg-gray-100 flex items-center gap-3 text-left text-gray-700" onClick={()=>deleteListingMutation(listing.id)}>
+                                                            <Trash2 size={18} className="text-gray-500" />
+                                                            <div className="font-medium text-sm">Delete listing</div>
+                                                        </button>
+
+                                                        <button className="w-full px-4 py-3 hover:bg-gray-100 flex items-center gap-3 text-left text-gray-700">
+                                                            <Share2 size={18} className="text-gray-500" />
+                                                            <span className="font-medium text-sm">Share listing</span>
+                                                        </button>
+
+
+                                                        <button className="w-full px-4 py-3 hover:bg-gray-100 flex items-center gap-3 text-left text-gray-700">
+                                                            <Link size={18} className="text-gray-500" />
+                                                            <span className="font-medium text-sm">Copy link</span>
+                                                        </button>
+
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
                         ))}
                 </div>
             </div>
 
             {/* Right Sidebar - Marketplace Profile */}
-            <div className="w-[360px] h-screen bg-white border-l mt-1 border-gray-200 sticky top-0">
+            <div className="w-[360px] h-screen bg-white border-l mt-1 border-gray-200 sticky top-0 ">
                 {/* Header */}
                 <div className="p-5 border-b border-gray-200">
                     <h2 className="text-xl font-bold text-gray-900 m-0 mb-4">
@@ -187,6 +305,7 @@ export default function MarketplaceListings() {
                     </button>
                 </div>
             </div>
+            <ListingModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} listing={listing} />
         </div>
     );
 }

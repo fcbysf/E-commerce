@@ -18,7 +18,7 @@ class ListingsController extends Controller
     }
     public function index()
     {
-        return Listings::with("images")->latest()->paginate(6);
+        return Listings::with("images")->where('status', 'active')->latest()->paginate(6);
     }
     public function userlistings(Request $request)
     {
@@ -33,7 +33,7 @@ class ListingsController extends Controller
         $data = $request->validate([
             'title' => 'required|min:3',
             'description' => 'required|min:10',
-            'price' => 'required|numeric',
+            'price' => 'required|numeric|min:0',
             'images' => 'required|array',
             'images.*' => 'required|image|file|max:2042',
             'category' => 'required|exists:categories,slug',
@@ -61,16 +61,30 @@ class ListingsController extends Controller
     }
 
 
-    public function update(Request $request, Listings $listings)
+    public function update(Request $request, Listings $listing)
     {
-        //
+
+        if ($request->status =="sold") {
+            $request->validate(['status' => 'string|required']);
+            $listing->status = $request->status;
+            $listing->save();
+            return response()->json($listing);
+        }
+        if ($request->status =="active") {
+            $request->validate(['status' => 'string|required']);
+            $listing->status = $request->status;
+            $listing->save();
+            return response()->json($listing);
+        }
+        return response()->json('test');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Listings $listings)
+    public function destroy(Listings $listing)
     {
-        //
+        $listing->delete();
+        return response()->json("listing deleted");
     }
 }

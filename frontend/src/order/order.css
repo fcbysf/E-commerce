@@ -1,110 +1,122 @@
-.orderContainer{
-    min-height: 100vh;
-    max-height: 100%;
-    font-family: Georgia, 'Times New Roman', Times, serif;
+.orderContainer {
+  min-height: 100vh;
+  max-height: 100%;
+  font-family: Georgia, "Times New Roman", Times, serif;
 }
-.orderContainer .orders{
-    padding: 0px 50px;
+.orderContainer .orders {
+  padding: 0px 50px;
 }
-.orderContainer table{
-    border-collapse: collapse;
-    width: 100%;
-    text-align: center;
-    
+.orderContainer table {
+  border-collapse: collapse;
+  width: 100%;
+  text-align: center;
 }
-.orderContainer table th,.orderContainer td{
-    border: 1px solid rgba(0, 0, 0, 0.11);
-    padding:10px;
+.orderContainer table th,
+.orderContainer td {
+  border: 1px solid rgba(0, 0, 0, 0.11);
+  padding: 10px;
 }
-.orderContainer th{
-    background-color: rgba(245, 245, 245, 0.507);
-    padding: 10px;
+.orderContainer th {
+  background-color: rgba(245, 245, 245, 0.507);
+  padding: 10px;
 }
-.orderContainer td{
-    padding: 0px 10px;
-    background-color: #ffffffa1;
+.orderContainer td {
+  padding: 0px 10px;
+  background-color: #ffffffa1;
 }
 
-.ordredP{
-width: 90%;
-margin:30px auto;
-display: flex;
-background-color: #ffffffa1;
-padding: 20px;
-border-radius: 10px;
-flex-wrap: wrap;
-gap: 20px;
-padding-left: 30px;
+.ordredP {
+  width: 90%;
+  margin: 30px auto;
+  display: flex;
+  background-color: #ffffffa1;
+  padding: 20px;
+  border-radius: 10px;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding-left: 30px;
 }
-.ordredProduct img{
-    width: 180px;
-    height: 180px;
-    object-fit: contain;
-    border-right:2px solid rgba(0, 0, 0, 0.068) ;
+.ordredProduct img {
+  width: 180px;
+  height: 180px;
+  object-fit: contain;
+  border-right: 2px solid rgba(0, 0, 0, 0.068);
 }
-.pNames{
-    display: flex;
-    flex-wrap: wrap;
-    margin: 0;
+.pNames {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
 }
 
 @media (max-width: 768px) {
-    .orderContainer .orders {
-        padding: 0 10px;
-    }
+  .orderContainer .orders {
+    padding: 0 10px;
+  }
 
-    .orderContainer table {
-        display: block;
-        width: 100%;
-    }
+  .orderContainer table {
+    display: block;
+    width: 100%;
+  }
 
-    .orderContainer thead,
-    .orderContainer tbody,
-    .orderContainer th,
-    .orderContainer td,
-    .orderContainer tr {
-        display: block;
-    }
+  .orderContainer thead,
+  .orderContainer tbody,
+  .orderContainer th,
+  .orderContainer td,
+  .orderContainer tr {
+    display: block;
+  }
 
-    .orderContainer thead tr {
-        position: absolute;
-        top: -9999px;
-        left: -9999px;
-    }
+  .orderContainer thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
 
-    .orderContainer tr {
-        margin-bottom: 1rem;
-        border: 1px solid rgba(0, 0, 0, 0.11);
-    }
+  .orderContainer tr {
+    margin-bottom: 1rem;
+    border: 1px solid rgba(0, 0, 0, 0.11);
+  }
 
-    .orderContainer td {
-        border: none;
-        border-bottom: 1px solid #eee;
-        position: relative;
-        padding-left: 50%;
-        text-align: left;
-    }
+  .orderContainer td {
+    border: none;
+    border-bottom: 1px solid #eee;
+    position: relative;
+    padding-left: 50%;
+    text-align: left;
+  }
 
-    .orderContainer td:before {
-        position: absolute;
-        top: 6px;
-        left: 6px;
-        width: 45%;
-        padding-right: 10px;
-        white-space: nowrap;
-        text-align: left;
-        font-weight: bold;
-    }
+  .orderContainer td:before {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 45%;
+    padding-right: 10px;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: bold;
+  }
 
-    .orderContainer td:nth-of-type(1):before { content: "Order number"; }
-    .orderContainer td:nth-of-type(2):before { content: "Date"; }
-    .orderContainer td:nth-of-type(3):before { content: "Status"; }
-    .orderContainer td:nth-of-type(4):before { content: "Total price"; }
-    .orderContainer td:nth-of-type(5):before { content: "Items"; }
-    .orderContainer td:nth-of-type(6):before { content: "Total items"; }
+  .orderContainer td:nth-of-type(1):before {
+    content: "Order number";
+  }
+  .orderContainer td:nth-of-type(2):before {
+    content: "Date";
+  }
+  .orderContainer td:nth-of-type(3):before {
+    content: "Status";
+  }
+  .orderContainer td:nth-of-type(4):before {
+    content: "Total price";
+  }
+  .orderContainer td:nth-of-type(5):before {
+    content: "Items";
+  }
+  .orderContainer td:nth-of-type(6):before {
+    content: "Total items";
+  }
 
-    .ordredP {
-        width: 100%;
-        padding: 10px;
-    }
+  .ordredP {
+    width: 100%;
+    padding: 10px;
+  }
 }

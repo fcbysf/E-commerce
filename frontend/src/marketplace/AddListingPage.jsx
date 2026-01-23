@@ -162,6 +162,7 @@ const AddListingPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const formDataSubmit = new FormData();
+    if(formData.price<0) return
     formDataSubmit.append("title", formData.title);
     formDataSubmit.append("price", formData.price);
     formDataSubmit.append("category", formData.category);
@@ -322,6 +323,7 @@ const AddListingPage = () => {
                     <input
                       type="number"
                       name="price"
+                      min={0}
                       placeholder="0.00"
                       value={formData?.price}
                       onChange={(e) =>
