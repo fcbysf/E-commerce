@@ -2,10 +2,12 @@ import { useState, useRef, useEffect } from 'react';
 import { X, MoreHorizontal, Eye, Share2, Link, Pause, Pencil, Trash2, Rocket } from 'lucide-react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { useNavigate } from 'react-router-dom';
 dayjs.extend(relativeTime);
 
 
-export default function ListingModal({ isModalOpen, setIsModalOpen, listing }) {
+export default function ListingModal({ isModalOpen, setIsModalOpen, listing,deleteListingMutation }) {
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const modalRef = useRef(null);
   const menuRef = useRef(null);
@@ -113,22 +115,16 @@ export default function ListingModal({ isModalOpen, setIsModalOpen, listing }) {
                 </div>
 
                 {/* Bottom Action Icons */}
-                <div className="mt-6 flex items-center gap-4">
-                  <button className="flex flex-col items-center gap-1 text-gray-600 hover:text-gray-800">
-                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200">
-                      <Pause size={18} />
-                    </div>
-                    <span className="text-xs">Mark as pending</span>
-                  </button>
+                <div className="mt-6 flex items-center justify-center gap-4">
 
-                  <button className="flex flex-col items-center gap-1 text-gray-600 hover:text-gray-800">
+                  <button className="flex flex-col items-center gap-1 text-gray-600 hover:text-gray-800" onClick={()=>navigate(`/marketPlace/editlisting/${listing.id}`)}>
                     <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200">
                       <Pencil size={18} />
                     </div>
                     <span className="text-xs">Edit listing</span>
                   </button>
 
-                  <button className="flex flex-col items-center gap-1 text-gray-600 hover:text-gray-800">
+                  <button className="flex flex-col items-center gap-1 text-gray-600 hover:text-gray-800" onClick={() => deleteListingMutation(listing.id)}>
                     <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200">
                       <Trash2 size={18} />
                     </div>

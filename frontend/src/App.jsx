@@ -15,6 +15,7 @@ const MarkttPlaceLayout = lazy(() => import("./marketplace/marketPlaceLayout"));
 const ProductDetailPage = lazy(() =>
   import("./marketplace/ProductDetailPage")
 );
+const EditListing = lazy(() => import("./marketplace/EditListing"));
 const AddListingPage = lazy(() => import("./marketplace/AddListingPage"));
 import Provider from "./context/context";
 
@@ -42,7 +43,7 @@ export default function App() {
             <Route path="/profile" element={<UserProfile />} />
             <Route path="marketplace/:place?" element={<MarkttPlaceLayout />} />
             <Route path="/marketplace/addListing" element={<AddListingPage />} />
-            
+            <Route path="/marketplace/editListing/:id" element={<EditListing />} />
           </Route>
           <Route path="/admin/:place/:id?" element={<AdminPanel />} />
           <Route path="*" element={<Home />} />

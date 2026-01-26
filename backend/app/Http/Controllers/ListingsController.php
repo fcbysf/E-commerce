@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ListingsRequest;
 use App\Models\Category;
 use App\Models\Listings;
 use App\Models\ListingsImages;
@@ -57,26 +58,49 @@ class ListingsController extends Controller
     }
     public function show(Listings $listing)
     {
-        return $listing->load(['images', 'user']);
+        return $listing->load(['images', 'user', 'category']);
     }
 
 
-    public function update(Request $request, Listings $listing)
+    public function update(ListingsRequest $request, Listings $listing)
     {
-
-        if ($request->status =="sold") {
-            $request->validate(['status' => 'string|required']);
+        $updatedData = $request->validated();
+        if ($request->status == "sold") {
             $listing->status = $request->status;
             $listing->save();
             return response()->json($listing);
         }
-        if ($request->status =="active") {
-            $request->validate(['status' => 'string|required']);
+        if ($request->status == "active") {
             $listing->status = $request->status;
             $listing->save();
             return response()->json($listing);
         }
-        return response()->json('test');
+        if ($request->category) {
+            $category_id = Category::where('slug', $request->category)->firstOrfail();
+            $updatedData['category_id'] = $category_id->id;
+        }
+        if ($request->location) {
+            $updatedData['city'] = $request->location;
+            $updatedData['country'] = null;
+        }
+        if ($request->images) {
+            foreach ($request->file('images') as $file) {
+                $file->store('images', 'public');
+                $filePath = url('storage/images/' . $file->hashName());
+                ListingsImages::create([
+                    'listing_id' => $listing->id,
+                    'image' => $filePath
+                ]);
+            }
+        }
+        if ($request->deletedImgsIds) {
+            foreach ($request->deletedImgsIds as $id) {
+                $img = ListingsImages::where('id', $id)->first();
+                $img->delete();
+            }
+        }
+        $listing->update($updatedData);
+        return response()->json('updated');
     }
 
     /**

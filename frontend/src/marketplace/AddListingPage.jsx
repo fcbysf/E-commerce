@@ -21,6 +21,7 @@ import {
   Trophy,
   Puzzle,
   MapPin,
+  ArrowLeft,
 } from "lucide-react";
 import { useContext } from "react";
 import { Context } from "../context/context";
@@ -162,7 +163,7 @@ const AddListingPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const formDataSubmit = new FormData();
-    if(formData.price<0) return
+    if (formData.price < 0) return
     formDataSubmit.append("title", formData.title);
     formDataSubmit.append("price", formData.price);
     formDataSubmit.append("category", formData.category);
@@ -202,7 +203,8 @@ const AddListingPage = () => {
         <div className="w-[420px] bg-white border-r border-gray-200 overflow-y-auto shadow-sm scroll-w">
           <div className="p-6">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <ArrowLeft size={20} className="-mt-1 hover:bg-gray-50 transition-colors cursor-pointer rounded-full p-1" onClick={() => navigate(-1)} />
               <div>
                 <div
                   className="text-[#0d5270de] mb-1 uppercase tracking-wide text-xl cursor-pointer"
@@ -445,12 +447,11 @@ const AddListingPage = () => {
               {/* Submit Button */}
               <button
                 type="submit"
-                className={`w-full py-4 rounded-xl font-bold transition-all text-lg ${
-                  formData?.title && formData?.price && formData?.category
+                className={`w-full py-4 rounded-xl font-bold transition-all text-lg ${formData?.title && formData?.price && formData?.category
                     ? "bg-[#206e8f] hover:bg-[#1d546c] text-white shadow-md hover:shadow-lg"
                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                }`}
-                // disabled={!formData?.title || !formData?.price || !formData?.category}
+                  }`}
+              // disabled={!formData?.title || !formData?.price || !formData?.category}
               >
                 Submit
               </button>

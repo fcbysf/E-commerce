@@ -102,16 +102,16 @@ export default function MarketplaceListings() {
                 Accept: 'application/json',
                 Authorization: 'bearer ' + token
             }
-        }).then(res=>{
-            if(res.ok) return res.json()
+        }).then(res => {
+            if (res.ok) return res.json()
             else throw 'something went wrong'
         }),
-        onSuccess: ()=>{
+        onSuccess: () => {
             setIsModalOpen(null)
             toast.success('Listing deleted successfully')
             queryClient.invalidateQueries('listings')
         },
-        onError: (err)=>{
+        onError: (err) => {
             toast.error(err)
         }
     })
@@ -154,8 +154,8 @@ export default function MarketplaceListings() {
                                     {/* Image */}
                                     <div className="w-32 h-32 rounded-lg overflow-hidden shrink-0 bg-gray-100 cursor-pointer">
                                         <img
-                                            src={listing.images[0].image}
-                                            alt={listing.title}
+                                            src={listing?.images[0]?.image}
+                                            alt={listing?.title}
                                             className="w-full h-full object-contain"
                                         />
                                     </div>
@@ -181,36 +181,25 @@ export default function MarketplaceListings() {
                                         {/* Action Buttons */}
                                         <div className="flex gap-2 mt-auto" onClick={(e) => e.stopPropagation()}>
                                             {listing.status === 'active' ? (
-                                                <>
-                                                    <button className="py-2 px-4 bg-[#56acd115] border border-gray-300 rounded-md text-sm font-semibold cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100 text-[#1d546c]" onClick={() => markAsSoldMutation(listing.id)}>
-                                                        <CheckCircle size={16} />
-                                                        Mark as sold
-                                                    </button>
-                                                    <button className="py-2 px-4 bg-white border border-gray-300 rounded-md text-sm font-semibold text-gray-900 cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100" onClick={() => navigate(`/marketplace/product/${listing.id}`)}>
-                                                        <Eye size={18} className="text-gray-500" />
-                                                        View Listing
-                                                    </button>
-                                                    <button className="py-2 px-4 bg-white border border-gray-300 rounded-md text-sm font-semibold text-gray-900 cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100">
-                                                        <Edit2 size={16} />
-                                                        Edit
-                                                    </button>
-                                                </>
+                                                <button className="py-2 px-4 bg-[#56acd115] border border-gray-300 rounded-md text-sm font-semibold cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100 text-[#1d546c]" onClick={() => markAsSoldMutation(listing.id)}>
+                                                    <CheckCircle size={16} />
+                                                    Mark as sold
+                                                </button>
+
                                             ) : (
-                                                <>
-                                                    <button className="py-2 px-4 bg-[#56acd115] border border-gray-300 rounded-md text-sm font-semibold text-[#1d546c] cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100" onClick={() => markAsAvailaibleMutation(listing.id)}>
-                                                        <CheckCircle size={16} />
-                                                        Mark as available
-                                                    </button>
-                                                    <button className="py-2 px-4 bg-white border border-gray-300 rounded-md text-sm font-semibold text-gray-900 cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100">
-                                                        <RotateCcw size={16} />
-                                                        Relist Item
-                                                    </button>
-                                                    <button className="py-2 px-4 bg-white border border-gray-300 rounded-md text-sm font-semibold text-gray-900 cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100">
-                                                        <Edit2 size={16} />
-                                                        Edit 
-                                                    </button>
-                                                </>
+                                                <button className="py-2 px-4 bg-[#56acd115] border border-gray-300 rounded-md text-sm font-semibold text-[#1d546c] cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100" onClick={() => markAsAvailaibleMutation(listing.id)}>
+                                                    <CheckCircle size={16} />
+                                                    Mark as available
+                                                </button>
                                             )}
+                                            <button className="py-2 px-4 bg-white border border-gray-300 rounded-md text-sm font-semibold text-gray-900 cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100" onClick={() => navigate(`/marketplace/product/${listing.id}`)}>
+                                                <Eye size={18} className="text-gray-500" />
+                                                View Listing
+                                            </button>
+                                            <button className="py-2 px-4 bg-white border border-gray-300 rounded-md text-sm font-semibold text-gray-900 cursor-pointer flex items-center gap-1.5 transition-colors hover:bg-gray-100" onClick={() => navigate(`/marketplace/editListing/${listing.id}`)}>
+                                                <Edit2 size={16} />
+                                                Edit
+                                            </button>
                                             <div className="relative" ref={menuRef}>
                                                 <button
                                                     onClick={() => {
@@ -226,9 +215,9 @@ export default function MarketplaceListings() {
 
                                                 {/* Dropdown Menu */}
                                                 {isMenuOpen === listing.id && (
-                                                    <div className="absolute bottom-full mb-2 right-0 bg-white rounded-lg shadow-xl border border-gray-200 py-2 w-64 z-10" onClick={(e)=>e.stopPropagation()}>
+                                                    <div className="absolute bottom-full mb-2 right-0 bg-white rounded-lg shadow-xl border border-gray-200 py-2 w-64 z-10" onClick={(e) => e.stopPropagation()}>
 
-                                                        <button className="w-full px-4 py-3 hover:bg-gray-100 flex items-center gap-3 text-left text-gray-700" onClick={()=>deleteListingMutation(listing.id)}>
+                                                        <button className="w-full px-4 py-3 hover:bg-gray-100 flex items-center gap-3 text-left text-gray-700" onClick={() => deleteListingMutation(listing.id)}>
                                                             <Trash2 size={18} className="text-gray-500" />
                                                             <div className="font-medium text-sm">Delete listing</div>
                                                         </button>
@@ -305,7 +294,7 @@ export default function MarketplaceListings() {
                     </button>
                 </div>
             </div>
-            <ListingModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} listing={listing} />
+            <ListingModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} listing={listing} deleteListingMutation={deleteListingMutation} />
         </div>
     );
 }
