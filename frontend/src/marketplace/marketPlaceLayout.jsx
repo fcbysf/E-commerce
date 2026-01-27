@@ -4,6 +4,7 @@ import "../profile/profile.css";
 import NavBar from "../layouts/ShopNavBar";
 import MarketplacePage from "./MarketplacePage";
 import UserListings from "./userListings";
+import MarketplaceInbox from "./inbox/inbox";
 
 export default function MarkttPlaceLayout() {
     const { place } = useParams()
@@ -14,6 +15,7 @@ export default function MarkttPlaceLayout() {
                 <MarketplaceSideBar />
                 {location.pathname === '/marketplace' && <MarketplacePage />}
                 {place=== 'selling' && <UserListings />}
+                {place === 'inbox' && <MarketplaceInbox />}
             </div>
         </div>
     )

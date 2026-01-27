@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\FavouriteController;
 use App\Http\Controllers\ListingsController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
 
@@ -54,3 +56,8 @@ Route::middleware(['throttle:favourites'])->post('/favourites', [FavouriteContro
 // MarketPlace Routes
 Route::apiResource('listing', ListingsController::class);
 Route::get('userlistings', [ListingsController::class, 'userlistings']);
+
+// Conversations and Messages Routes
+Route::middleware(['auth:sanctum'])->apiResource('conversation', ConversationController::class)->except(['update']);
+Route::apiResource('message', MessageController::class)->except(["index", 'show']);
+
