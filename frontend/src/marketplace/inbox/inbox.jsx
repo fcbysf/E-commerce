@@ -1,13 +1,18 @@
 import { useContext, useMemo, useState } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { Context } from "../../context/context";
+import { createEcho } from '../../echo/echo';
+import dayjs from 'dayjs';
+import Conversation from './conversation';
 
 
 
 export default function MarketplaceInbox() {
   const [activeTab, setActiveTab] = useState('selling');
   const [activeFilter, setActiveFilter] = useState('all');
-  const {api , token} = useContext(Context)
+  const [convId, setConvid] = useState(sessionStorage.getItem('convId') ?? null);
+  const {api , token, user} = useContext(Context)
+
 
   const filters = [
     'All',
@@ -23,7 +28,7 @@ export default function MarketplaceInbox() {
   const {data: conversationsFetch, error, isLoading,fetchNextPage,hasNextPage,isFetchingNextPage}= useInfiniteQuery({
     queryKey: ['conversations'],
     queryFn: async ({pageParam = 1 }) =>{
-        const res = await fetch(api + 'conversation',{
+        const res = await fetch(api + 'conversation'+'?page='+pageParam,{
             headers:{
                 Accept : 'application/json',
                 Authorization : `Bearer ${token}`,
@@ -37,68 +42,8 @@ export default function MarketplaceInbox() {
     } 
   })
   const conversations = useMemo(()=>conversationsFetch?.pages.flatMap(page=>page.data)??[],[conversationsFetch])
-  console.log(conversations);
-
-  const messages = [
-    {
-      id: 1,
-      image: '/api/placeholder/60/60',
-      title: 'Str Luxu · 70 سروال ملبح غريب dh',
-      message: '😊 هل لا يزال هذا العنصر متوفرًا؟',
-      date: '14 Jan',
-      unread: false
-    },
-    {
-      id: 2,
-      image: '/api/placeholder/60/60',
-      title: 'Mohamed · Gilet original',
-      message: 'Kayn xxl',
-      date: '12 Jan',
-      unread: false
-    },
-    {
-      id: 3,
-      image: '/api/placeholder/60/60',
-      title: 'Gilet original · مصطفى',
-      message: 'مصطفى السلام sent you a message about your listing: Gilet original.',
-      date: '12 Jan',
-      unread: true
-    },
-    {
-      id: 4,
-      image: '/api/placeholder/60/60',
-      title: 'Zakaria · Gilet original',
-      message: 'Fin kin',
-      date: '11 Jan',
-      unread: true
-    },
-    {
-      id: 5,
-      image: '/api/placeholder/60/60',
-      title: 'Mohammed · Gilet original',
-      message: 'Taman',
-      date: '11 Jan',
-      unread: true
-    },
-    {
-      id: 6,
-      image: '/api/placeholder/60/60',
-      title: 'Salah · Gilet original',
-      message: 'تمن',
-      date: '11 Jan',
-      unread: true
-    },
-    {
-      id: 7,
-      image: '/api/placeholder/60/60',
-      title: 'Anouar · Gilet original',
-      message: 'Salam',
-      date: '11 Jan',
-      unread: true
-    }
-  ];
-
   return (
+    !convId && 
     <div className="w-full max-w-4xl mx-auto bg-white min-h-screen">
       {/* Tabs */}
       <div className="border-b border-gray-200 px-6 pt-6">
@@ -148,21 +93,22 @@ export default function MarketplaceInbox() {
 
       {/* Messages List */}
       <div className="divide-y divide-gray-200">
-        {messages.map((msg) => (
+        {conversations?.map((conv) => (
           <div
-            key={msg.id}
+            key={conv.id}
             className="px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3 relative"
-          >
+            onClick={() =>{ sessionStorage.setItem('convId',conv.id);setConvid(conv.id)}}
+                      >
             {/* Unread Indicator */}
-            {msg.unread && (
+            {conv.unread && (
               <div className="absolute left-2 top-1/2 -translate-y-1/2 w-2 h-2 bg-blue-600 rounded-full"></div>
             )}
 
             {/* Product Image */}
             <div className="w-14 h-14 flex-shrink-0 bg-gray-800 rounded-lg overflow-hidden">
               <img
-                src={msg.image}
-                alt={msg.title}
+                src={conv?.listing?.images[0]?.image}
+                alt={conv?.listing?.title}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -170,13 +116,13 @@ export default function MarketplaceInbox() {
             {/* Message Content */}
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2 mb-1">
-                <h3 className={`text-sm ${msg.unread ? 'font-semibold' : 'font-normal'} text-gray-900 truncate m-0`}>
-                  {msg.title}
+                <h3 className={`text-sm ${conv.unread ? 'font-semibold' : 'font-normal'} text-gray-900 truncate m-0`}>
+                  <span className='text-[16px] font-bold me-2'>{conv?.seller?.name == user?.name ? conv?.buyer?.name : conv?.seller?.name} ·</span>{conv?.listing?.title}
                 </h3>
-                <span className="text-xs text-gray-500 flex-shrink-0">{msg.date}</span>
+                <span className="text-xs text-gray-500 flex-shrink-0">{dayjs(conv?.last_message?.created_at).fromNow()}</span>
               </div>
-              <p className={`text-sm ${msg.unread ? 'font-medium' : 'font-normal'} text-gray-600 truncate my-2`}>
-                {msg.message}
+              <p className={`text-sm font-bold text-black/90 truncate my-2`}>
+                {conv?.last_message?.message}
               </p>
             </div>
           </div>
@@ -200,5 +146,6 @@ export default function MarketplaceInbox() {
         </svg>
       </button>
     </div>
+    || <Conversation cnvId={convId} setconvoId={setConvid}/>
   );
 }

@@ -12,6 +12,8 @@ use App\Http\Controllers\ListingsController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
+use App\Models\Conversation;
+use Illuminate\Support\Facades\Broadcast;
 
 //auth routes
 
@@ -59,5 +61,13 @@ Route::get('userlistings', [ListingsController::class, 'userlistings']);
 
 // Conversations and Messages Routes
 Route::middleware(['auth:sanctum'])->apiResource('conversation', ConversationController::class)->except(['update']);
-Route::apiResource('message', MessageController::class)->except(["index", 'show']);
+Route::middleware(['auth:sanctum'])->get('/hasConversation', function (Request $request) {
+    $convoId= Conversation::where('listing_id', $request->listing_id)->where('buyer_id', $request->user()->id)->Where('seller_id', $request->seller_id)->first();
+    if($convoId){
+        return response()->json($convoId->id);
+    }
+    return response()->json(false);
+});
+Route::middleware(['auth:sanctum'])->apiResource('message', MessageController::class)->except(["index", 'show']);
 
+Broadcast::routes(['middleware' => ['auth:sanctum']]);

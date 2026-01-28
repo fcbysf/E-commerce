@@ -9,11 +9,12 @@ import {
   MapPin,
   Info,
   LucideMessageCircle,
+  BadgeInfo,
 } from "lucide-react";
 import "../profile/profile.css";
 import { useNavigate, useParams } from "react-router-dom";
 import NavBar from "../layouts/ShopNavBar";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useContext } from "react";
 import { Context } from "../context/context";
@@ -21,12 +22,16 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 const ProductDetailPage = () => {
-  const { api, token, user } = useContext(Context);
+  const { api, token, user, loading } = useContext(Context);
   const { id } = useParams();
   const navigate = useNavigate();
   const [message, setMessage] = useState(`Bonjour, cet article est-il toujours disponible ?`);
+  const queryClient = useQueryClient();
 
-  const { data: product } = useQuery({
+
+
+  // Fetch product details
+  const { data: product, error, isLoading: isLoadingProduct } = useQuery({
     queryKey: ["product", id],
     queryFn: async () => {
       return await fetch(api + "listing/" + id, {
@@ -40,6 +45,21 @@ const ProductDetailPage = () => {
       });
     },
   });
+
+  // Check if conversation exists
+  const { data: hasConversation, isLoading } = useQuery({
+    queryKey: ["hasConversation", id],
+    queryFn: () => fetch(api + `hasConversation?listing_id=${id}&seller_id=${product?.user?.id}`, {
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`
+      },
+    })
+      .then((res) => {
+        if (res.ok) return res.json()
+        else throw Error("Something went wrong")
+      })
+  })
 
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -74,6 +94,35 @@ const ProductDetailPage = () => {
       prevIndex === product?.images.length - 1 ? 0 : prevIndex + 1,
     );
   };
+
+  // Send message
+  const sendMessage = async () => {
+    const res = await fetch(api + "conversation", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        listing_id: id,
+        message: message,
+        buyer_id: user?.id,
+        seller_id: product?.user?.id
+      })
+    })
+    const data = await res.json()
+    if (!res.ok) {
+      toast.error('Error sending message')
+      throw 'Error sending message'
+    }
+    queryClient.invalidateQueries(['conversations', 'hasConversation']);
+    setMessage('')
+    toast.success('Message sent successfully')
+    return data;
+
+  }
+
   return (
     <div className="fixed inset-0 bg-gray-50 z-50 ">
       <NavBar />
@@ -249,20 +298,47 @@ const ProductDetailPage = () => {
             </div>
           </div>
           {/* Quick Message */}
-          {product?.user?.id !== user?.id &&
-            <div className="px-6 bg-gray-50  sticky bottom-24 z-50 shadow-lg !border-t !border-gray-400 !border-solid">
-              <div>
-                <p className="flex items-center gap-2">
-                  <LucideMessageCircle className="w-5 h-5 "/>
-                  send message to {product?.user?.name}
-                </p>
-              </div>
-              <textarea className="text-sm min-w-[380px] max-w-[380px] px-2 py-2 min-h-16 rounded-xl text-black mb-3 !border !border-gray-300 !border-solid resize-none" value={message} onChange={(e)=>setMessage(e.target.value)} placeholder="Your Message" />
+          <div className="px-6 bg-gray-50  sticky bottom-24 z-50 shadow-lg !border-t !border-gray-400 !border-solid">
+            {(product?.user?.id !== user?.id && !hasConversation && !isLoading) &&
+              <>
+                <div>
+                  <p className="flex items-center gap-2">
+                    <LucideMessageCircle className="w-5 h-5 " />
+                    send message to {product?.user?.name}
+                  </p>
+                </div>
+                <textarea className="text-sm min-w-[380px] max-w-[380px] px-2 py-2 min-h-16 rounded-xl text-black mb-3 !border !border-gray-300 !border-solid resize-none" value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Your Message" />
 
-              <button className="w-full cursor-pointer bg-[#357f9ef1] hover:bg-[#2e7594f1] text-white text-center font-semibold py-2.5 rounded-lg transition-colors">
-                Send
-              </button>
-            </div>}
+                <button className={`w-full cursor-pointer bg-[#357f9ef1] hover:bg-[#2e7594f1] text-white text-center font-semibold py-2.5 rounded-lg transition-colors ${isLoading && 'opacity-50 cursor-not-allowed'}`} onClick={sendMessage} disabled={!message.trim() || isLoading}>
+                  Send
+                </button>
+              </>
+              || product?.user?.id !== user?.id && !isLoadingProduct && !loading &&
+              <>
+                <div>
+                  <p className="flex items-center gap-2 ">
+                    <Info className="w-5 h-5 " />
+                    Already have a conversation with "{product?.user?.name}" about this Listing
+                  </p>
+                </div>
+                <button className={`w-full cursor-pointer bg-[#357f9ef1] hover:bg-[#2e7594f1] text-white text-center font-semibold py-2.5 rounded-lg transition-colors ${isLoading && 'opacity-50 cursor-not-allowed'}`} onClick={() => { sessionStorage.setItem('convId', hasConversation); navigate('/marketplace/inbox') }} disabled={isLoading}>
+                  Message Again
+                </button>
+              </>
+              || product?.user?.id === user?.id && !isLoadingProduct && !loading &&
+              <>
+                <div>
+                  <p className="flex items-center gap-2 ">
+                    <BadgeInfo className="w-5 h-5 " />
+                    This Listing is Yours
+                  </p>
+                </div>
+                <button className={`w-full cursor-pointer bg-[#357f9ef1] hover:bg-[#2e7594f1] text-white text-center font-semibold py-2.5 rounded-lg transition-colors ${isLoading && 'opacity-50 cursor-not-allowed'}`} onClick={() => {  navigate('/marketplace') }} disabled={!message.trim() || isLoading}>
+                  Browse Listings
+                </button>
+              </>
+            }
+          </div>
         </div>
       </div>
     </div>

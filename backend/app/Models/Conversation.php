@@ -10,19 +10,26 @@ class Conversation extends Model
         'listing_id',
         'seller_id',
         'buyer_id',
-        'lastMessage_id'
+        'last_message_id'
     ];
-    public function listing(){
+    public function listing()
+    {
         return $this->belongsTo(Listings::class);
     }
-    public function seller(){
+    public function seller()
+    {
         return $this->belongsTo(User::class);
     }
-    public function buyer(){
+    public function buyer()
+    {
         return $this->belongsTo(User::class);
     }
-    public function messages(){
+    public function messages()
+    {
         return $this->hasMany(Message::class);
     }
-
+    public function lastMessage()
+    {
+        return $this->belongsTo(Message::class, 'last_message_id');
+    }
 }

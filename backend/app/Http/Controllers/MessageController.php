@@ -1,7 +1,9 @@
 <?php
-
+//message controller
 namespace App\Http\Controllers;
 
+use App\Events\MessageSent;
+use App\Models\Conversation;
 use App\Models\Message;
 use Illuminate\Http\Request;
 
@@ -15,37 +17,31 @@ class MessageController extends Controller
         //
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        //
+        $msg = $request->validate([
+            'conversation_id' => 'required',
+            'message' => 'required|min:1|max:255',
+        ]);
+        $msg['sender_id'] = $request->user()->id;
+        $message = Message::create($msg);
+        $conversation = Conversation::where('id', $msg['conversation_id'])->first();
+        $conversation->last_message_id = $message->id;
+        $conversation->save();
+        broadcast(new MessageSent($message));
+        return response()->json('message sent');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Message $message)
-    {
-        //
-    }
+    public function show(Message $message) {}
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Message $message)
-    {
-        //
-    }
+
 
     /**
      * Update the specified resource in storage.

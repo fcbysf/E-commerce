@@ -12,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('conversations', function (Blueprint $table) {
-            $table->foreignId('last_message_id')->constrained('messages')->noActionOnDelete();
-            
+            $table->foreignId('last_message_id')->nullable()->constrained('messages')->cascadeOnDelete();
         });
     }
 
