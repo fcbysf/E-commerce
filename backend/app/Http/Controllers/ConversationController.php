@@ -16,7 +16,7 @@ class ConversationController extends Controller
      */
     public function index(Request $request)
     {
-        return Conversation::with('seller:id,name,image', 'buyer:id,name,image', 'lastMessage:id,message,seen_at,created_at', 'listing.images')->orderBy('last_message_id', 'desc')->where('seller_id', $request->user()->id)->orWhere('buyer_id', $request->user()->id)->latest()->paginate(10);
+        return Conversation::with('seller:id,name,image', 'buyer:id,name,image', 'lastMessage:id,message,sender_id,seen_at,created_at', 'listing.images')->orderBy('last_message_id', 'desc')->where('seller_id', $request->user()->id)->orWhere('buyer_id', $request->user()->id)->latest()->paginate(10);
     }
 
 

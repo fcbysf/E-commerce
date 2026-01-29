@@ -11,7 +11,7 @@ export default function MarketplaceInbox() {
   const [activeTab, setActiveTab] = useState('selling');
   const [activeFilter, setActiveFilter] = useState('all');
   const [convId, setConvid] = useState(sessionStorage.getItem('convId') ?? null);
-  const {api , token, user} = useContext(Context)
+  const { api, token, user } = useContext(Context)
 
 
   const filters = [
@@ -25,46 +25,44 @@ export default function MarketplaceInbox() {
   ];
 
   // fetch conversations
-  const {data: conversationsFetch, error, isLoading,fetchNextPage,hasNextPage,isFetchingNextPage}= useInfiniteQuery({
+  const { data: conversationsFetch, error, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ['conversations'],
-    queryFn: async ({pageParam = 1 }) =>{
-        const res = await fetch(api + 'conversation'+'?page='+pageParam,{
-            headers:{
-                Accept : 'application/json',
-                Authorization : `Bearer ${token}`,
-            }
-        });
-        if(!res.ok)throw 'Error fetching conversation'
-        return res.json();
+    queryFn: async ({ pageParam = 1 }) => {
+      const res = await fetch(api + 'conversation' + '?page=' + pageParam, {
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`,
+        }
+      });
+      if (!res.ok) throw 'Error fetching conversation'
+      return res.json();
     },
-    getNextPageParam : (lastPage) =>{
-        lastPage.current_page < lastPage.last_page ? lastPage.current_page + 1 : undefined
-    } 
+    getNextPageParam: (lastPage) => {
+      lastPage.current_page < lastPage.last_page ? lastPage.current_page + 1 : undefined
+    }
   })
-  const conversations = useMemo(()=>conversationsFetch?.pages.flatMap(page=>page.data)??[],[conversationsFetch])
+  const conversations = useMemo(() => conversationsFetch?.pages.flatMap(page => page.data) ?? [], [conversationsFetch])
   return (
-    !convId && 
+    !convId &&
     <div className="w-full max-w-4xl mx-auto bg-white min-h-screen">
       {/* Tabs */}
       <div className="border-b border-gray-200 px-6 pt-6">
         <div className="flex gap-6">
           <button
             onClick={() => setActiveTab('selling')}
-            className={`pb-3 px-1 font-semibold text-sm border-b-2 transition-colors ${
-              activeTab === 'selling'
-                ? 'text-blue-600 border-blue-600'
-                : 'text-gray-600 border-transparent hover:text-gray-800'
-            }`}
+            className={`pb-3 px-1 font-semibold text-sm border-b-2 transition-colors ${activeTab === 'selling'
+              ? 'text-blue-600 border-blue-600'
+              : 'text-gray-600 border-transparent hover:text-gray-800'
+              }`}
           >
             Selling
           </button>
           <button
             onClick={() => setActiveTab('buying')}
-            className={`pb-3 px-1 font-semibold text-sm border-b-2 transition-colors ${
-              activeTab === 'buying'
-                ? 'text-blue-600 border-blue-600'
-                : 'text-gray-600 border-transparent hover:text-gray-800'
-            }`}
+            className={`pb-3 px-1 font-semibold text-sm border-b-2 transition-colors ${activeTab === 'buying'
+              ? 'text-blue-600 border-blue-600'
+              : 'text-gray-600 border-transparent hover:text-gray-800'
+              }`}
           >
             Buying
           </button>
@@ -79,11 +77,10 @@ export default function MarketplaceInbox() {
             <button
               key={filter}
               onClick={() => setActiveFilter(filter.toLowerCase())}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                activeFilter === filter.toLowerCase()
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${activeFilter === filter.toLowerCase()
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
             >
               {filter}
             </button>
@@ -97,15 +94,15 @@ export default function MarketplaceInbox() {
           <div
             key={conv.id}
             className="px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3 relative"
-            onClick={() =>{ sessionStorage.setItem('convId',conv.id);setConvid(conv.id)}}
-                      >
+            onClick={() => { sessionStorage.setItem('convId', conv.id); setConvid(conv.id) }}
+          >
             {/* Unread Indicator */}
             {conv.unread && (
               <div className="absolute left-2 top-1/2 -translate-y-1/2 w-2 h-2 bg-blue-600 rounded-full"></div>
             )}
 
             {/* Product Image */}
-            <div className="w-14 h-14 flex-shrink-0 bg-gray-800 rounded-lg overflow-hidden">
+            <div className="w-14 h-14 flex-shrink-0 bg-gray-300 rounded-lg overflow-hidden">
               <img
                 src={conv?.listing?.images[0]?.image}
                 alt={conv?.listing?.title}
@@ -119,10 +116,13 @@ export default function MarketplaceInbox() {
                 <h3 className={`text-sm ${conv.unread ? 'font-semibold' : 'font-normal'} text-gray-900 truncate m-0`}>
                   <span className='text-[16px] font-bold me-2'>{conv?.seller?.name == user?.name ? conv?.buyer?.name : conv?.seller?.name} ·</span>{conv?.listing?.title}
                 </h3>
-                <span className="text-xs text-gray-500 flex-shrink-0">{dayjs(conv?.last_message?.created_at).fromNow()}</span>
+                <div>
+                  <span className="text-xs text-gray-500 flex-shrink-0">{dayjs(conv?.last_message?.created_at).fromNow()}</span><br />
+                </div>
               </div>
-              <p className={`text-sm font-bold text-black/90 truncate my-2`}>
+              <p className={`text-sm font-bold  text-black/90 truncate my-2 flex justify-between ${conv?.last_message?.seen_at && 'text-black/40'}`}>
                 {conv?.last_message?.message}
+                {conv?.last_message.sender_id == user?.id && conv?.last_message?.seen_at && <small className='text-black/40'>Seen {dayjs(conv?.last_message?.created_at).fromNow()}</small>}
               </p>
             </div>
           </div>
@@ -146,6 +146,6 @@ export default function MarketplaceInbox() {
         </svg>
       </button>
     </div>
-    || <Conversation cnvId={convId} setconvoId={setConvid}/>
+    || <Conversation cnvId={convId} setconvoId={setConvid} />
   );
 }

@@ -69,5 +69,6 @@ Route::middleware(['auth:sanctum'])->get('/hasConversation', function (Request $
     return response()->json(false);
 });
 Route::middleware(['auth:sanctum'])->apiResource('message', MessageController::class)->except(["index", 'show']);
+Route::post('/markAsSeen', [MessageController::class, 'markAsSeen'])->middleware('auth:sanctum');
 
 Broadcast::routes(['middleware' => ['auth:sanctum']]);

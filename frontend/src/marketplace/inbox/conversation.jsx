@@ -19,7 +19,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { createEcho } from '../../echo/echo';
 dayjs.extend(relativeTime);
 
-export default function Conversation({ cnvId, setconvoId}) {
+export default function Conversation({ cnvId, setconvoId }) {
     const [message, setMessage] = useState('');
     const { api, token, user } = useContext(Context);
     const messagesEndRef = useRef(null);
@@ -62,9 +62,26 @@ export default function Conversation({ cnvId, setconvoId}) {
                 };
             });
         });
+        channel.listen('.MarkAsSeen', e => {
+            queryClient.setQueryData(['messages', cnvId], old => {
+                if (!old) return old;
+
+                return {
+                    ...old,
+                    messages: old.messages.map(m =>
+                        m.sender_id === user.id || m.seen_at
+                            ? m
+                            : { ...m, seen_at: e.seen_at }
+                    ),
+                };
+            });
+            queryClient.invalidateQueries(['messages', cnvId]);
+        });
 
         return () => {
             channel.stopListening('.MessageSent');
+            echoRef.current.leave(`chat.${cnvId}`);
+            channel.stopListening('.MarkAsSeen');
             echoRef.current.leave(`chat.${cnvId}`);
         };
     }, [cnvId]);
@@ -99,6 +116,28 @@ export default function Conversation({ cnvId, setconvoId}) {
         });
 
     };
+    // Mark as seen 
+    useEffect(() => {
+
+        if (!messages || messages.messages.length === 0) return;
+        const unseenMessages = messages.messages.filter(
+            (m) => m.sender_id !== user?.id && !m.seen_at
+        );
+        if (unseenMessages.length === 0) return;
+
+        fetch(`${api}markAsSeen`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                conversation_id: cnvId,
+            }),
+        });
+    }, [messages, cnvId]);
+
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
@@ -126,7 +165,7 @@ export default function Conversation({ cnvId, setconvoId}) {
             {/* Header */}
             <div className="border-b border-gray-200 px-4 py-3 flex items-center justify-between bg-white sticky top-0 z-10 shadow-sm">
                 <div className="flex items-center gap-3 flex-1">
-                    <button className="p-2 hover:bg-gray-100 rounded-full transition-colors" onClick={() =>{sessionStorage.removeItem('convId');setconvoId(null)}}>
+                    <button className="p-2 hover:bg-gray-100 rounded-full transition-colors" onClick={() => { sessionStorage.removeItem('convId'); setconvoId(null) }}>
                         <ArrowLeft size={20} className="text-gray-700" />
                     </button>
 
@@ -235,8 +274,8 @@ export default function Conversation({ cnvId, setconvoId}) {
 
                 {messages?.messages?.map((msg, index) => {
                     const prevMsg = messages[index - 1];
-                    const showDate = !prevMsg ||
-                        dayjs(msg.created_at).diff(dayjs(prevMsg.created_at), 'day') >= 0;
+                    const showDate = !prevMsg || dayjs(msg.created_at).format('YYYY-MM-DD') !== dayjs(prevMsg.created_at).format('YYYY-MM-DD');
+
 
                     return (
                         <div key={msg.id}>
@@ -269,7 +308,8 @@ export default function Conversation({ cnvId, setconvoId}) {
                                     <p className={`text-xs m-0 text-gray-500 mt-1 px-2 ${msg.sender_id === user?.id ? 'text-right' : 'text-left'
                                         }`}>
                                         {dayjs(msg.created_at).format('HH:mm')}
-                                        {msg._optimistic && ' •••'}
+                                        <br />
+                                        {index === messages.messages.length - 1 && msg.seen_at && msg.sender_id == user?.id && <small>Seen</small>}
                                     </p>
                                 </div>
                             </div>

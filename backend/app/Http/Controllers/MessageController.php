@@ -2,10 +2,13 @@
 //message controller
 namespace App\Http\Controllers;
 
+use App\Events\MarkAsSeen;
 use App\Events\MessageSent;
 use App\Models\Conversation;
 use App\Models\Message;
 use Illuminate\Http\Request;
+
+use function Symfony\Component\Clock\now;
 
 class MessageController extends Controller
 {
@@ -15,6 +18,23 @@ class MessageController extends Controller
     public function index()
     {
         //
+    }
+    public function markAsSeen(Request $request)
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'conversation_id' => 'required|exists:conversations,id',
+        ]);
+
+        Message::where('conversation_id', $request->conversation_id)
+            ->where('sender_id', '!=', $user->id)
+            ->whereNull('seen_at')
+            ->update(['seen_at' => now()]);
+
+        broadcast(new MarkAsSeen($request->conversation_id, $user->id));
+
+        return response()->noContent();
     }
 
 
