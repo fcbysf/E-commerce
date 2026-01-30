@@ -120,9 +120,9 @@ export default function MarketplaceInbox() {
                   <span className="text-xs text-gray-500 flex-shrink-0">{dayjs(conv?.last_message?.created_at).fromNow()}</span><br />
                 </div>
               </div>
-              <p className={`text-sm font-bold  text-black/90 truncate my-2 flex justify-between ${conv?.last_message?.seen_at && 'text-black/40'}`}>
-                {conv?.last_message?.message}
-                {conv?.last_message.sender_id == user?.id && conv?.last_message?.seen_at && <small className='text-black/40'>Seen {dayjs(conv?.last_message?.created_at).fromNow()}</small>}
+              <p className={`text-sm font-bold truncate my-2 flex justify-between ${conv?.last_message?.seen_at && 'text-black/40'}`}>
+                {conv?.last_message?.message || conv?.last_message?.sender_id !== user?.id && "reply ?"}
+                {conv?.last_message.sender_id == user?.id && conv?.last_message?.seen_at && <small className='text-black/40 font-normal text-xs'>Seen {dayjs(conv?.last_message?.created_at).fromNow()}</small>}
               </p>
             </div>
           </div>

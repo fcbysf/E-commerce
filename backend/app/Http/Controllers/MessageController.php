@@ -7,6 +7,7 @@ use App\Events\MessageSent;
 use App\Models\Conversation;
 use App\Models\Message;
 use Illuminate\Http\Request;
+use PhpParser\Node\Expr\Isset_;
 
 use function Symfony\Component\Clock\now;
 
@@ -45,9 +46,18 @@ class MessageController extends Controller
     {
         $msg = $request->validate([
             'conversation_id' => 'required',
-            'message' => 'required|min:1|max:255',
+            'message' => 'sometimes|min:1|max:255|nullable',
+            'file_path' => 'sometimes|file|max:2048|nullable',
+            'file_type' => 'sometimes|string|nullable'
         ]);
         $msg['sender_id'] = $request->user()->id;
+        if ($request->hasFile('file_path')){
+            if ($request->file_type == 'audio') {
+                $file = $request->file('file_path');
+                $file->store('audios', 'public');
+                $msg['file_path'] = url('storage/audios/' . $file->hashName());
+            }
+        }
         $message = Message::create($msg);
         $conversation = Conversation::where('id', $msg['conversation_id'])->first();
         $conversation->last_message_id = $message->id;

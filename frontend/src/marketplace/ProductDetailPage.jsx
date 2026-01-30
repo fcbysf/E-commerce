@@ -47,19 +47,24 @@ const ProductDetailPage = () => {
   });
 
   // Check if conversation exists
-  const { data: hasConversation, isLoading } = useQuery({
-    queryKey: ["hasConversation", id],
-    queryFn: () => fetch(api + `hasConversation?listing_id=${id}&seller_id=${product?.user?.id}`, {
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`
-      },
-    })
+  const { data: hasConversation, isPending } = useQuery({
+    queryKey: ["hasConversation", id, product],
+    queryFn: async () => {
+      if(!product) return
+      return await fetch(api + `hasConversation?listing_id=${id}&seller_id=${product?.user?.id}`, {
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`
+        },
+      })
       .then((res) => {
         if (res.ok) return res.json()
         else throw Error("Something went wrong")
       })
+    }
   })
+
+
 
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -299,7 +304,7 @@ const ProductDetailPage = () => {
           </div>
           {/* Quick Message */}
           <div className="px-6 bg-gray-50  sticky bottom-24 z-50 shadow-lg !border-t !border-gray-400 !border-solid">
-            {(product?.user?.id !== user?.id && !hasConversation && !isLoading) &&
+            {(product?.user?.id !== user?.id && !hasConversation && !isPending && !isLoadingProduct && !loading) &&
               <>
                 <div>
                   <p className="flex items-center gap-2">
@@ -309,7 +314,7 @@ const ProductDetailPage = () => {
                 </div>
                 <textarea className="text-sm min-w-[380px] max-w-[380px] px-2 py-2 min-h-16 rounded-xl text-black mb-3 !border !border-gray-300 !border-solid resize-none" value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Your Message" />
 
-                <button className={`w-full cursor-pointer bg-[#357f9ef1] hover:bg-[#2e7594f1] text-white text-center font-semibold py-2.5 rounded-lg transition-colors ${isLoading && 'opacity-50 cursor-not-allowed'}`} onClick={sendMessage} disabled={!message.trim() || isLoading}>
+                <button className={`w-full cursor-pointer bg-[#357f9ef1] hover:bg-[#2e7594f1] text-white text-center font-semibold py-2.5 rounded-lg transition-colors ${isPending && 'opacity-50 cursor-not-allowed'}`} onClick={sendMessage} disabled={!message.trim() || isPending}>
                   Send
                 </button>
               </>
@@ -321,7 +326,7 @@ const ProductDetailPage = () => {
                     Already have a conversation with "{product?.user?.name}" about this Listing
                   </p>
                 </div>
-                <button className={`w-full cursor-pointer bg-[#357f9ef1] hover:bg-[#2e7594f1] text-white text-center font-semibold py-2.5 rounded-lg transition-colors ${isLoading && 'opacity-50 cursor-not-allowed'}`} onClick={() => { sessionStorage.setItem('convId', hasConversation); navigate('/marketplace/inbox') }} disabled={isLoading}>
+                <button className={`w-full cursor-pointer bg-[#357f9ef1] hover:bg-[#2e7594f1] text-white text-center font-semibold py-2.5 rounded-lg transition-colors ${isPending && 'opacity-50 cursor-not-allowed'}`} onClick={() => { sessionStorage.setItem('convId', hasConversation); navigate('/marketplace/inbox') }} disabled={isPending}>
                   Message Again
                 </button>
               </>
@@ -333,7 +338,7 @@ const ProductDetailPage = () => {
                     This Listing is Yours
                   </p>
                 </div>
-                <button className={`w-full cursor-pointer bg-[#357f9ef1] hover:bg-[#2e7594f1] text-white text-center font-semibold py-2.5 rounded-lg transition-colors ${isLoading && 'opacity-50 cursor-not-allowed'}`} onClick={() => {  navigate('/marketplace') }} disabled={!message.trim() || isLoading}>
+                <button className={`w-full cursor-pointer bg-[#357f9ef1] hover:bg-[#2e7594f1] text-white text-center font-semibold py-2.5 rounded-lg transition-colors ${isPending && 'opacity-50 cursor-not-allowed'}`} onClick={() => { navigate('/marketplace') }} disabled={!message.trim() || isPending}>
                   Browse Listings
                 </button>
               </>
