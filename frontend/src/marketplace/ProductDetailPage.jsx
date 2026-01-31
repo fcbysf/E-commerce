@@ -28,8 +28,6 @@ const ProductDetailPage = () => {
   const [message, setMessage] = useState(`Bonjour, cet article est-il toujours disponible ?`);
   const queryClient = useQueryClient();
 
-
-
   // Fetch product details
   const { data: product, error, isLoading: isLoadingProduct } = useQuery({
     queryKey: ["product", id],
@@ -50,17 +48,17 @@ const ProductDetailPage = () => {
   const { data: hasConversation, isPending } = useQuery({
     queryKey: ["hasConversation", id, product],
     queryFn: async () => {
-      if(!product) return
+      if (!product) return
       return await fetch(api + `hasConversation?listing_id=${id}&seller_id=${product?.user?.id}`, {
         headers: {
           Accept: "application/json",
           Authorization: `Bearer ${token}`
         },
       })
-      .then((res) => {
-        if (res.ok) return res.json()
-        else throw Error("Something went wrong")
-      })
+        .then((res) => {
+          if (res.ok) return res.json()
+          else throw Error("Something went wrong")
+        })
     }
   })
 
@@ -303,7 +301,7 @@ const ProductDetailPage = () => {
             </div>
           </div>
           {/* Quick Message */}
-          <div className="px-6 bg-gray-50  sticky bottom-24 z-50 shadow-lg !border-t !border-gray-400 !border-solid">
+          {user && <div className="px-6 bg-gray-50  sticky bottom-24 z-50 shadow-lg !border-t !border-gray-400 !border-solid">
             {(product?.user?.id !== user?.id && !hasConversation && !isPending && !isLoadingProduct && !loading) &&
               <>
                 <div>
@@ -344,6 +342,7 @@ const ProductDetailPage = () => {
               </>
             }
           </div>
+          }
         </div>
       </div>
     </div>

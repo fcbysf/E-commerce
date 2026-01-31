@@ -5,13 +5,11 @@ const Provider = ({ children }) => {
   const api = "http://localhost:8000/api/";
   const [token, setToken] = useState(sessionStorage.getItem("token") || null);
   const [isLoggedIn, setIsLoggedIn] = useState(
-    sessionStorage.getItem("token") ? true : false
-  );
+    sessionStorage.getItem("token") ? true : false);
   const [userId, setUserId] = useState(null);
   const [user, setUser] = useState(null);
   const [userRole, setUserRole] = useState(
-    sessionStorage.getItem("role") || null
-  );
+    sessionStorage.getItem("role") || null);
   const [loading, setLoading] = useState(true);
 
   function fetching() {
@@ -59,6 +57,7 @@ const Provider = ({ children }) => {
   };
 
 
+
   return useMemo(
     () => (
       <Context.Provider
@@ -79,7 +78,7 @@ const Provider = ({ children }) => {
         {children}
       </Context.Provider>
     ),
-    [user,userId, token, children, isLoggedIn, userRole, loading]
+    [user, userId, token, children, isLoggedIn, userRole, loading]
   );
 };
 export default Provider;

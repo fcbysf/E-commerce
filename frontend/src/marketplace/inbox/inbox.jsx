@@ -1,9 +1,9 @@
-import { useContext, useMemo, useState } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { Context } from "../../context/context";
-import { createEcho } from '../../echo/echo';
 import dayjs from 'dayjs';
 import Conversation from './conversation';
+import { createEcho } from '../../echo/echo';
 
 
 
@@ -12,6 +12,50 @@ export default function MarketplaceInbox() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [convId, setConvid] = useState(sessionStorage.getItem('convId') ?? null);
   const { api, token, user } = useContext(Context)
+  const queryClient = useQueryClient();
+  const echoRef = useRef(null);
+  useEffect(() => {
+    if (!token) return;
+    echoRef.current = createEcho(token);
+    return () => echoRef.current.disconnect();
+  }, [token]);
+  // listen to new messages
+useEffect(() => {
+  if (!echoRef.current || !user) return;
+
+  const channel = echoRef.current.private(`conversations.${user.id}`);
+
+  channel.listen('.UpdateConversation', (e) => {
+    console.log(e);
+    queryClient.setQueryData(['conversations'], (old) => {
+      if (!old) return old;
+
+      const oldData = old.pages.flatMap(page => page.data);
+
+      let newData = oldData.filter(
+        c => c.id !== e.conversation.id
+      );
+
+      newData.push(e.conversation);
+
+      newData.sort((a, b) =>
+        new Date(b.last_message.created_at) -
+        new Date(a.last_message.created_at)
+      );
+
+      return {
+        ...old,
+        pages: [{ ...old.pages[0], data: newData }]
+      };
+    });
+  });
+
+  return () => {
+    channel.stopListening('.UpdateConversation');
+    echoRef.current.leave(`conversations.${user.id}`);
+  };
+}, [user]);
+
 
 
   const filters = [
@@ -112,6 +156,7 @@ export default function MarketplaceInbox() {
 
             {/* Message Content */}
             <div className="flex-1 min-w-0">
+
               <div className="flex items-start justify-between gap-2 mb-1">
                 <h3 className={`text-sm ${conv.unread ? 'font-semibold' : 'font-normal'} text-gray-900 truncate m-0`}>
                   <span className='text-[16px] font-bold me-2'>{conv?.seller?.name == user?.name ? conv?.buyer?.name : conv?.seller?.name} ·</span>{conv?.listing?.title}
@@ -120,9 +165,10 @@ export default function MarketplaceInbox() {
                   <span className="text-xs text-gray-500 flex-shrink-0">{dayjs(conv?.last_message?.created_at).fromNow()}</span><br />
                 </div>
               </div>
-              <p className={`text-sm font-bold truncate my-2 flex justify-between ${conv?.last_message?.seen_at && 'text-black/40'}`}>
-                {conv?.last_message?.message || conv?.last_message?.sender_id !== user?.id && "reply ?"}
-                {conv?.last_message.sender_id == user?.id && conv?.last_message?.seen_at && <small className='text-black/40 font-normal text-xs'>Seen {dayjs(conv?.last_message?.created_at).fromNow()}</small>}
+              <p className={`text-sm font-bold truncate my-2 flex justify-between ${(conv?.last_message?.seen_at || conv?.last_message?.sender_id == user?.id) && 'text-black/40'}`}>
+                {conv?.last_message?.message || (conv?.last_message?.file_type ==='audio') && <small className={`text-black/${conv?.last_message?.seen_at ? '40 font-normal' : '100 font-bold'}  text-sm flex items-center gap-1`}>voice message <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="icon icon-tabler icons-tabler-filled icon-tabler-microphone"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M19 9a1 1 0 0 1 1 1a8 8 0 0 1 -6.999 7.938l-.001 2.062h3a1 1 0 0 1 0 2h-8a1 1 0 0 1 0 -2h3v-2.062a8 8 0 0 1 -7 -7.938a1 1 0 1 1 2 0a6 6 0 0 0 12 0a1 1 0 0 1 1 -1m-7 -8a4 4 0 0 1 4 4v5a4 4 0 1 1 -8 0v-5a4 4 0 0 1 4 -4" /></svg></small>}
+                {conv?.last_message?.message ||  conv?.last_message?.file_type ==='image' && <small className={`text-black/${conv?.last_message?.seen_at ? '40 font-normal' : '100 font-bold'}  text-sm flex items-center gap-1`}>image <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-polaroid"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 6a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2l0 -12" /><path d="M4 16l16 0" /><path d="M4 12l3 -3c.928 -.893 2.072 -.893 3 0l4 4" /><path d="M13 12l2 -2c.928 -.893 2.072 -.893 3 0l2 2" /><path d="M14 7l.01 0" /></svg></small>}
+                {conv?.last_message?.sender_id == user?.id && conv?.last_message?.seen_at && <small className='text-black/40 font-normal text-xs'>Seen {dayjs(conv?.last_message?.created_at).fromNow()} </small>|| conv?.last_message?.sender_id == user?.id && !conv?.last_message?.seen_at&&<small className='text-black/40 font-normal text-xs'>Sent</small>}
               </p>
             </div>
           </div>

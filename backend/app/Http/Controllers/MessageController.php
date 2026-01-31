@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\MarkAsSeen;
 use App\Events\MessageSent;
+use App\Events\UpdateConversation;
 use App\Models\Conversation;
 use App\Models\Message;
 use Illuminate\Http\Request;
@@ -34,6 +35,7 @@ class MessageController extends Controller
             ->update(['seen_at' => now()]);
 
         broadcast(new MarkAsSeen($request->conversation_id, $user->id));
+        broadcast(new UpdateConversation(Conversation::where('id', $request->conversation_id)->first()));
 
         return response()->noContent();
     }
@@ -48,7 +50,7 @@ class MessageController extends Controller
             'conversation_id' => 'required',
             'message' => 'sometimes|min:1|max:255|nullable',
             'file_path' => 'sometimes|file|max:2048|nullable',
-            'file_type' => 'sometimes|string|nullable'
+            'file_type' => 'sometimes|string|nullable|in:audio,video,image'
         ]);
         $msg['sender_id'] = $request->user()->id;
         if ($request->hasFile('file_path')){
@@ -57,12 +59,23 @@ class MessageController extends Controller
                 $file->store('audios', 'public');
                 $msg['file_path'] = url('storage/audios/' . $file->hashName());
             }
+            if ($request->file_type == 'video') {
+                $file = $request->file('file_path');
+                $file->store('videos', 'public');
+                $msg['file_path'] = url('storage/videos/' . $file->hashName());
+            }
+            if ($request->file_type == 'image') {
+                $file = $request->file('file_path');
+                $file->store('images', 'public');
+                $msg['file_path'] = url('storage/images/' . $file->hashName());
+            }
         }
         $message = Message::create($msg);
         $conversation = Conversation::where('id', $msg['conversation_id'])->first();
         $conversation->last_message_id = $message->id;
         $conversation->save();
         broadcast(new MessageSent($message));
+        broadcast(new UpdateConversation($conversation));
         return response()->json('message sent');
     }
 

@@ -5,9 +5,9 @@ import {
     Phone,
     Info,
     Image,
-    Smile,
     Send,
     AlertCircle,
+    X,
 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Context } from '../../context/context';
@@ -16,6 +16,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { createEcho } from '../../echo/echo';
 import AudioMessage from './AudioCom';
 import calendar from 'dayjs/plugin/calendar';
+import { toast } from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom';
 dayjs.extend(calendar);
 dayjs.extend(relativeTime);
@@ -24,6 +25,7 @@ dayjs.extend(relativeTime);
 export default function Conversation({ cnvId, setconvoId }) {
     const navigate = useNavigate();
     const [message, setMessage] = useState('');
+    const [image, setImage] = useState(null);
     const { api, token, user } = useContext(Context);
     const messagesEndRef = useRef(null);
     const queryClient = useQueryClient();
@@ -166,6 +168,7 @@ export default function Conversation({ cnvId, setconvoId }) {
         if (audio.url) {
             URL.revokeObjectURL(audio.url);
         }
+        setRecording(false);
         setAudio({ file: null, url: null });
     };
 
@@ -177,6 +180,7 @@ export default function Conversation({ cnvId, setconvoId }) {
         const tempAudioMessage = {
             id: tempId,
             file_path: audio.url, // Use local URL for immediate playback
+            file_type: 'audio',
             sender_id: user.id,
             created_at: new Date().toISOString(),
             _optimistic: true,
@@ -279,7 +283,9 @@ export default function Conversation({ cnvId, setconvoId }) {
     };
 
     useEffect(() => {
-        scrollToBottom();
+        setTimeout(() => {
+            scrollToBottom();
+        }, 10)
     }, [messages]);
 
 
@@ -289,6 +295,76 @@ export default function Conversation({ cnvId, setconvoId }) {
             handleSend();
         }
     };
+    const sendImages = async () => {
+        if (!image) return;
+        const formData = new FormData();
+        formData.append('conversation_id', cnvId);
+        formData.append('file_type', 'image');
+        formData.append('file_path', image);
+
+        const optimisticImage = {
+            id: `temp-${Date.now()}`,
+            file_path: URL.createObjectURL(image),
+            file_type: 'image',
+            sender_id: user?.id,
+            created_at: new Date().toISOString(),
+            _optimistic: true,
+            _sending: true,
+        };
+        queryClient.setQueryData(['messages', cnvId], (old) => ({
+            ...old,
+            messages: [...(old?.messages ?? []), optimisticImage],
+        }));
+        setImage(null);
+
+
+        try {
+            const res = await fetch(`${api}message`, {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: formData,
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+
+                // Update message to "sent" state (waiting for WebSocket)
+                queryClient.setQueryData(['messages', cnvId], (old) => ({
+                    ...old,
+                    messages: (old?.messages ?? []).map(m =>
+                        m.id === tempId ? {
+                            ...m,
+                            _sending: false,
+                            _sent: true,
+                            serverTempId: data.message?.id // Store server ID for WebSocket matching
+                        } : m
+                    ),
+
+                }));
+
+
+                // Clean up the blob URL after a delay (WebSocket should arrive soon)
+                setTimeout(() => {
+                    URL.revokeObjectURL(image);
+                }, 6000);
+
+            }
+        } catch (err) {
+            console.error('Error sending audio:', err);
+
+            // Mark as failed
+            queryClient.setQueryData(['messages', cnvId], (old) => ({
+                ...old,
+                messages: (old?.messages ?? []).map(m =>
+                    m.id === tempId ? { ...m, _sending: false, _failed: true } : m
+                ),
+            }));
+        }
+
+    }
 
 
 
@@ -361,7 +437,7 @@ export default function Conversation({ cnvId, setconvoId }) {
                                 {messages.listing.city} · posted {dayjs(messages.listing.created_at).fromNow()}
                             </p>
                         </div>
-                        <button className="text-blue-600 hover:text-blue-700 font-semibold text-sm h-fit" onClick={()=>navigate(`/marketplace/product/${messages.listing.id}`)}>
+                        <button className="text-blue-600 hover:text-blue-700 font-semibold text-sm h-fit" onClick={() => navigate(`/marketplace/product/${messages.listing.id}`)}>
                             View
                         </button>
                     </div>
@@ -409,6 +485,7 @@ export default function Conversation({ cnvId, setconvoId }) {
                                     {/* Text Message*/}
                                     {msg.message && !msg.file_path &&
                                         <>
+
                                             <div
                                                 className={`px-4 py-2 rounded-2xl ${msg.sender_id === user?.id
                                                     ? 'bg-blue-600 text-white rounded-br-md'
@@ -430,7 +507,7 @@ export default function Conversation({ cnvId, setconvoId }) {
                                     {/* Audio Message */}
                                     {msg.file_path &&
                                         <>
-                                            <div className="relative">
+                                            {msg.file_type === 'audio' && <div className="relative">
                                                 <AudioMessage
                                                     audioUrl={msg.file_path}
                                                     isSender={msg.sender_id === user?.id}
@@ -465,7 +542,42 @@ export default function Conversation({ cnvId, setconvoId }) {
                                                         </div>
                                                     </div>
                                                 )}
-                                            </div>
+                                            </div>}
+                                            {
+                                                msg.file_type === 'image' &&
+                                                <div className="relative">
+                                                    <img src={msg.file_path} alt="" className={`w-56 object-contain ${msg._optimistic ? 'opacity-70' : ''} rounded-md`} />
+                                                    {/* Sending/Sent/Failed Status Indicator */}
+                                                    {msg._sending && (
+                                                        <div className="absolute -bottom-1 -right-1 flex items-center gap-1">
+                                                            <div className="w-4 h-4 bg-white rounded-full shadow-md flex items-center justify-center">
+                                                                <svg className="animate-spin w-3 h-3 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                                </svg>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    {(msg._sent) && (
+                                                        <div className="absolute -bottom-1 -right-1">
+                                                            <div className="w-4 h-4 bg-white rounded-full shadow-md flex items-center justify-center">
+                                                                <svg className="w-3 h-3 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                                </svg>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    {msg._failed && (
+                                                        <div className="absolute -bottom-1 -right-1">
+                                                            <div className="w-4 h-4 bg-white rounded-full shadow-md flex items-center justify-center">
+                                                                <svg className="w-3 h-3 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                                </svg>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            }
                                             {(msg._sent || showTime) && <p className={`text-xs m-0 text-gray-500 mt-1 px-2 ${msg.sender_id === user?.id ? 'text-right' : 'text-left'
                                                 }`}>
                                                 {dayjs(msg.created_at).format('HH:mm')}
@@ -489,7 +601,7 @@ export default function Conversation({ cnvId, setconvoId }) {
             {/* Audio Preview Section */}
             {
                 audio.url && (
-                    <div className="border-t border-gray-200 bg-white p-4">
+                    <div className="w-3/4 m-auto border-t border-gray-200 bg-white p-4">
                         <div className="flex items-center gap-3">
                             <button
                                 onClick={cancelAudio}
@@ -510,6 +622,7 @@ export default function Conversation({ cnvId, setconvoId }) {
                                         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                         <path d="M19 9a1 1 0 0 1 1 1a8 8 0 0 1 -6.999 7.938l-.001 2.062h3a1 1 0 0 1 0 2h-8a1 1 0 0 1 0 -2h3v-2.062a8 8 0 0 1 -7 -7.938a1 1 0 1 1 2 0a6 6 0 0 0 12 0a1 1 0 0 1 1 -1m-7 -8a4 4 0 0 1 4 4v5a4 4 0 1 1 -8 0v-5a4 4 0 0 1 4 -4" />
                                     </svg>
+
                                 </div>
 
                                 <audio
@@ -535,38 +648,48 @@ export default function Conversation({ cnvId, setconvoId }) {
             {/* Message Input */}
             {
                 !audio.url && (
-                    <div className="border-t border-gray-200 p-4 bg-white">
+                    <div className="w-3/4 m-auto border-t border-gray-200 p-4 bg-white">
                         <div className="flex items-end gap-2">
-                            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0">
+                            {!recording && <label htmlFor='image' className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0">
                                 <Image size={22} className="text-blue-600" />
-                            </button>
+                            </label>}
+                            <input type="file" className='hidden' name="" id="image" onChange={(e) => { setImage(e.target.files[0]) }} />
 
                             {!recording ? (
-                                <div className="flex-1 bg-gray-100 rounded-3xl px-4 py-2 flex items-center gap-2">
-                                    <textarea
-                                        value={message}
-                                        onChange={(e) => setMessage(e.target.value)}
-                                        onKeyPress={handleKeyPress}
-                                        placeholder="Type a message..."
-                                        className="flex-1 bg-transparent outline-none resize-none text-sm text-gray-900 placeholder-gray-500 max-h-32"
-                                        rows="1"
-                                        style={{
-                                            minHeight: '24px',
-                                            maxHeight: '128px',
-                                        }}
-                                        onInput={(e) => {
-                                            e.target.style.height = 'auto';
-                                            e.target.style.height = e.target.scrollHeight + 'px';
-                                        }}
-                                    />
+                                <div className='w-full'>
+                                    {image &&
+                                        <div className="flex flex-wrap justify-center items-center gap-3 flex-1 mb-1.5">
+                                            <div className="img w-36 h-36 bg-gray-100 rounded flex-shrink-0 overflow-hidden relative">
+                                                <X size={17} className='absolute right-0 top-0 text-black/70 cursor-pointer hover:text-red-300' onClick={() => setImage(null)} />
+                                                <img src={image && URL.createObjectURL(image)} alt="" className='w-36 rounded object-contain' />
+                                            </div>
+                                        </div>
+                                    }
+                                    {!image && <div className="flex-1 bg-gray-100 rounded-3xl px-4 py-2 flex items-center gap-2">
+                                        <textarea
+                                            value={message}
+                                            onChange={(e) => setMessage(e.target.value)}
+                                            onKeyPress={handleKeyPress}
+                                            placeholder="Type a message..."
+                                            className="flex-1 bg-transparent outline-none resize-none text-sm text-gray-900 placeholder-gray-500 max-h-32"
+                                            rows="1"
+                                            style={{
+                                                minHeight: '24px',
+                                                maxHeight: '128px',
+                                            }}
+                                            onInput={(e) => {
+                                                e.target.style.height = 'auto';
+                                                e.target.style.height = e.target.scrollHeight + 'px';
+                                            }}
+                                        />
 
-                                    <button className="hover:opacity-70 transition-opacity flex-shrink-0">
-                                        <Smile size={20} className="text-gray-500" />
-                                    </button>
+                                    </div>}
                                 </div>
                             ) : (
                                 <div className="flex-1 bg-red-50 border-2 border-red-500 rounded-3xl px-4 py-3 flex items-center gap-3">
+
                                     <div className="flex items-center gap-2 flex-1">
+                                        <X size={20} onClick={cancelAudio} className='cursor-pointer hover:text-red-500' />
                                         <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
                                         <span className="text-sm font-medium text-red-700">Recording...</span>
                                     </div>
@@ -577,6 +700,7 @@ export default function Conversation({ cnvId, setconvoId }) {
                                                 className="w-1 bg-red-500 rounded-full animate-pulse"
                                                 style={{
                                                     height: `${Math.random() * 20 + 10}px`,
+                                                    maxHeight: '23px',
                                                     animationDelay: `${i * 0.1}s`
                                                 }}
                                             ></div>
@@ -588,7 +712,8 @@ export default function Conversation({ cnvId, setconvoId }) {
                             <div className="flex gap-2">
                                 {!recording ? (
                                     <>
-                                        <button
+
+                                        {!image && <button
                                             onClick={startRecording}
                                             className="p-2 hover:bg-blue-50 rounded-full transition-colors"
                                         >
@@ -596,11 +721,11 @@ export default function Conversation({ cnvId, setconvoId }) {
                                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                                 <path d="M19 9a1 1 0 0 1 1 1a8 8 0 0 1 -6.999 7.938l-.001 2.062h3a1 1 0 0 1 0 2h-8a1 1 0 0 1 0 -2h3v-2.062a8 8 0 0 1 -7 -7.938a1 1 0 1 1 2 0a6 6 0 0 0 12 0a1 1 0 0 1 1 -1m-7 -8a4 4 0 0 1 4 4v5a4 4 0 1 1 -8 0v-5a4 4 0 0 1 4 -4" />
                                             </svg>
-                                        </button>
+                                        </button>}
                                         <button
-                                            onClick={handleSend}
-                                            disabled={!message.trim()}
-                                            className={`p-2 rounded-full transition-all flex-shrink-0 ${message.trim()
+                                            onClick={!image ? handleSend : sendImages}
+                                            disabled={!message.trim() && !image}
+                                            className={`p-2 rounded-full transition-all flex-shrink-0 ${(message.trim() || image)
                                                 ? 'bg-blue-600 hover:bg-blue-700 text-white'
                                                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                                                 }`}
@@ -609,15 +734,17 @@ export default function Conversation({ cnvId, setconvoId }) {
                                         </button>
                                     </>
                                 ) : (
-                                    <button
-                                        onClick={stopRecording}
-                                        className="p-2 bg-red-500 hover:bg-red-600 rounded-full transition-colors"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="fill-white">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M17 4h-10a3 3 0 0 0 -3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3 -3v-10a3 3 0 0 0 -3 -3z" />
-                                        </svg>
-                                    </button>
+                                    <>
+                                        <button
+                                            onClick={stopRecording}
+                                            className="p-2 bg-red-500 hover:bg-red-600 rounded-full transition-colors"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="fill-white">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path d="M17 4h-10a3 3 0 0 0 -3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3 -3v-10a3 3 0 0 0 -3 -3z" />
+                                            </svg>
+                                        </button>
+                                    </>
                                 )}
                             </div>
                         </div>
