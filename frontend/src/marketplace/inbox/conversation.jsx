@@ -16,7 +16,6 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { createEcho } from '../../echo/echo';
 import AudioMessage from './AudioCom';
 import calendar from 'dayjs/plugin/calendar';
-import { toast } from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom';
 dayjs.extend(calendar);
 dayjs.extend(relativeTime);
@@ -175,16 +174,16 @@ export default function Conversation({ cnvId, setconvoId }) {
     const sendAudio = async () => {
         if (!audio.file) return;
 
-        // Create optimistic audio message with sending state
+        // Create optimistic audio message
         const tempId = `temp-${Date.now()}`;
         const tempAudioMessage = {
             id: tempId,
-            file_path: audio.url, // Use local URL for immediate playback
+            file_path: audio.url, 
             file_type: 'audio',
             sender_id: user.id,
             created_at: new Date().toISOString(),
             _optimistic: true,
-            _sending: true // Flag to indicate sending state
+            _sending: true
         };
 
         // Add optimistic message to UI
@@ -216,7 +215,7 @@ export default function Conversation({ cnvId, setconvoId }) {
             if (res.ok) {
                 const data = await res.json();
 
-                // Update message to "sent" state (waiting for WebSocket)
+                // Update message to state (waiting for WebSocket)
                 queryClient.setQueryData(['messages', cnvId], (old) => ({
                     ...old,
                     messages: (old?.messages ?? []).map(m =>
@@ -653,7 +652,7 @@ export default function Conversation({ cnvId, setconvoId }) {
                             {!recording && <label htmlFor='image' className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0">
                                 <Image size={22} className="text-blue-600" />
                             </label>}
-                            <input type="file" className='hidden' name="" id="image" onChange={(e) => { setImage(e.target.files[0]) }} />
+                            <input type="file" className='hidden' name="" id="image" onChange={(e) => { setImage(e.target.files[0]) }} accept="image/*" />
 
                             {!recording ? (
                                 <div className='w-full'>

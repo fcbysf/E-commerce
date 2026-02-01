@@ -13,11 +13,11 @@ export default function Product() {
 
   // FETCH PRODUCT
   const { data: product } = useQuery({
-    queryKey: ["product", "shop",id],
+    queryKey: ["product", "shop", id],
     queryFn: () =>
       fetch(`${api}product/${id}`)
-        .then((res) =>{
-          if(res.ok)return res.json();
+        .then((res) => {
+          if (res.ok) return res.json();
           else throw Error("product not found")
 
         })
@@ -37,7 +37,7 @@ export default function Product() {
         .catch((err) => console.log(err));
   }, [product?.category]);
 
-  return (product&&
+  return (product &&
     <div className="productContainer">
       <div className="shopContainer">
         <NavBar />
@@ -53,9 +53,8 @@ export default function Product() {
             </div>
             <div className="otherImages">
               <div
-                className={`aloneImg ${
-                  imageSrc === product.image ? "bgImg" : ""
-                }`}
+                className={`aloneImg ${imageSrc === product.image ? "bgImg" : ""
+                  }`}
               >
                 <img
                   src={product.image}
@@ -78,54 +77,41 @@ export default function Product() {
                 ))}
             </div>
           </div>
-          <div className="oneProductInfos">
-            <h1>{product.name}</h1>
+          <div className="oneProductInfos !bg-white mt-10 rounded-xl shadow-xl">
+            <h1 className="text-[#1d546c] !m-0">{product.name}</h1>
             <div className="priceRow">
               <h2>${product.price}</h2>
               <div className="rating">
-                <span>(stars)</span>
-                <small>(reviews)</small>
+                <span><FourStars /></span>
               </div>
             </div>
             <div className="description">
-              <p>
-                <h3>
+              <p className="!m-0 ">
+                <h3 className="!mb-2.5">
                   description : <br />
                 </h3>
-                {product.description}
+                <span className="text-black/40 !ms-2">
+                  {product.description}
+
+                </span>
               </p>
             </div>
-            <div className="colors">
-              <h3>colors : </h3>
-              (colors, soon...)
+            <div className="colors ">
+              <h3 className="!mb-2.5">colors : </h3>
+              <span className="text-black/40 !ms-2">
+                (colors, soon...)
+
+              </span>
             </div>
             <div className="size">
-              <h3>size : </h3>
-              (size, soon...)
+              <h3 className="!mb-2.5">size : </h3>
+              <span className="text-black/40 !ms-2">
+                (size, soon...)
+              </span>
             </div>
             <div className="btns">
               <Button product={product} />
-              <BuyButton />
             </div>
-          </div>
-        </div>
-        <div className="recommendedP">
-          <h2>recommended products</h2>
-          <div className="recommendedProducts">
-            {recommenedProducts.map(
-              (p) =>
-                p.id !== product.id && (
-                  <div className="product" key={p.id}>
-                    <div className="image-wrapper">
-                      <img src={p.image} alt="" />
-                    </div>
-                    <div className="SCproductInfos">
-                      <p>{p.name}</p>
-                      <i>$ {p.price}</i>
-                    </div>
-                  </div>
-                )
-            )}
           </div>
         </div>
       </main>
@@ -135,6 +121,7 @@ export default function Product() {
 
 import styled from "styled-components";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Star, Stars } from "lucide-react";
 
 const Button = ({ product }) => {
   const navigate = useNavigate();
@@ -562,66 +549,14 @@ const StyledWrapper = styled.div`
     pointer-events: none;
   }
 `;
-
-const BuyButton = () => {
-  return (
-    <StyledWrappe>
-      <button className="button">
-        <svg
-          viewBox="0 0 16 16"
-          className="bi bi-cart-check"
-          height={24}
-          width={24}
-          xmlns="http://www.w3.org/2000/svg"
-          fill="#fff"
-        >
-          <path d="M11.354 6.354a.5.5 0 0 0-.708-.708L8 8.293 6.854 7.146a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3z" />
-          <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
-        </svg>
-        <p className="text">Buy Now</p>
-      </button>
-    </StyledWrappe>
-  );
-};
-
-const StyledWrappe = styled.div`
-  .button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 4px 30px;
-    gap: 15px;
-    background-color: #181717;
-    outline: 3px #181717 solid;
-    outline-offset: -3px;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    border-radius: 25px;
-    transition: 400ms;
-    margin-top: 30px;
-  }
-
-  .button .text {
-    color: white;
-    font-weight: 700;
-    font-size: 0.9em;
-    transition: 400ms;
-  }
-
-  .button svg path {
-    transition: 400ms;
-  }
-
-  .button:hover {
-    background-color: transparent;
-  }
-
-  .button:hover .text {
-    color: #181717;
-  }
-
-  .button:hover svg path {
-    fill: #181717;
-  }
-`;
+export function FourStars() {
+    return (
+        <div className="flex gap-1">
+            <Star size={14} className="text-yellow-400 fill-yellow-400" />
+            <Star size={14} className="text-yellow-400 fill-yellow-400" />
+            <Star size={14} className="text-yellow-400 fill-yellow-400" />
+            <Star size={14} className="text-yellow-400 fill-yellow-400" />
+            <Star size={14} className="text-gray-300" />
+        </div>
+    );
+}

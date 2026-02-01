@@ -1,5 +1,5 @@
 .adminOrdersContainer{
-  width: 80%;
+  width: 100%;
   min-height: 100vh;
   max-height: 100%;
   margin-top: 10px;
@@ -15,7 +15,6 @@
     display: flex;
     align-items: center;
     gap: 4px;
-    margin: 0;
 }
 .adminOrdersContainer h1 svg{
     scale: 1.3;
@@ -39,17 +38,15 @@
     background-color: rgba(255, 255, 255, 0.377);
     cursor: pointer;
 }
-.selected{
-    background-color: rgba(255, 255, 255, 0.377);
-}
 .adminOrdersContainer td{
     border-bottom: 1px solid #0c0c0c00 !important;
-    background-color: rgba(255, 255, 255, 0.377);
-    
+    background-color: rgba(255, 255, 255, 0.377);  
+    border-bottom: 1px solid #b4b4b43b !important;
+
 }
 .adminOrdersContainer th{
     background-color: rgba(255, 255, 255, 0.781);
-    border-bottom: 1px solid #6b6b6b49 !important;
+    border-bottom: 1px solid #6b6b6b69 !important;
     text-transform: capitalize;
 }
 .adminOrdersContainer th svg{
@@ -70,10 +67,9 @@
     gap: 5px;
 }
 .orderDialog{
-    width: 30%;
-    min-height: 100vh;
+    width:35%;
+    min-height: 90vh;
     max-height: 100%;
-    background-color: rgba(255, 255, 255, 0.89);
     border-radius: 5px;
     margin-top: 5px;
     padding: 10px;
@@ -305,7 +301,6 @@ td .menu span:hover{
     border-radius: 10px
 }
 .filterAndTitle .filter select{
-    background-color: transparent;
     border: 0;
     outline: 0;
 }

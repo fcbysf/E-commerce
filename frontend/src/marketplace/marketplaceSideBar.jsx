@@ -23,16 +23,18 @@ import {
   PawPrint,
   Trophy,
   Puzzle,
+  User,
 }
 from "lucide-react";
 export default function MarketplaceSideBar(){
     const navigate = useNavigate();
       const menuItems = [
     { name: "Browse all", icon: Search, navigate : "/marketplace" },
-    { name: "Notifications", icon: Bell,navigate : "/marketplace/notifications"},
     { name: "Inbox", icon: MessageSquare, navigate : "/marketplace/inbox"},
     { name: "Buying", icon: ShoppingBag, hasSubmenu: true, navigate : "/marketplace/buying"},
     { name: "Selling", icon: Tag, hasSubmenu: true,navigate : "/marketplace/selling"},
+    { name: "Marketplace profile", icon: User,navigate : "/marketplace/profile"},
+    
   ];
     const categories = [
     { name: "Vehicles", icon: Car },
@@ -56,7 +58,7 @@ export default function MarketplaceSideBar(){
           <div className="p-4">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
-              <h1 className="text-3xl font-bold text-[#1d546c]">Marketplace</h1>
+              <h1 className="text-3xl font-bold text-[#1d546c] m-1">Marketplace</h1>
               <button className="w-9 h-9 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors">
                 <Settings className="w-5 h-5 text-gray-700" />
               </button>

@@ -183,17 +183,17 @@ const AddListingPage = () => {
     return category?.icon;
   };
 
-  const getCategoryLabel = () => {
-    const category = categories.find((cat) => cat.value === formData.category);
-    return category?.label || "Category";
-  };
+  // const getCategoryLabel = () => {
+  //   const category = categories.find((cat) => cat.value === formData.category);
+  //   return category?.label || "Category";
+  // };
 
-  const getConditionLabel = () => {
-    const condition = conditions.find(
-      (cond) => cond.value === formData.condition,
-    );
-    return condition?.label || "Condition";
-  };
+  // const getConditionLabel = () => {
+  //   const condition = conditions.find(
+  //     (cond) => cond.value === formData.condition,
+  //   );
+  //   return condition?.label || "Condition";
+  // };
 
   return (
     <div className="min-h-screen bg-gray-50">

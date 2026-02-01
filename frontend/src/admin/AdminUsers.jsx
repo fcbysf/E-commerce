@@ -82,7 +82,7 @@ export default function AdminUsers() {
   return (
     <div className="adminUsersContainer">
       <div className="titleAndFilter">
-        <h1>
+        <h1 className="text-[#1d546c] !mt-5 !ms-2 !mb-2.5">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -110,7 +110,7 @@ export default function AdminUsers() {
       </div>
       <div className="both">
         <table>
-          <thead>
+          <thead className="bg-gray-400">
             <tr>
               <th>User Id</th>
               <th>Name</th>
@@ -122,7 +122,7 @@ export default function AdminUsers() {
           </thead>
           <tbody>
             {users?.map((user) => (
-              <tr key={user.id} onClick={() => setselectedUserId(user.id)}>
+              <tr key={user.id} onClick={() => setselectedUserId(user.id)} className="!bg-gray-50">
                 <td>
                   {user.id} {user.id === userId && <small>(you)</small>}
                 </td>

@@ -3,10 +3,11 @@ import { X, MoreHorizontal, Eye, Share2, Link, Pause, Pencil, Trash2, Rocket } f
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useNavigate } from 'react-router-dom';
+import DeleteModal from '../../layouts/DeleteModal';
 dayjs.extend(relativeTime);
 
 
-export default function ListingModal({ isModalOpen, setIsModalOpen, listing,deleteListingMutation }) {
+export default function ListingModal({ isModalOpen, setIsModalOpen, listing, deleteListingMutation }) {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const modalRef = useRef(null);
@@ -64,6 +65,7 @@ export default function ListingModal({ isModalOpen, setIsModalOpen, listing,dele
     isModalOpen && (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={(e) => e.stopPropagation()}>
         {/* Modal Content */}
+
         <div
           ref={modalRef}
           className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-hidden"
@@ -93,7 +95,7 @@ export default function ListingModal({ isModalOpen, setIsModalOpen, listing,dele
                   {/* Product Details */}
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-900 mb-1 m-0">
-                      {listing?.status=="sold"&& <small className='text-green-400 me-1'>Sold</small>}· {listing?.title}
+                      {listing?.status == "sold" && <small className='text-green-400 me-1'>Sold</small>}· {listing?.title}
                     </h3>
                     <p className="text-gray-600 text-sm m-0">MAD {listing?.price} · {listing?.city}</p>
                     <p className="text-gray-500 text-xs m-0">Posted {dayjs(listing?.created_at).fromNow()}</p>
@@ -117,14 +119,14 @@ export default function ListingModal({ isModalOpen, setIsModalOpen, listing,dele
                 {/* Bottom Action Icons */}
                 <div className="mt-6 flex items-center justify-center gap-4">
 
-                  <button className="flex flex-col items-center gap-1 text-gray-600 hover:text-gray-800" onClick={()=>navigate(`/marketPlace/editlisting/${listing.id}`)}>
+                  <button className="flex flex-col items-center gap-1 text-gray-600 hover:text-gray-800" onClick={() => navigate(`/marketPlace/editlisting/${listing.id}`)}>
                     <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200">
                       <Pencil size={18} />
                     </div>
                     <span className="text-xs">Edit listing</span>
                   </button>
 
-                  <button className="flex flex-col items-center gap-1 text-gray-600 hover:text-gray-800" onClick={() => deleteListingMutation(listing.id)}>
+                  <button className="flex flex-col items-center gap-1 text-gray-600 hover:text-gray-800" onClick={() =>{if(!confirm('are you sure you want to delete this listing ?'))return; deleteListingMutation(listing.id); setIsModalOpen(false)}}>
                     <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200">
                       <Trash2 size={18} />
                     </div>

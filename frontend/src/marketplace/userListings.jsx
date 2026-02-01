@@ -5,6 +5,7 @@ import { Context } from '../context/context';
 import { useNavigate } from 'react-router-dom';
 import ListingModal from './Marketplace layouts/listingModal';
 import { toast } from 'react-hot-toast'
+import DeleteModal from '../layouts/DeleteModal';
 
 
 
@@ -14,9 +15,11 @@ export default function MarketplaceListings() {
     const queryClient = useQueryClient()
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDeleteModal, setIsDeleteModal] = useState(false);
     const { api, token, user } = useContext(Context)
     const [search, setSearch] = useState('');
     const [listing, setListing] = useState(null);
+    const [listingId, setListingId] = useState(null);
 
     // Close menu when clicking outside
     useEffect(() => {
@@ -108,6 +111,7 @@ export default function MarketplaceListings() {
         }),
         onSuccess: () => {
             setIsModalOpen(null)
+            setIsDeleteModal(false)
             toast.success('Listing deleted successfully')
             queryClient.invalidateQueries('listings')
         },
@@ -217,7 +221,7 @@ export default function MarketplaceListings() {
                                                 {isMenuOpen === listing.id && (
                                                     <div className="absolute bottom-full mb-2 right-0 bg-white rounded-lg shadow-xl border border-gray-200 py-2 w-64 z-10" onClick={(e) => e.stopPropagation()}>
 
-                                                        <button className="w-full px-4 py-3 hover:bg-gray-100 flex items-center gap-3 text-left text-gray-700" onClick={() => deleteListingMutation(listing.id)}>
+                                                        <button className="w-full px-4 py-3 hover:bg-gray-100 flex items-center gap-3 text-left text-gray-700" onClick={() =>{setIsDeleteModal(true); setListingId(listing.id)}}>
                                                             <Trash2 size={18} className="text-gray-500" />
                                                             <div className="font-medium text-sm">Delete listing</div>
                                                         </button>
@@ -294,6 +298,7 @@ export default function MarketplaceListings() {
                     </button>
                 </div>
             </div>
+            <DeleteModal isOpen={isDeleteModal} onClose={() => setIsDeleteModal(false)} onConfirm={() => deleteListingMutation(listingId)} title="Delete Listing" message="Are you sure you want to delete this listing? This action cannot be undone." confirmText="Delete" cancelText="Cancel" type="danger" />
             <ListingModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} listing={listing} deleteListingMutation={deleteListingMutation} />
         </div>
     );

@@ -1,5 +1,5 @@
 .adminUsersContainer {
-  width: 80%;
+  width: 100%;
   min-height: 100vh;
   max-height: 100%;
   margin-top: 10px;
@@ -7,7 +7,7 @@
 .adminUsersContainer .both{
     width: 100%;
     display: flex;
-    gap: 5px;
+    gap: 10px;
 }
 .adminUsersContainer table {
   width: 97.5%;
@@ -39,7 +39,7 @@
     
 }
 .adminUsersContainer .adminUserDetails{
-    width: 30%;
+    width: 35%;
     min-height: 100vh;
     max-height: 100%;
     background-color: rgba(255, 255, 255, 0.89);

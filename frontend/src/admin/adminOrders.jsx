@@ -17,7 +17,7 @@ export default function AdminOrders() {
   const [status, setStatus] = useState("all");
   const [search, setSearch] = useState("");
   const queryClient = useQueryClient();
-  const {ref, inView} = useInView({threshold: 0.5,});
+  const { ref, inView } = useInView({ threshold: 0.5, });
 
 
 
@@ -46,7 +46,7 @@ export default function AdminOrders() {
         }
       })
   }
-  const { data, fetchNextPage, isFetchingNextPage, hasNextPage} = useInfiniteQuery({
+  const { data, fetchNextPage, isFetchingNextPage, hasNextPage } = useInfiniteQuery({
     queryKey: ['orders'],
     queryFn: fetching,
     getNextPageParam: (lastPage) => lastPage.current_page < lastPage.last_page ? lastPage.current_page + 1 : undefined,
@@ -54,11 +54,11 @@ export default function AdminOrders() {
   })
   const orders = useMemo(() => data?.pages.flatMap(page => page.data) ?? [], [data])
   useEffect(() => {
-    if (inView && !isFetchingNextPage&& hasNextPage)
+    if (inView && !isFetchingNextPage && hasNextPage)
       fetchNextPage();
-    }, [fetchNextPage, inView, hasNextPage, isFetchingNextPage]);
+  }, [fetchNextPage, inView, hasNextPage, isFetchingNextPage]);
 
-  
+
 
   // FINISH ORDER
   const { mutate: finishOrderMutation } = useMutation({
@@ -133,11 +133,12 @@ export default function AdminOrders() {
   return (
     <div className="adminOrdersContainer">
       <div className="filterAndTitle">
-        <h1><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-package"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5" /><path d="M12 12l8 -4.5" /><path d="M12 12l0 9" /><path d="M12 12l-8 -4.5" /><path d="M16 5.25l-8 4.5" /></svg>orders</h1>
+        <h1 className="text-[#1d546c] !mt-3 !ms-2 !mb-2.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-package"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5" /><path d="M12 12l8 -4.5" /><path d="M12 12l0 9" /><path d="M12 12l-8 -4.5" /><path d="M16 5.25l-8 4.5" /></svg>orders</h1>
         <div className="filtersCon">
-          <div className="filter">
+          <div className="filter bg-gray-100">
             <p>status: </p>
             <select
+              className="bg-gray-100"
               defaultValue={status}
               onChange={(e) => setStatus(e.target.value)}
             >
@@ -147,8 +148,9 @@ export default function AdminOrders() {
               <option value="canceled">canceled</option>
             </select>
           </div>
-          <div class="input-container">
+          <div class="input-container bg-gray-100 rounded-2xl">
             <input
+              className="bg-gray-100 rounded-2xl"
               type="text"
               placeholder="Search Order"
               onChange={(e) => setSearch(e.target.value)}
@@ -158,7 +160,7 @@ export default function AdminOrders() {
       </div>
       <div className="adminOrders">
         <table>
-          <thead>
+          <thead className="bg-gray-400">
             <tr>
               <th>
                 <svg
@@ -268,7 +270,7 @@ export default function AdminOrders() {
                   <tr
                     key={order.id}
                     onClick={() => setSelectedOrder(order.id)}
-                    className={selectedOrder === order.id ? "selected" : ""}
+                    className={selectedOrder === order.id ? "bg-gray-200" : "bg-gray-100"}
                   >
                     <td>#{order.id}</td>
                     <td>{order.user.name}</td>
@@ -517,7 +519,7 @@ export default function AdminOrders() {
             )
         )}
       </div>
-        <div className="!mt-3" ref={ref} >{isFetchingNextPage && <Loader />}</div>
+      <div className="!mt-3" ref={ref} >{isFetchingNextPage && <Loader />}</div>
     </div>
   );
 }

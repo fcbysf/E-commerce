@@ -1,39 +1,41 @@
 .adminSideBar{
-    width: 18%;
-    height: 100vh;
-    background-color:#13323fce ;
-    color: #fff;
-    border-radius: 10px;
+    width: 20%;
+    height: 90vh;
+    background-color:#fff ;
+    color: #1d546c;
+    border-radius: 8px;
     margin: 0;
     position: sticky;
-    top: 0;
+    top: 0px;
 
 }
-.adminSideBar h2{
-    padding:25px 5px 0 20px;
+.adminSideBar h1{
+    padding:25px 5px 0 24px;
 }
 aside{
     margin: 0;
     padding: 0;
 }
 .sideLinks{
-    margin-top: 40px;
+    margin-top: 30px;
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 .sideLinks a{
     text-decoration: none;
-    color: #ffffffde;
+    color: #000;
     display: flex;
     gap: 10px;
     align-items: center;
     padding: 10px 30px;
 }
+.sideLinks svg{
+    color: #1a5b77;
+}
 .activeLink{
-    background-color: rgba(245, 245, 245, 0.13);
+    background-color: #8cc1d818;
     width: 100%;
-    border-radius: 10px;
     padding: 10px 30px !important;
 }
 

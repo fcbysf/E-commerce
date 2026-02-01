@@ -1,71 +1,98 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Context } from "../../context/context";
 import dayjs from 'dayjs';
 import Conversation from './conversation';
 import { createEcho } from '../../echo/echo';
+import { MoreHorizontal, Eye, Share2, Link, Trash2 } from 'lucide-react';
+import DeleteModal from '../../layouts/DeleteModal';
+import { toast } from 'react-hot-toast';
+import { NavLink } from 'react-router-dom';
+
 
 
 
 export default function MarketplaceInbox() {
-  const [activeTab, setActiveTab] = useState('selling');
   const [activeFilter, setActiveFilter] = useState('all');
   const [convId, setConvid] = useState(sessionStorage.getItem('convId') ?? null);
+  const [deleteConvoId, setDeleteConvoId] = useState(null);
   const { api, token, user } = useContext(Context)
   const queryClient = useQueryClient();
   const echoRef = useRef(null);
+  const menuRef = useRef(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
+        setOpenMenuId(null);
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMenuOpen]);
+
+  const toggleMenu = (convId) => {
+    setIsMenuOpen(!isMenuOpen);
+    setOpenMenuId(convId);
+  };
+
   useEffect(() => {
     if (!token) return;
     echoRef.current = createEcho(token);
     return () => echoRef.current.disconnect();
   }, [token]);
+
   // listen to new messages
-useEffect(() => {
-  if (!echoRef.current || !user) return;
+  useEffect(() => {
+    if (!echoRef.current || !user) return;
 
-  const channel = echoRef.current.private(`conversations.${user.id}`);
+    const channel = echoRef.current.private(`conversations.${user.id}`);
 
-  channel.listen('.UpdateConversation', (e) => {
-    console.log(e);
-    queryClient.setQueryData(['conversations'], (old) => {
-      if (!old) return old;
+    channel.listen('.UpdateConversation', (e) => {
+      queryClient.setQueryData(['conversations'], (old) => {
+        if (!old) return old;
 
-      const oldData = old.pages.flatMap(page => page.data);
+        const oldData = old.pages.flatMap(page => page.data);
 
-      let newData = oldData.filter(
-        c => c.id !== e.conversation.id
-      );
+        let newData = oldData.filter(
+          c => c.id !== e.conversation.id
+        );
 
-      newData.push(e.conversation);
+        newData.push(e.conversation);
 
-      newData.sort((a, b) =>
-        new Date(b.last_message.created_at) -
-        new Date(a.last_message.created_at)
-      );
+        newData.sort((a, b) =>
+          new Date(b.last_message.created_at) -
+          new Date(a.last_message.created_at)
+        );
 
-      return {
-        ...old,
-        pages: [{ ...old.pages[0], data: newData }]
-      };
+        return {
+          ...old,
+          pages: [{ ...old.pages[0], data: newData }]
+        };
+      });
     });
-  });
 
-  return () => {
-    channel.stopListening('.UpdateConversation');
-    echoRef.current.leave(`conversations.${user.id}`);
-  };
-}, [user]);
+    return () => {
+      channel.stopListening('.UpdateConversation');
+      echoRef.current.leave(`conversations.${user.id}`);
+    };
+  }, [user]);
 
 
 
   const filters = [
     'All',
-    'Pending payment',
-    'Paid',
-    'To be dispatched',
-    'Dispatched',
-    'Cash on delivery',
-    'Completed'
+    'buying',
+    "selling"
   ];
 
   // fetch conversations
@@ -86,30 +113,51 @@ useEffect(() => {
     }
   })
   const conversations = useMemo(() => conversationsFetch?.pages.flatMap(page => page.data) ?? [], [conversationsFetch])
+
+  // delete conversation
+  const { mutate: deleteConversation, isPending } = useMutation({
+    mutationFn: async (id) => {
+      const res = await fetch(api + 'conversation/' + id, {
+        method: 'DELETE',
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`,
+        }
+      });
+      if (!res.ok) throw 'Error deleting conversation'
+      return res.json();
+    },
+    onSuccess: () => {
+      toast.success('deleted');
+      setDeleteConvoId(null);
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+    },
+    onError: () => {
+      toast.error('something went wrong');
+    },
+  });
+
+
+
   return (
     !convId &&
     <div className="w-full max-w-4xl mx-auto bg-white min-h-screen">
+      <DeleteModal
+        isOpen={!!deleteConvoId}
+        onClose={() => setDeleteConvoId(null)}
+        onConfirm={() => deleteConversation(deleteConvoId)}
+        cancelText='Cancel'
+        confirmText='Delete'
+        type='danger'
+        message='Are you sure you want to delete this conversation?'
+        title='Delete Conversation'
+        isLoading={isPending}
+      />
+
       {/* Tabs */}
       <div className="border-b border-gray-200 px-6 pt-6">
         <div className="flex gap-6">
-          <button
-            onClick={() => setActiveTab('selling')}
-            className={`pb-3 px-1 font-semibold text-sm border-b-2 transition-colors ${activeTab === 'selling'
-              ? 'text-blue-600 border-blue-600'
-              : 'text-gray-600 border-transparent hover:text-gray-800'
-              }`}
-          >
-            Selling
-          </button>
-          <button
-            onClick={() => setActiveTab('buying')}
-            className={`pb-3 px-1 font-semibold text-sm border-b-2 transition-colors ${activeTab === 'buying'
-              ? 'text-blue-600 border-blue-600'
-              : 'text-gray-600 border-transparent hover:text-gray-800'
-              }`}
-          >
-            Buying
-          </button>
+          <h1 className='m-0 text-[#1d546c]'>Inbox</h1>
         </div>
       </div>
 
@@ -134,16 +182,27 @@ useEffect(() => {
 
       {/* Messages List */}
       <div className="divide-y divide-gray-200">
-        {conversations?.map((conv) => (
+        {conversations?.length > 0 && conversations?.map((conv) => (
+
           <div
             key={conv.id}
-            className="px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3 relative"
-            onClick={() => { sessionStorage.setItem('convId', conv.id); setConvid(conv.id) }}
+            className="px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3 relative group"
+            onClick={(e) => {
+              // Don't open conversation if clicking inside menu container
+              if (e.target.closest('.menu-container')) {
+                e.stopPropagation();
+                return;
+              }
+              sessionStorage.setItem('convId', conv.id);
+              setConvid(conv.id);
+            }}
+            onMouseLeave={() => {
+              if (isMenuOpen && openMenuId === conv.id) {
+                setIsMenuOpen(false);
+                setOpenMenuId(null);
+              }
+            }}
           >
-            {/* Unread Indicator */}
-            {conv.unread && (
-              <div className="absolute left-2 top-1/2 -translate-y-1/2 w-2 h-2 bg-blue-600 rounded-full"></div>
-            )}
 
             {/* Product Image */}
             <div className="w-14 h-14 flex-shrink-0 bg-gray-300 rounded-lg overflow-hidden">
@@ -162,35 +221,59 @@ useEffect(() => {
                   <span className='text-[16px] font-bold me-2'>{conv?.seller?.name == user?.name ? conv?.buyer?.name : conv?.seller?.name} ·</span>{conv?.listing?.title}
                 </h3>
                 <div>
-                  <span className="text-xs text-gray-500 flex-shrink-0">{dayjs(conv?.last_message?.created_at).fromNow()}</span><br />
+                  <span className="text-xs group-hover:hidden text-gray-500 flex-shrink-0">{dayjs(conv?.last_message?.created_at).fromNow()}</span><br />
+
                 </div>
               </div>
-              <p className={`text-sm font-bold truncate my-2 flex justify-between ${(conv?.last_message?.seen_at || conv?.last_message?.sender_id == user?.id) && 'text-black/40'}`}>
-                {conv?.last_message?.message || (conv?.last_message?.file_type ==='audio') && <small className={`text-black/${conv?.last_message?.seen_at ? '40 font-normal' : '100 font-bold'}  text-sm flex items-center gap-1`}>voice message <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="icon icon-tabler icons-tabler-filled icon-tabler-microphone"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M19 9a1 1 0 0 1 1 1a8 8 0 0 1 -6.999 7.938l-.001 2.062h3a1 1 0 0 1 0 2h-8a1 1 0 0 1 0 -2h3v-2.062a8 8 0 0 1 -7 -7.938a1 1 0 1 1 2 0a6 6 0 0 0 12 0a1 1 0 0 1 1 -1m-7 -8a4 4 0 0 1 4 4v5a4 4 0 1 1 -8 0v-5a4 4 0 0 1 4 -4" /></svg></small>}
-                {conv?.last_message?.message ||  conv?.last_message?.file_type ==='image' && <small className={`text-black/${conv?.last_message?.seen_at ? '40 font-normal' : '100 font-bold'}  text-sm flex items-center gap-1`}>image <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-polaroid"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 6a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2l0 -12" /><path d="M4 16l16 0" /><path d="M4 12l3 -3c.928 -.893 2.072 -.893 3 0l4 4" /><path d="M13 12l2 -2c.928 -.893 2.072 -.893 3 0l2 2" /><path d="M14 7l.01 0" /></svg></small>}
-                {conv?.last_message?.sender_id == user?.id && conv?.last_message?.seen_at && <small className='text-black/40 font-normal text-xs'>Seen {dayjs(conv?.last_message?.created_at).fromNow()} </small>|| conv?.last_message?.sender_id == user?.id && !conv?.last_message?.seen_at&&<small className='text-black/40 font-normal text-xs'>Sent</small>}
-              </p>
+              <div className="flex justify-between  ">
+                <p className={`text-sm font-bold truncate my-2 flex items-center gap-4 justify-between ${(conv?.last_message?.seen_at || conv?.last_message?.sender_id == user?.id) && 'text-black/40'}`}>
+                  {conv?.last_message?.message || (conv?.last_message?.file_type === 'audio') && <small className={`text-black/${conv?.last_message?.seen_at ? '40 font-normal' : '100 font-bold'}  text-sm flex items-center gap-1`}>voice message <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="icon icon-tabler icons-tabler-filled icon-tabler-microphone"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M19 9a1 1 0 0 1 1 1a8 8 0 0 1 -6.999 7.938l-.001 2.062h3a1 1 0 0 1 0 2h-8a1 1 0 0 1 0 -2h3v-2.062a8 8 0 0 1 -7 -7.938a1 1 0 1 1 2 0a6 6 0 0 0 12 0a1 1 0 0 1 1 -1m-7 -8a4 4 0 0 1 4 4v5a4 4 0 1 1 -8 0v-5a4 4 0 0 1 4 -4" /></svg></small>}
+                  {conv?.last_message?.file_type === 'image' && <small className={`text-black/${conv?.last_message?.seen_at ? '40 font-normal' : '100 font-bold'}  text-sm flex items-center gap-1`}>image <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-polaroid"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M4 6a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2l0 -12" /><path d="M4 16l16 0" /><path d="M4 12l3 -3c.928 -.893 2.072 -.893 3 0l4 4" /><path d="M13 12l2 -2c.928 -.893 2.072 -.893 3 0l2 2" /><path d="M14 7l.01 0" /></svg></small>}
+                  {conv?.last_message?.sender_id === user?.id && conv?.last_message?.seen_at && <small className='text-black/40 font-normal text-xs'>Seen {dayjs(conv?.last_message?.created_at).fromNow()} </small>}
+                </p>
+
+                {/* Menu Container - Added class for targeting */}
+                <div
+                  className="relative hidden group-hover:block menu-container"
+                  ref={openMenuId === conv.id ? menuRef : null}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleMenu(conv.id);
+                  }}
+                >
+                  <div className="w-10 h-8 relative bottom-3 rounded-full flex items-center justify-center hover:bg-gray-200">
+                    <MoreHorizontal size={20} />
+                  </div>
+
+                  {/* Dropdown Menu */}
+                  {isMenuOpen && openMenuId === conv.id && (
+                    <div className="absolute bottom-full right-0 bg-white rounded-lg shadow-xl border border-gray-200 w-64 z-10">
+                      <button
+                        className="w-full px-4 py-3 hover:bg-gray-100 flex items-center gap-3 text-left text-gray-700"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsMenuOpen(false);
+                          setOpenMenuId(null);
+                          setDeleteConvoId(conv.id);
+                        }}
+                      >
+                        <Trash2 size={18} className="text-red-500" />
+                        <div className="font-medium text-sm">Delete Conversation</div>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
-        ))}
+        )) ||
+          <div className='flex items-center flex-col'>
+            <p className='m-0 mt-2'>you have no conversations yet</p>
+            <NavLink to={'/marketplace'} >Browse Listings</NavLink>
+          </div>
+        }
       </div>
 
-      {/* Floating Action Button */}
-      <button className="fixed bottom-6 right-6 w-14 h-14 bg-white border border-gray-300 rounded-full shadow-lg hover:shadow-xl transition-shadow flex items-center justify-center">
-        <svg
-          className="w-6 h-6 text-gray-700"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-          />
-        </svg>
-      </button>
     </div>
     || <Conversation cnvId={convId} setconvoId={setConvid} />
   );

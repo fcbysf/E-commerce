@@ -73,6 +73,7 @@ class ConversationController extends Controller
      */
     public function destroy(Conversation $conversation)
     {
-        //
+        $conversation->delete();
+        return response()->json('conversation deleted');
     }
 }

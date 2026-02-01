@@ -83,7 +83,7 @@ export default function AdminProducts() {
   return (
     <div className="adminProductsContainer">
       <div className="filterAndTitle">
-        <h1>
+        <h1 className="text-[#1d546c] !mt-3 !ms-2 !mb-2.5">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -103,26 +103,27 @@ export default function AdminProducts() {
           Products
         </h1>
         <div className="filtersCon">
-          <div className="filter">
+          <div className="filter bg-gray-50">
             <p>category: </p>
-            <select onChange={(e) => setCategory(e.target.value)}>
+            <select onChange={(e) => setCategory(e.target.value)} className="bg-gray-50 ">
               {categories.map((category) => (
                 <option value={category}>{category}</option>
               ))}
             </select>
           </div>
-          <div class="input-container">
+          <div class="input-container bg-gray-50 rounded-2xl">
             <input
               type="text"
               placeholder="Search Product"
-              onChange={(e) => setSearch(e.target.value)}
+              className="bg-gray-50"
             />
           </div>
+
         </div>
       </div>{" "}
       <div className="adminProducts">
         <table>
-          <thead>
+          <thead className="bg-gray-400">
             <tr>
               <th>
                 <span className="prdctclmn">
@@ -290,7 +291,7 @@ export default function AdminProducts() {
             {products?.map(
               (p) =>
                 (category === "all categories" || category === p.category) && (
-                  <tr key={p.id} onClick={() => navigate(`/product/${p.id}`)}>
+                  <tr key={p.id} onClick={() => navigate(`/product/${p.id}`)} className="bg-gray-50">
                     <td className="prdctclmn">
                       <img src={p.image} alt="" />
                       <p>{p.name}</p>

@@ -3,6 +3,7 @@ import { Context } from "../context/context";
 import "./dashbord.css";
 import toast from "react-hot-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { RefreshCcw, RefreshCcwDot } from "lucide-react";
 
 function Dashbord() {
   const [images, setImages] = useState([]);
@@ -79,7 +80,7 @@ function Dashbord() {
     <div className="dachbordContainer">
       <form onSubmit={submit} encType="multipart/form-data" ref={formRef}>
         <div className="formLeftSide">
-          <h1>
+          <h1 className="!text-[#1d546c] !m-0">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -101,8 +102,8 @@ function Dashbord() {
             </svg>{" "}
             Add Product
           </h1>
-          <div className="generalInfos">
-            <h2>general Infos</h2>
+          <div className="generalInfos bg-gray-100 shadow-md">
+            <h2 >general Infos</h2>
             <div className="name">
               <label htmlFor="">Product name: </label>
               <br />
@@ -139,7 +140,7 @@ function Dashbord() {
               </div>
             </div>
           </div>
-          <div className="otherInfos">
+          <div className="otherInfos bg-gray-100 shadow-md">
             <h2>other Infos</h2>
 
             <div className="addProductInofs">
@@ -175,8 +176,20 @@ function Dashbord() {
           </div>
         </div>
         <div className="formRightSide">
-          <div className="btnSubmit">
-            <button type="submit" onSubmit={submit} className="fancy">
+          <div className="btnSubmit flex justify-end items-center gap-2">
+            <button type="reset" className="w-20 bg-gray-200  border-0 !p-2 cursor-pointer !text-[12px] rounded-2xl flex justify-center items-center gap-1" onClick={() =>{
+              formRef.current?.reset();
+              setErrors([]);
+              setImages([]);
+              setMainImg(null);
+              setPreview(null);
+              setImagsPreview([]);
+              setSelectedSize([]);
+              }}>
+                <svg xmlns="http://www.w3.org/2000/svg" width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-reload"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M19.933 13.041a8 8 0 1 1 -9.925 -8.788c3.899 -1 7.935 1.007 9.425 4.747" /><path d="M20 4v5h-5" /></svg>
+                Reset
+            </button>
+            <button type="submit" onSubmit={submit} className="fancy ">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -195,7 +208,7 @@ function Dashbord() {
               add product
             </button>
           </div>
-          <label className="custum-file-upload" htmlFor="file">
+          <label className="custum-file-upload bg-gray-100 drop-shadow-md hover:-translate-y-0.5 transition-all duration-300" htmlFor="file">
             {!mainImg && (
               <>
                 <div className="icon">
@@ -229,6 +242,7 @@ function Dashbord() {
             {mainImg && <img src={URL.createObjectURL(mainImg)} alt="" />}
             <input
               type="file"
+              accept="image/*"
               id="file"
               name="image"
               onChange={(e) => setMainImg(e.target.files[0])}
@@ -246,13 +260,14 @@ function Dashbord() {
                   </span>
                 </div>
               ))}
-            <label htmlFor="imgs">
+            <label htmlFor="imgs" className="!bg-gray-100 drop-shadow-md hover:-translate-y-0.5 transition-all duration-300">
               <span>+</span>
             </label>
 
             <input
               type="file"
               id="imgs"
+              accept="image/*"
               name="images"
               onChange={handleImgsChange}
               multiple
