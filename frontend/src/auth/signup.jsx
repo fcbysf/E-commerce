@@ -3,14 +3,15 @@ import styled from "styled-components";
 import { Context } from "../context/context";
 import { useNavigate } from "react-router-dom";
 import ImageUploadInput from "./imageUpload";
+import { ArrowLeft } from "lucide-react";
 
 const SignUp = () => {
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
   const { api, isLoggedIn } = useContext(Context);
-  const [selectedImg , setSelectedImg] = useState(null);
+  const [selectedImg, setSelectedImg] = useState(null);
 
-  function imageSelected(image){
+  function imageSelected(image) {
     setSelectedImg(image);
   }
   useEffect(() => {
@@ -44,6 +45,8 @@ const SignUp = () => {
   return (
     <StyledWrapper>
       <div className="signupCon">
+        <ArrowLeft className="mt-5 ms-5 cursor-pointer" onClick={() => navigate('/home')} />
+
         <form className="formm" onSubmit={register} encType="multipart/form-data">
           <div className="flex-column">
             <label>Name </label>
@@ -130,7 +133,7 @@ const SignUp = () => {
             />
           </div>
           {errors.password && <p style={{ color: "red" }}>{errors.password}</p>}
-          <ImageUploadInput imageSelected={imageSelected}/>
+          <ImageUploadInput imageSelected={imageSelected} />
           <button className="button-submit">Sign Up</button>
           <p className="p">
             Already have a account?{" "}

@@ -141,7 +141,7 @@ export default function MarketplaceInbox() {
 
   return (
     !convId &&
-    <div className="w-full max-w-4xl mx-auto bg-white min-h-screen">
+    <div className="w-full max-w-4xl mx-auto bg-white min-h-screen mt-1">
       <DeleteModal
         isOpen={!!deleteConvoId}
         onClose={() => setDeleteConvoId(null)}
@@ -183,7 +183,8 @@ export default function MarketplaceInbox() {
       {/* Messages List */}
       <div className="divide-y divide-gray-200">
         {conversations?.length > 0 && conversations?.map((conv) => (
-
+          (activeFilter === 'all' || (activeFilter=='buying' && conv.buyer_id == user?.id) || (activeFilter=='selling' && conv.seller_id == user?.id))&&
+            
           <div
             key={conv.id}
             className="px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors flex items-start gap-3 relative group"

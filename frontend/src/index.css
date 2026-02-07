@@ -13,7 +13,7 @@
 
 
 body {
-  @apply bg-violet-200;
+  background-color: #c7d3d8da;
   background-repeat: no-repeat;
   width: 100%;
   height: 100%;

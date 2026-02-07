@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import { Context } from "../context/context";
 import { Link, useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 const LogIn = () => {
   const navigate = useNavigate()
@@ -55,6 +56,7 @@ const LogIn = () => {
     isLoggedIn==false &&
     <StyledWrapper>
       <div className="loginContainer">
+        <ArrowLeft className="mt-5 ms-5 cursor-pointer" onClick={()=>navigate('/home')}/>
         <form className="formm" onSubmit={login}>
           <div className="flex-column">
             <label>Email </label>
@@ -136,7 +138,7 @@ const StyledWrapper = styled.div`
     padding: 30px;
     width: 450px;
     height: fit-content;
-    margin: 60px auto;
+    margin: 40px auto;
     border-radius: 20px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
       Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;

@@ -6,10 +6,9 @@ import AdminOrders from "./adminOrders";
 import AdminProducts from "./adminProducts";
 import EditeProduct from "./editProduct";
 import AdminUsers from "./AdminUsers";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Context } from "../context/context";
 import Loader from "../layouts/loader";
-import NavBar from "../layouts/ShopNavBar";
 
 export default function AdminPanel() {
   const { place, id } = useParams();
@@ -28,10 +27,10 @@ export default function AdminPanel() {
 
   return (
     <>
-      <NavBar />
+      {/* <NavBar /> */}
       <div className="adminPanelContainer !mt-3">
         <SideBAr />
-        <div className="bg-white drop-shadow-md !ps-5 rounded-lg w-[78.5%] m-auto">
+        <div className={`bg-[white] drop-shadow-md !ps-5 rounded-lg w-[78.5%] m-auto`}>
           {place === "dashbord" && <Dashbord />}
           {place === "orders" && <AdminOrders />}
           {place == "products" && <AdminProducts />}

@@ -60,13 +60,18 @@ class OrderController extends Controller
     {
         $request->validate([
             'status' => 'required',
-            'product' => 'required',
+            'product' => 'sometimes',
         ]);
+        if ($request->status === 'canceled') {
+            $order->status = $request->input('status');
+            $order->save();
+            return response()->json('order canceled');
+        }
         $order->status = $request->input('status');
         $order->save();
         foreach ($request->product as $product) {
             $prd = Product::where('id', $product['id'])->first();
-            $prd->stock = $product['stock']-1;
+            $prd->stock = $product['stock'] - 1;
             $prd->save();
         }
         return $order;

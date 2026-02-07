@@ -19,7 +19,6 @@ import toast from "react-hot-toast";
 import Security from "./security";
 import WishList from "./wishList";
 import ProfileOrders from "./ProfileOrders";
-import ProfileSettings from "./ProfileSettings";
 import ImageUploadInput from "../auth/imageUpload";
 
 const UserProfile = () => {
@@ -69,7 +68,6 @@ const UserProfile = () => {
     { id: "security", label: "Security", icon: Shield, section: "account" },
     { id: "wishlist", label: "Wishlist", icon: Heart, section: "account" },
     { id: "orders", label: "Orders", icon: Package, section: "account" },
-    { id: "settings", label: "Settings", icon: Settings, section: "account" },
     {
       id: "logout",
       label: "Logout",
@@ -300,7 +298,6 @@ if(selectedImg==null){
 
   const renderOrdersPage = () => <ProfileOrders user={user} />;
 
-  const renderSettingsPage = () => <ProfileSettings />;
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -10,7 +10,7 @@ export default function Home() {
   const [animateImg, setAnimateImg] = useState(false);
   const [imageId, setImageId] = useState("");
   const [showStock, setShowStock] = useState(false);
-  const { api } = useContext(Context);
+  const { api,userId,loading } = useContext(Context);
 
   // ANIMATION
   useEffect(() => {
@@ -23,10 +23,10 @@ export default function Home() {
   }, []);
 
   // FETCH 6 PRODUCTS
-  const sixProducts = ()=> fetch(api + "homeProducts").then((res) => res.ok && res.json());
-  const {data} = useQuery({
-    queryKey : ['products'],
-    queryFn : sixProducts,
+  const sixProducts = () => fetch(api + "homeProducts").then((res) => res.ok && res.json());
+  const { data } = useQuery({
+    queryKey: ['products'],
+    queryFn: sixProducts,
   })
   return (
     <div className="homeContainer">
@@ -34,17 +34,26 @@ export default function Home() {
         <nav>
           <div className="leftLinks">
             <NavLink to={"/shop/allCategories"}>Shop</NavLink>
-            <NavLink to={"/shop/men"}>Men</NavLink>
-            <NavLink to={"/shop/women"}>women</NavLink>
-            <NavLink to={"/shop/trending"}>Trending</NavLink>
+            <NavLink to={"/shop/Fashion"}>Fashion</NavLink>
+            <NavLink to={"/shop/Sport"}>Sport</NavLink>
+            <NavLink to={"/shop/Tech"}>Tech</NavLink>
           </div>
           <div className="logo">
             <h1>YSF SHOOP</h1>
           </div>
           <div className="rightLinks">
-            <NavLink to={"/shop/accesories"}>Accessories</NavLink>
-            <NavLink to={"/login"}>login</NavLink>
-            <NavLink to={"/signup"}>signUp</NavLink>
+            <NavLink to={"/marketplace"}>MarketPlace</NavLink>
+            { !userId && !loading ?
+              <>
+                <NavLink to={"/login"}>login</NavLink>
+                <NavLink to={"/signup"}>signUp</NavLink>
+              </>
+              :
+              <>
+                <NavLink to={'/Profile'}>Profile</NavLink>
+                <NavLink to={'/Cart'}>Cart</NavLink>
+              </>
+            }
           </div>
         </nav>
       </header>
@@ -124,8 +133,8 @@ export default function Home() {
               }}
               onMouseOut={() => setShowStock(false)}
             >
-              <div className="image-wrapper" onClick={()=>navigate(`/product/${product.id}`)}>
-                <img src={product.image} alt=""  loading="lazy"/>
+              <div className="image-wrapper" onClick={() => navigate(`/product/${product.id}`)}>
+                <img src={product.image} alt="" loading="lazy" />
                 {showStock && product.id === imageId && (
                   <p>{product.stock} left</p>
                 )}
@@ -133,7 +142,7 @@ export default function Home() {
               <div className="productInfos">
                 <p>{product.name}</p>
                 <i>$ {product.price}</i>
-                <button className="cartBtn" onClick={()=>navigate(`/product`)}>
+                <button className="cartBtn" onClick={() => navigate(`/product`)}>
                   <svg
                     className="cart"
                     fill="white"

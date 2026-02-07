@@ -56,7 +56,6 @@ export default function Conversation({ cnvId, setconvoId }) {
     // Subscribe to private channel
     useEffect(() => {
         if (!cnvId || !echoRef.current) return;
-        // Listen for new messages
         const channel = echoRef.current.private(`chat.${cnvId}`);
         channel.listen('.MessageSent', (e) => {
             queryClient.setQueryData(['messages', cnvId], (old) => {
@@ -143,8 +142,6 @@ export default function Conversation({ cnvId, setconvoId }) {
                 const url = URL.createObjectURL(blob);
                 const file = new File([blob], `audio-${Date.now()}.webm`, { type: 'audio/webm' });
                 setAudio({ file, url });
-
-                // Stop all tracks
                 stream.getTracks().forEach(track => track.stop());
             };
 
@@ -215,7 +212,6 @@ export default function Conversation({ cnvId, setconvoId }) {
             if (res.ok) {
                 const data = await res.json();
 
-                // Update message to state (waiting for WebSocket)
                 queryClient.setQueryData(['messages', cnvId], (old) => ({
                     ...old,
                     messages: (old?.messages ?? []).map(m =>
@@ -223,12 +219,11 @@ export default function Conversation({ cnvId, setconvoId }) {
                             ...m,
                             _sending: false,
                             _sent: true,
-                            serverTempId: data.message?.id // Store server ID for WebSocket matching
+                            serverTempId: data.message?.id
                         } : m
                     ),
                 }));
 
-                // Clean up the blob URL after a delay (WebSocket should arrive soon)
                 setTimeout(() => {
                     URL.revokeObjectURL(audioToSend.url);
                 }, 5000);
@@ -647,7 +642,7 @@ export default function Conversation({ cnvId, setconvoId }) {
             {/* Message Input */}
             {
                 !audio.url && (
-                    <div className="w-3/4 m-auto border-t border-gray-200 p-4 bg-white">
+                    <div className="w-3/4 m-auto border-t border-gray-200 p-1 bg-white">
                         <div className="flex items-end gap-2">
                             {!recording && <label htmlFor='image' className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0">
                                 <Image size={22} className="text-blue-600" />
@@ -748,9 +743,6 @@ export default function Conversation({ cnvId, setconvoId }) {
                             </div>
                         </div>
 
-                        <p className="text-xs text-gray-500 mt-2 text-center m-0 p-0">
-                            Be respectful and keep the conversation about the listing
-                        </p>
                     </div>
                 )
             }

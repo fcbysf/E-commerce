@@ -121,7 +121,7 @@ export default function Product() {
 
 import styled from "styled-components";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Star, Stars } from "lucide-react";
+import { ArrowLeft, Star, Stars } from "lucide-react";
 
 const Button = ({ product }) => {
   const navigate = useNavigate();
@@ -550,13 +550,13 @@ const StyledWrapper = styled.div`
   }
 `;
 export function FourStars() {
-    return (
-        <div className="flex gap-1">
-            <Star size={14} className="text-yellow-400 fill-yellow-400" />
-            <Star size={14} className="text-yellow-400 fill-yellow-400" />
-            <Star size={14} className="text-yellow-400 fill-yellow-400" />
-            <Star size={14} className="text-yellow-400 fill-yellow-400" />
-            <Star size={14} className="text-gray-300" />
-        </div>
-    );
+  return (
+    <div className="flex gap-1">
+      <Star size={14} className="text-yellow-400 fill-yellow-400" />
+      <Star size={14} className="text-yellow-400 fill-yellow-400" />
+      <Star size={14} className="text-yellow-400 fill-yellow-400" />
+      <Star size={14} className="text-yellow-400 fill-yellow-400" />
+      <Star size={14} className="text-gray-300" />
+    </div>
+  );
 }

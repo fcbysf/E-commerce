@@ -145,7 +145,7 @@ function EditProduct() {
     <div className="dachbordContainer">
       <form onSubmit={submit} encType="multipart/form-data">
         <div className="formLeftSide">
-          <h1>
+          <h1 className="!text-[#1d546c] !m-0">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -167,7 +167,7 @@ function EditProduct() {
             </svg>{" "}
             Edit Product
           </h1>
-          <div className="generalInfos">
+          <div className="generalInfos bg-gray-100 shadow-md">
             <h2>general Infos</h2>
             <div className="name">
               <label htmlFor="">Product name: </label>
@@ -213,7 +213,7 @@ function EditProduct() {
               </div>
             </div>
           </div>
-          <div className="otherInfos">
+          <div className="otherInfos bg-gray-100 shadow-md">
             <h2>other Infos</h2>
 
             <div className="addProductInofs">
@@ -293,7 +293,7 @@ function EditProduct() {
               Edit Product
             </button>
           </div>
-          <label className="custum-file-upload" htmlFor="file">
+          <label className="custum-file-upload bg-gray-100 shadow-sm" htmlFor="file">
             {!mainImg && !notEditedImg && (
               <>
                 <div className="icon">
@@ -327,6 +327,7 @@ function EditProduct() {
             {<img src={preview ? preview : notEditedImg} alt="" />}
             <input
               type="file"
+              accept="image/*"
               id="file"
               name="image"
               onChange={(e) => setMainImg(e.target.files[0])}
@@ -336,7 +337,7 @@ function EditProduct() {
           <div className="otherImgs">
             {notEditedImgs.length > 0 &&
               notEditedImgs.map((img) => (
-                <div className="otherimgswrapper">
+                <div className="otherimgswrapper !bg-gray-100 shadow-md">
                   <img src={img.image_url} alt="" />
                   <span className="deleteImg" onClick={() => dlt(img)}>
                     X

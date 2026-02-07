@@ -1,6 +1,6 @@
 .adminSideBar{
     width: 20%;
-    height: 90vh;
+    height: 98vh;
     background-color:#fff ;
     color: #1d546c;
     border-radius: 8px;
@@ -10,7 +10,7 @@
 
 }
 .adminSideBar h1{
-    padding:25px 5px 0 24px;
+    padding:18px 5px 0 24px;
 }
 aside{
     margin: 0;

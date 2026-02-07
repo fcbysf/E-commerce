@@ -31,7 +31,6 @@ export default function MarketplaceSideBar(){
       const menuItems = [
     { name: "Browse all", icon: Search, navigate : "/marketplace" },
     { name: "Inbox", icon: MessageSquare, navigate : "/marketplace/inbox"},
-    { name: "Buying", icon: ShoppingBag, hasSubmenu: true, navigate : "/marketplace/buying"},
     { name: "Selling", icon: Tag, hasSubmenu: true,navigate : "/marketplace/selling"},
     { name: "Marketplace profile", icon: User,navigate : "/marketplace/profile"},
     

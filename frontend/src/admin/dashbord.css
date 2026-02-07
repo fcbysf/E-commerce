@@ -169,18 +169,17 @@
   margin-top: 20px;
 }
 .otherimgswrapper{
-    width:125px;
+    width:115px;
     height: 140px;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: rgba(255, 255, 255, 0.192);
     border-radius: 10px;
     position: relative;
     margin-left: 6.5px;
 }
 .formRightSide .otherImgs img {
-    width: fit-content;
+    width: 150px;
     height: 130px;
     object-fit: contain;
     border-radius: 10px;

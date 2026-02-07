@@ -33,7 +33,7 @@ class ConversationController extends Controller
             'listing_id' => 'required|numeric',
             'message' => 'sometimes|min:3|max:255',
         ]);
-        $hasConvo = Conversation::where('listing_id', $convoData['listing_id'])->where('seller_id', $convoData['seller_id'])->where('buyer_id', $convoData['buyer_id'])->exists();
+        $hasConvo = Conversation::where('listing_id', $convoData['listing_id'])->where('seller_id',(int) $convoData['seller_id'])->where('buyer_id', $convoData['buyer_id'])->exists();
         if($hasConvo){
             return response()->json('conversation already exists', 400);
         }
